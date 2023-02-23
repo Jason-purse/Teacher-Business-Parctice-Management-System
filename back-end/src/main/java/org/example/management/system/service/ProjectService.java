@@ -41,6 +41,10 @@ public class ProjectService {
         // // TODO: 2023/2/22 删除条件待定
     }
 
+    public void deleteProjectById(Integer id) {
+        projectRepository.deleteById(id);
+    }
+
     public List<Project> findProjects(ProjectParam param, Pageable pageable) {
         Project project = BeanUtils.transformFrom(param, Project.class);
         assert project != null;

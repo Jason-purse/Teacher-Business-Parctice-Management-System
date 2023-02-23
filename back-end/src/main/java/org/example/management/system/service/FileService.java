@@ -1,6 +1,5 @@
 package org.example.management.system.service;
 
-import lombok.RequiredArgsConstructor;
 import org.example.management.system.config.SystemConfigProperties;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,11 @@ public class FileService {
 
     public FileService(SystemConfigProperties properties) {
         this.fileStoreDir = Paths.get(properties.getFileStoreDir());
-        this.canonicalFileStoreDirPath = fileStoreDir.toFile().getCanonicalPath();
+        try {
+            this.canonicalFileStoreDirPath = fileStoreDir.toFile().getCanonicalPath();
+        }catch (Exception e) {
+            throw new IllegalStateException("文件系统存储目录存在错误,请检查 !!!");
+        }
     }
 
     public String saveFile(InputStream inputStream,String directory,String filename) {
@@ -38,8 +41,10 @@ public class FileService {
     }
 
     public void deleteFile(String directory,String filename) {
+        // 进行字符串截取 !!!
+        int index = filename.indexOf(directory);
         try {
-            Files.deleteIfExists(fileStoreDir.resolve(directory).resolve(filename));
+            Files.deleteIfExists(fileStoreDir.resolve(directory).resolve(filename.substring(index + directory.length())));
         }catch (Exception e) {
             throw new IllegalArgumentException("文件删除失败,错误原因: " + e.getMessage());
         }

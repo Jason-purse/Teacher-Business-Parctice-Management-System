@@ -32,6 +32,27 @@ public class Dict implements Serializable {
 
     private String itemValue;
 
+    /**
+     * 支持流程？
+     */
+    @Column(name = "next_data_type")
+    private Integer nextDataType;
+
+
+    @Column(name = "previous_data_type")
+    private Integer previousDataType;
+
+    /**
+     * 支持流程
+     */
+    private Boolean supportFlow;
+
+    /**
+     *
+     */
+    private Boolean support;
+
+
     private String createTimeStr;
 
 
