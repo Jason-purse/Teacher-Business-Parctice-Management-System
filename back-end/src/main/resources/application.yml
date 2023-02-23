@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    username: admin
+    password: admin
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:file:./back-end/data/db
+    driver-class-name: org.h2.Driver
