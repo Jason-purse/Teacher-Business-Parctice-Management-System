@@ -2,6 +2,7 @@ package org.example.management.system.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.param.UserParam;
 import org.example.management.system.model.vo.UserVo;
@@ -69,7 +70,7 @@ public class UserController {
      */
     @ApiOperation(value = "获取用户列表且分页",notes = "用户名称左like, 邮箱精确匹配, 注册时间(区间匹配,通过提交startTimeAt / endTimeAt 处理),三者皆可空")
     @GetMapping("list")
-    public Page<UserVo> getAllUserDetails(UserParam userParam, Pageable pageable) {
+    public Page<UserVo> getAllUserDetails(UserParam userParam, @ApiParam("分页参数") Pageable pageable) {
         return userService.getAllUserDetailsByPage(userParam,pageable);
     }
 }
