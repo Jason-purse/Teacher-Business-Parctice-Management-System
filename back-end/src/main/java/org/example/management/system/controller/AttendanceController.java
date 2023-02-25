@@ -1,5 +1,6 @@
 package org.example.management.system.controller;
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.param.AttendanceParam;
 import org.example.management.system.model.vo.AttendanceVo;
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/attendance/v1")
 @RequiredArgsConstructor
+@Api
 public class AttendanceController {
 
     private final AttendanceService attendanceService;

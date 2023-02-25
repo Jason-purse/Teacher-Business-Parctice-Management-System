@@ -12,16 +12,5 @@ import java.util.List;
 public class ManagementConfiguration implements WebMvcConfigurer {
 
 
-    @Override
-    public void extendMessageConverters(@NotNull List<HttpMessageConverter<?>> converters) {
-        // 增加全局Result 处理
-        int index = converters.size();
-        for (int i = 0; i < converters.size(); i++) {
-            if (converters.get(i) instanceof MappingJackson2HttpMessageConverter) {
-                index = i;
-                break;
-            }
-        }
-        converters.add(index,new ResultMessageConverter());
-    }
+
 }

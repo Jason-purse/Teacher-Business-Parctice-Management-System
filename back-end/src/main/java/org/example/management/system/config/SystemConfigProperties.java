@@ -19,7 +19,7 @@ public class SystemConfigProperties {
     /**
      * 可以设置相对路径,或者绝对路径,根据操作系统文件系统路径进行设置
      */
-    private String fileStoreDir  = System.getProperty("user.home") + "teacher-bp-management-system";
+    private String fileStoreDir  = System.getProperty("user.home") + "/teacher-bp-management-system";
 
     public String getFileStoreDir() {
         return resolveDir(fileStoreDir);

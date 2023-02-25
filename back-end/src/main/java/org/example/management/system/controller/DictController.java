@@ -1,5 +1,6 @@
 package org.example.management.system.controller;
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.entity.Dict;
 import org.example.management.system.service.DictService;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/dict/v1")
 @RequiredArgsConstructor
+@Api
 public class DictController {
 
     private final DictService dictService;

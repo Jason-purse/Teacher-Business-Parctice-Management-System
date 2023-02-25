@@ -1,5 +1,6 @@
 package org.example.management.system.controller;
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.param.ReportParam;
 import org.example.management.system.service.ReportService;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/admin/report/v1")
 @RequiredArgsConstructor
+@Api
 public class ReportController {
 
     private final ReportService reportService;

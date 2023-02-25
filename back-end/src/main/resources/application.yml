@@ -5,3 +5,36 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:h2:file:./back-end/data/db
     driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    generate-ddl: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+lightning:
+  security:
+    auth:
+      server:
+        common:
+          component:
+            permission:
+              url-white-list:
+                - /api/user/v1/register/**
+                - /api/user/v1/delete/**
+                - /swagger-ui/**
+                - /swagger-resources/**
+                - /swagger-ui.html
+                - /v2/api-docs
+                - /webjars/**
+server:
+  port: 8090
+
+springfox:
+  documentation:
+    swagger-ui:
+      base-url: /
+    swagger:
+      v2:
+        enabled: true
