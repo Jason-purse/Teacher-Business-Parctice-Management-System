@@ -3,7 +3,9 @@ package org.example.management.system.service;
 import org.example.management.system.config.SystemConfigProperties;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,7 +22,7 @@ public class FileService {
     private final String canonicalFileStoreDirPath;
 
     public FileService(SystemConfigProperties properties) {
-        this.fileStoreDir = Paths.get(properties.getFileStoreDir());
+        this.fileStoreDir = Paths.get(URI.create(properties.getFileStoreDir()));
         try {
             this.canonicalFileStoreDirPath = fileStoreDir.toFile().getCanonicalPath();
         }catch (Exception e) {
@@ -31,8 +33,15 @@ public class FileService {
     public String saveFile(InputStream inputStream,String directory,String filename) {
         Path resolve = fileStoreDir.resolve(directory.trim()).resolve(filename.trim());
         try {
-            Files.copy(inputStream,resolve,
-                    StandardCopyOption.COPY_ATTRIBUTES,StandardCopyOption.REPLACE_EXISTING);
+            File file = resolve.toFile();
+            if (!file.exists()) {
+                File parentFile = file.getParentFile();
+                if(!parentFile.exists()) {
+                    parentFile.mkdirs();
+                }
+                file.createNewFile();
+            }
+            Files.copy(inputStream,resolve, StandardCopyOption.REPLACE_EXISTING);
             String canonicalPath = resolve.toFile().getCanonicalPath();
             return canonicalPath.substring(canonicalFileStoreDirPath.length());
         }catch (Exception e) {

@@ -15,6 +15,7 @@ import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,14 +35,14 @@ public class ReportService {
                         .build()
         ));
 
-        Assert.isTrue(reportContainer.isEmpty(),"当前项目对应的" + reportParam.getReportType() + "的报告已经存在,请不要重复提交 !!!");
+        Assert.isTrue(reportContainer.isEmpty(), "当前项目对应的" + reportParam.getReportType() + "的报告已经存在,请不要重复提交 !!!");
 
         // 判断它没有没有前置报告
         // 也就是前置报告的审核是否完成 ..
         Dict item = dictService.getDictItemById(reportParam.getReportType());
 
         // 表示 第一项(没事)
-        if(item.getPreviousDataType() != null && item.getPreviousDataType() != -1) {
+        if (item.getPreviousDataType() != null && item.getPreviousDataType() != -1) {
             Optional<Report> one = reportRepository.findOne(
                     Example.of(
                             Report
@@ -53,7 +54,7 @@ public class ReportService {
             );
 
             // 判断结束,允许创建 ...
-            Assert.isTrue(one.isPresent() && one.get().getFinished() != null && one.get().getFinished(),"无法创建报告类型为 " + item.getItemValue() + "的报告,因为前置报告不存在或者正在审核中 !!!");
+            Assert.isTrue(one.isPresent() && one.get().getFinished() != null && one.get().getFinished(), "无法创建报告类型为 " + item.getItemValue() + "的报告,因为前置报告不存在或者正在审核中 !!!");
         }
 
         Report value = BeanUtils.transformFrom(reportParam, Report.class);
@@ -66,11 +67,11 @@ public class ReportService {
 
         LightningUserContext
                 .get()
-                        .getUserPrincipal(SimpleUserPrincipal.class)
-                                .ifPresent(simpleUserPrincipal -> {
-                                    value.setSubmitUserId(simpleUserPrincipal.getUser().getId());
-                                    value.setSubmitUserName(simpleUserPrincipal.getUsername());
-                                });
+                .getUserPrincipal(SimpleUserPrincipal.class)
+                .ifPresent(simpleUserPrincipal -> {
+                    value.setSubmitUserId(simpleUserPrincipal.getUser().getId());
+                    value.setSubmitUserName(simpleUserPrincipal.getUsername());
+                });
 
 
         // 设置状态
@@ -83,12 +84,19 @@ public class ReportService {
 
     public void updateReport(ReportParam reportParam) {
         Optional<Report> reportContainer = reportRepository.findById(reportParam.getId());
-        Assert.isTrue(reportContainer.isPresent(),"当前报告不存在!!!");
+        Assert.isTrue(reportContainer.isPresent(), "当前报告不存在!!!");
         Report report = reportContainer.get();
-        Assert.isTrue(report.getCanModify() == null || report.getCanModify(),"当前报告处于审核中,无法修改!!!");
-        BeanUtils.updateProperties(reportParam,reportParam);
+        Assert.isTrue(report.getCanModify() == null || report.getCanModify(), "当前报告处于审核中,无法修改!!!");
+        BeanUtils.updateProperties(reportParam, reportParam);
         reportRepository.save(report);
     }
 
 
+    public List<Report> getReportList(Integer projectId) {
+        return reportRepository.findAll(Example.of(
+                Report.builder()
+                        .projectId(projectId)
+                        .build()
+        ));
+    }
 }

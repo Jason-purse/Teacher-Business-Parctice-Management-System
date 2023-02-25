@@ -51,8 +51,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: 'test',
+        password: '123456'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -108,8 +108,12 @@ export default {
         if (valid) {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+            let component = this.$message.success("登陆成功 !!!")
             this.loading = false
+            setTimeout(() => {
+              this.$router.push({ path: this.redirect || '/' })
+              component.close()
+            },500)
           }).catch(() => {
             this.loading = false
           })

@@ -3,11 +3,13 @@ package org.example.management.system.test.ApplicationTests;
 import org.example.management.system.ManagementSystemApplication;
 import org.example.management.system.model.entity.Dict;
 import org.example.management.system.repository.DictRepository;
+import org.example.management.system.repository.UserRepository;
 import org.example.management.system.utils.DateTimeUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -15,14 +17,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 @SpringBootTest(classes = ManagementSystemApplication.class)
+@Commit
 public class ApplicationTests {
 
     @Autowired
     private DictRepository dictRepository;
 
+    @Autowired
+    UserRepository userRepository;
 
     @Test
-    @Commit
     public void initDictData() {
         // 删除所有
         dictRepository.deleteAll();
@@ -372,7 +376,8 @@ public class ApplicationTests {
                         .build()
         );
 
-        dictRepository.saveAll(dicts);
+        dictRepository.saveAllAndFlush(dicts);
+
     }
 
 }

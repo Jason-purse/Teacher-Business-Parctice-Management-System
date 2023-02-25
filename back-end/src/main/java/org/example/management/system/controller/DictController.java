@@ -3,13 +3,11 @@ package org.example.management.system.controller;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.entity.Dict;
+import org.example.management.system.model.param.DictParam;
 import org.example.management.system.service.DictService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,6 +19,10 @@ public class DictController {
 
     private final DictService dictService;
 
+    @PostMapping("init/all")
+    public void initAllDicts() {
+        dictService.initAllDicts();
+    }
 
     @GetMapping("{id}")
     public Dict getDictById(@PathVariable("id") Integer id) {
@@ -33,8 +35,8 @@ public class DictController {
     }
 
     @GetMapping("list/page")
-    public Page<Dict> getAllDictDataTypesByPage(Pageable pageable) {
-        return dictService.getAllDictDataTypesByPage(pageable);
+    public Page<Dict> getAllDictDataTypesByPage(DictParam param, Pageable pageable) {
+        return dictService.getAllDictDataTypesByPage(param,pageable);
     }
 
     @GetMapping("by/datatype")

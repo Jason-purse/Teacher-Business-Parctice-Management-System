@@ -5,6 +5,7 @@ package org.example.management.system.service;
 import com.generatera.authorization.application.server.form.login.config.components.LightningUserDetailService;
 import com.generatera.security.authorization.server.specification.LightningUserPrincipal;
 import com.jianyue.lightning.boot.starter.util.BeanUtils;
+import com.jianyue.lightning.boot.starter.util.ElvisUtil;
 import com.jianyue.lightning.boot.starter.util.OptionalFlux;
 import com.jianyue.lightning.boot.starter.util.StreamUtil;
 import com.jianyue.lightning.boot.starter.util.lambda.LambdaUtils;
@@ -19,6 +20,7 @@ import org.example.management.system.model.security.SimpleUserPrincipal;
 import org.example.management.system.model.vo.UserVo;
 import org.example.management.system.repository.UserRepository;
 import org.example.management.system.utils.DateTimeUtils;
+import org.example.management.system.utils.EscapeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -93,10 +95,12 @@ public class UserService implements LightningUserDetailService {
 
     @Override
     public LightningUserPrincipal mapAuthenticatedUser(LightningUserPrincipal userPrincipal) {
-        SimpleUserPrincipal principal = (SimpleUserPrincipal) userPrincipal;
+        if (userPrincipal instanceof SimpleUserPrincipal principal) {
+            // 给定一个认证的不可变的用户信息 !!!
+            return SimpleUserPrincipal.authenticated(principal.getUser(),principal.getAuthorities());
+        }
 
-        // 给定一个认证的不可变的用户信息 !!!
-        return SimpleUserPrincipal.authenticated(principal.getUser(),principal.getAuthorities());
+        return userPrincipal;
     }
 
     public Page<UserVo> getAllUserDetailsByPage(UserParam userParam, Pageable pageable) {
@@ -133,17 +137,17 @@ public class UserService implements LightningUserDetailService {
         @Override
         public Predicate toPredicate(@NotNull Root<User> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
             return
-            of(email)
+            of(ElvisUtil.stringElvis(email,null))
                 .map(emailEle -> criteriaBuilder.equal(
                            root.get(LambdaUtils.getPropertyNameForLambda(User::getEmail)),
-                           email
+                        emailEle.trim()
                    )
                 )
                 .orElse(
-                    of(username)
+                    of(ElvisUtil.stringElvis(username,null))
                         .map(userName -> {
                             Path<String> path = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getUsername));
-                            return criteriaBuilder.like(path, username);
+                            return criteriaBuilder.like(path, EscapeUtil.escapeExprSpecialWord(userName.trim()).concat("%"));
                         })
                         .<Predicate>getResult()
                 )

@@ -40,22 +40,24 @@ public class ResultMessageConverter extends MappingJackson2HttpMessageConverter 
 
     @Override
     protected void writeInternal(@NotNull Object object, Type type, @NotNull HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
-        HttpServletRequest request = HttpRequestUtil.getCurrentHttpServletRequest();
-        if(request != null) {
-            String requestURI = request.getRequestURI();
-            boolean needWrapper = true;
-            if(whiteUrlList != null && whiteUrlList.size() > 0) {
-                for (String s : whiteUrlList) {
-                    if (antPathMatcher.match(s,requestURI)) {
-                        needWrapper = false;
-                        break;
+        if(!(object instanceof Result<?>)) {
+            HttpServletRequest request = HttpRequestUtil.getCurrentHttpServletRequest();
+            if(request != null) {
+                String requestURI = request.getRequestURI();
+                boolean needWrapper = true;
+                if(whiteUrlList != null && whiteUrlList.size() > 0) {
+                    for (String s : whiteUrlList) {
+                        if (antPathMatcher.match(s,requestURI)) {
+                            needWrapper = false;
+                            break;
+                        }
                     }
+
                 }
 
-            }
-
-            if(needWrapper) {
-                object = ResultExt.success(object);
+                if(needWrapper) {
+                    object = ResultExt.success(object);
+                }
             }
         }
 
