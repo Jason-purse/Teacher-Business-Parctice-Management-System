@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.vo.AttachmentVo;
 import org.example.management.system.service.AttachmentService;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ public class AttachmentController {
      */
     @PostMapping("upload")
     public AttachmentVo uploadAttachment(MultipartFile file) {
+        Assert.notNull(file,"form parameter name  of file must be file!!!");
         return attachmentService.updateAttachment(file);
     }
 
