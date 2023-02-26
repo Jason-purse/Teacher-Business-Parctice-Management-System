@@ -19,13 +19,13 @@
     <el-table
       :data="tableData"
       style="width: 100%">
-      <el-table-column label="标识符" prop="itemType"/>
-      <el-table-column label="字典项值" prop="itemValue"/>
-      <el-table-column label="支持流程" prop="supportFlow" :formatter="value => value && '支持'|| '不支持'"/>
-      <el-table-column label="创建时间" prop="createTimeStr"/>
-      <el-table-column label="操作" width="250px" align="center">
-        <el-button @click="commit('reject')" type="danger">删除</el-button>
-      </el-table-column>
+      <el-table-column type="index" label="序号" />
+      <el-table-column label="标识符" prop="itemType" align="center"/>
+      <el-table-column label="字典项值" prop="itemValue" align="center"/>
+      <el-table-column label="创建时间" prop="createTimeStr" align="center"/>
+<!--      <el-table-column label="操作" width="250px" align="center">-->
+<!--        <el-button @click="commit('reject')" type="danger">删除</el-button>-->
+<!--      </el-table-column>-->
     </el-table>
 
     <div style="margin-top: 5px;text-align: right;">
@@ -60,13 +60,13 @@ export default {
   },
 
   created() {
-    this.getDataFunc()
+    this.onSubmit()
   },
   methods: {
     ...backendStyle.methods,
     ...dict.methods,
     getDataFunc() {
-      return this.getAllDictByPage(this.searchForm, this.pager).then(({result}) => {
+      return this.getAllDictByPage(this.getSearchform(), this.pager).then(({result}) => {
         this.tableData = result.content;
       })
     },

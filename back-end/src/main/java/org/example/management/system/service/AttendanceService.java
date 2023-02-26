@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.persistence.criteria.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -75,18 +77,21 @@ public class AttendanceService {
         Assert.isTrue(attendance.isEmpty(), "今日已打开,请勿重复打卡 !!!");
         Attendance attendance1 = BeanUtils.transformFrom(attendanceParam, Attendance.class);
         assert attendance1 != null;
+        long startTimeOfDay = DateTimeUtils.getStartTimeOfDay();
+        attendance1.setCreateAt(startTimeOfDay);
+        attendance1.setCreateTimeStr(DateTimeUtils.getTimeStr(LocalDate.now().atStartOfDay()));
         attendanceRepository.save(attendance1);
     }
 
     /**
      * 查询条件,复合查询,且分页
      */
-    public List<AttendanceVo> getAttendanceInfosByPage(AttendanceParam attendanceParam, Pageable pageable) {
+    public Page<AttendanceVo> getAttendanceInfosByPage(AttendanceParam attendanceParam, Pageable pageable) {
 
         Page<Attendance> all = attendanceRepository
                 .findAll(
                         new ComplexSpecification(
-                                attendanceParam.getUserName(),
+                                attendanceParam.getUsername(),
                                 attendanceParam.getStartTimeAt(),
                                 attendanceParam.getEndTimeAt()),
                         pageable

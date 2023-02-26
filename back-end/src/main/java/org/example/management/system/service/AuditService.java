@@ -92,11 +92,26 @@ public class AuditService {
             if (!nextPhase) {
                 report.setStatus(statusItem.getId());
                 // 置为空,表示已经完成 ...
-                report.setAuditPhase(null);
+                // 停留在 最后阶段
+//                report.setAuditPhase(null);
                 // 完成 ...
                 report.setFinished(true);
                 // 可以被删除 !!!
                 report.setCanModify(true);
+
+                // 判断是否为最后一个报告 ...
+                Dict dict = dictService.getDictItemById(report.getReportType());
+                if(dict.getNextDataTypeID() == null) {
+                    // 表示最后一个报告 ...
+                    Optional<Project> project = projectRepository.findById(report.getProjectId());
+                    project.ifPresent(ele -> {
+                        Dict running  = dictService.getDictItemById(ele.getStatus());
+                        Dict finish = dictService.getDictItemById(running.getNextDataTypeID());
+                        ele.setStatus(finish.getId());
+                        // 完成
+                        ele.setFinished(true);
+                    });
+                }
             }
         }
 
@@ -119,6 +134,8 @@ public class AuditService {
             Integer nextDataTypeID = firstAuditStatus.getNextDataTypeID();
             // 进入下一个阶段 ..
             ele.setStatus(nextDataTypeID);
+            // pending 状态
+            ele.setFailureFlag(null);
 
             // 其余情况已经自动转变 ...
             if(ele.getAuditPhase() == null) {

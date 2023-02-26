@@ -121,8 +121,8 @@ export default {
     return {
       searchForm: {
         username: '',
-        startTimeAt: '',
-        endTimeAt: ''
+        startTimeAt: null,
+        endTimeAt: null
       },
       tableData: [],
       drawerFlag: false,
@@ -149,12 +149,10 @@ export default {
     ...dict.methods,
     ...user.methods,
     getDataFunc() {
-      let data = this.getAllUsersByPage(this.searchForm, this.pager).then(({result}) => {
+      return this.getAllUsersByPage(this.getSearchform(), this.pager).then(({result}) => {
         this.tableData = result.content;
         return result
       })
-      console.log("data ", data)
-      return data
     },
     saveUser() {
       if (!this.drawerAction) {

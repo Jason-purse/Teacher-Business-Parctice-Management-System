@@ -92,10 +92,12 @@
                       <template v-if="!row.auditUserId">
                         <el-button size="small" type="primary" @click="addAuditUser(row)">指派审核</el-button>
                       </template>
-                      <template v-else-if="row.failureFlag !== null">
+                      <template v-else-if="row.failureFlag !== null && row.failureFlag">
                         <el-button size="small" type="success" @click="restoreReportAction(row)">重新申请</el-button>
                       </template>
-                      <el-button size="small" type="danger" @click="deleteReportDialogHandle(row)">删除</el-button>
+                      <el-button :disabled="row.finished" size="small" type="danger"
+                                 @click="deleteReportDialogHandle(row)">删除
+                      </el-button>
                     </template>
                   </el-table-column>
                 </el-table-column>
@@ -255,7 +257,6 @@
       title="审核结果-历史记录"
       :visible.sync="auditResult.visible"
       width="60%"
-      style="max-height: 600px;"
       @close="auditResult.visible = false; auditResult.description = ''">
       <span>{{ auditResult.description }}</span>
       <span slot="footer" class="dialog-footer">
@@ -438,6 +439,13 @@ export default {
           this.onSubmit()
           this.closeDrawer()
         })
+      }
+
+      // 优化可见性
+      this.currentRow = {
+        row: null,
+        index: -1,
+        reportList: []
       }
     },
     openDialogCommitReport(row) {

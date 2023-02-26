@@ -301,12 +301,12 @@ public class DictService {
 
         dicts.add(
                 Dict.builder()
-                        .id(28)
+                        .id(14)
                         .itemType("un_audit")
                         .itemValue("待指派审核")
                         .parentDataType(REPORT_STATUS)
                         .supportFlow(true)
-                        .nextDataTypeID(14)
+                        .nextDataTypeID(15)
                         .previousDataTypeID(FIRST_ITEM_IDENTIFY)
                         .createAt(createAt)
                         .createTimeStr(timeStr)
@@ -315,13 +315,13 @@ public class DictService {
 
         dicts.add(
                 Dict.builder()
-                        .id(14)
+                        .id(15)
                         .itemType("auditing")
                         .itemValue("审核中")
                         .parentDataType(REPORT_STATUS)
                         .supportFlow(true)
-                        .nextDataTypeID(15)
-                        .previousDataTypeID(28)
+                        .nextDataTypeID(16)
+                        .previousDataTypeID(14)
                         .createAt(createAt)
                         .createTimeStr(timeStr)
                         .build()
@@ -329,7 +329,7 @@ public class DictService {
 
         dicts.add(
                 Dict.builder()
-                        .id(15)
+                        .id(16)
                         .itemType("audit_success")
                         .itemValue("审核成功")
                         .parentDataType(REPORT_STATUS)
@@ -341,7 +341,7 @@ public class DictService {
 
         dicts.add(
                 Dict.builder()
-                        .id(16)
+                        .id(17)
                         .itemType("audit_failure")
                         .itemValue("审核失败")
                         .parentDataType(REPORT_STATUS)
@@ -353,7 +353,7 @@ public class DictService {
 
         dicts.add(
                 Dict.builder()
-                        .id(17)
+                        .id(18)
                         .itemType(AUDIT_PHASE)
                         .itemValue("审核阶段")
                         .parentDataType(ROOT)
@@ -364,12 +364,12 @@ public class DictService {
         );
         dicts.add(
                 Dict.builder()
-                        .id(18)
+                        .id(19)
                         .itemType("auditor_audit_phase")
                         .itemValue("审核员审核")
                         .parentDataType(AUDIT_PHASE)
                         .supportFlow(true)
-                        .nextDataTypeID(19)
+                        .nextDataTypeID(20)
                         .previousDataTypeID(FIRST_ITEM_IDENTIFY)
                         .createAt(createAt)
                         .createTimeStr(timeStr)
@@ -377,25 +377,12 @@ public class DictService {
         );
         dicts.add(
                 Dict.builder()
-                        .id(19)
+                        .id(20)
                         .itemType("leader_audit_phase")
                         .itemValue("领导审核")
                         .parentDataType(AUDIT_PHASE)
                         .supportFlow(true)
-                        .nextDataTypeID(20)
-                        .previousDataTypeID(18)
-                        .createAt(createAt)
-                        .createTimeStr(timeStr)
-                        .build()
-        );
-
-        dicts.add(
-                Dict.builder()
-                        .id(20)
-                        .itemType("enterprise_audit_phase")
-                        .itemValue("企业负责人审核")
-                        .parentDataType(AUDIT_PHASE)
-                        .supportFlow(true)
+                        .nextDataTypeID(21)
                         .previousDataTypeID(19)
                         .createAt(createAt)
                         .createTimeStr(timeStr)
@@ -405,6 +392,19 @@ public class DictService {
         dicts.add(
                 Dict.builder()
                         .id(21)
+                        .itemType("enterprise_audit_phase")
+                        .itemValue("企业负责人审核")
+                        .parentDataType(AUDIT_PHASE)
+                        .supportFlow(true)
+                        .previousDataTypeID(20)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(22)
                         .itemType(REPORT_TYPE)
                         .itemValue("报告类型")
                         .parentDataType(ROOT)
@@ -416,12 +416,12 @@ public class DictService {
 
         dicts.add(
                 Dict.builder()
-                        .id(22)
+                        .id(23)
                         .itemType("request_report")
                         .itemValue("申请报告")
                         .parentDataType(REPORT_TYPE)
                         .supportFlow(true)
-                        .nextDataTypeID(23)
+                        .nextDataTypeID(24)
                         .previousDataTypeID(FIRST_ITEM_IDENTIFY)
                         .createAt(createAt)
                         .createTimeStr(timeStr)
@@ -430,25 +430,12 @@ public class DictService {
 
         dicts.add(
                 Dict.builder()
-                        .id(23)
+                        .id(24)
                         .itemType("phase_report")
                         .itemValue("阶段性报告")
                         .parentDataType(REPORT_TYPE)
                         .supportFlow(true)
-                        .nextDataTypeID(24)
-                        .previousDataTypeID(22)
-                        .createAt(createAt)
-                        .createTimeStr(timeStr)
-                        .build()
-        );
-
-        dicts.add(
-                Dict.builder()
-                        .id(24)
-                        .itemType("summarize_report")
-                        .itemValue("总结报告")
-                        .parentDataType(REPORT_TYPE)
-                        .supportFlow(true)
+                        .nextDataTypeID(25)
                         .previousDataTypeID(23)
                         .createAt(createAt)
                         .createTimeStr(timeStr)
@@ -458,6 +445,19 @@ public class DictService {
         dicts.add(
                 Dict.builder()
                         .id(25)
+                        .itemType("summarize_report")
+                        .itemValue("总结报告")
+                        .parentDataType(REPORT_TYPE)
+                        .supportFlow(true)
+                        .previousDataTypeID(24)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(26)
                         .itemType(REPORT_FORMAT)
                         .itemValue("报告类型")
                         .parentDataType(ROOT)
@@ -469,7 +469,7 @@ public class DictService {
 
         dicts.add(
                 Dict.builder()
-                        .id(26)
+                        .id(27)
                         .itemType("word_report_type")
                         .itemValue("word文档")
                         .parentDataType(REPORT_FORMAT)
@@ -481,10 +481,46 @@ public class DictService {
 
         dicts.add(
                 Dict.builder()
-                        .id(27)
+                        .id(28)
                         .itemType("pdf_report_type")
                         .itemValue("pdf文档")
                         .parentDataType(REPORT_FORMAT)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(29)
+                        .itemType(ATTENDANCE_STATUS)
+                        .itemValue("考勤状态")
+                        .parentDataType(ROOT)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(30)
+                        .itemType("attendanced")
+                        .itemValue("已考勤")
+                        .parentDataType(ATTENDANCE_STATUS)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(31)
+                        .itemType("un_attendanced")
+                        .itemValue("未考勤")
+                        .parentDataType(ATTENDANCE_STATUS)
                         .supportFlow(false)
                         .createAt(createAt)
                         .createTimeStr(timeStr)

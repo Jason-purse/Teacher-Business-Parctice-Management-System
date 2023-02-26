@@ -19,7 +19,7 @@ public class AttendanceParam {
     /**
      * 打卡人名称
      */
-    private String userName;
+    private String username;
 
 
     /**

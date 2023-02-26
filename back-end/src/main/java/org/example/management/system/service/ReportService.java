@@ -85,10 +85,15 @@ public class ReportService {
         // 设置进入下一个阶段 ...
         Integer status = projectValue.getStatus();
         Dict dict = dictService.getDictItemById(status);
-        Dict nextStatus = dictService.getDictItemById(dict.getNextDataTypeID());
-        // 表示无法被删除,且进入进行中
-        projectValue.setFinished(false);
-        projectValue.setStatus(nextStatus.getId());
+
+        // 只有第一次才需要改变状态
+        Dict flow = dictService.getFirstDataItemInFlow(DictConstant.PROJECT_STATUS);
+        if(status.equals(flow.getId())) {
+            Dict nextStatus = dictService.getDictItemById(dict.getNextDataTypeID());
+            // 表示无法被删除,且进入进行中
+            projectValue.setFinished(false);
+            projectValue.setStatus(nextStatus.getId());
+        }
         projectRepository.save(projectValue);
     }
 

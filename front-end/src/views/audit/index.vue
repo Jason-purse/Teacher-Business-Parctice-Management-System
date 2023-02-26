@@ -47,17 +47,17 @@
       <el-table-column label="发起人" prop="submitUserName"/>
       <el-table-column label="审核阶段" prop="auditPhase">
         <template v-slot="{row:{auditPhase}}">
-          {{mapDictItemValue('auditPhase',auditPhase)}}
+          {{ mapDictItemValue('auditPhase', auditPhase) }}
         </template>
       </el-table-column>
       <el-table-column label="报告类型" prop="reportType">
         <template v-slot="{row:{reportType}}">
-          {{mapDictItemValue('reportTypes',reportType)}}
+          {{ mapDictItemValue('reportTypes', reportType) }}
         </template>
       </el-table-column>
       <el-table-column label="报告格式" prop="reportFormat">
         <template v-slot="{row:{reportFormat}}">
-          {{mapDictItemValue('reportFormat',reportFormat)}}
+          {{ mapDictItemValue('reportFormat', reportFormat) }}
         </template>
       </el-table-column>
       <el-table-column label="文件预览">
@@ -65,10 +65,10 @@
           点击文件预览
         </template>
       </el-table-column>
-      <el-table-column label="提交时间" prop="createTimeStr" />
+      <el-table-column label="提交时间" prop="createTimeStr"/>
       <el-table-column label="状态" align="center">
         <template v-slot="{row: {status}}">
-          {{mapDictItemValue('auditStatus',status)}}
+          {{ mapDictItemValue('auditStatus', status) }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="250px" align="center">
@@ -98,17 +98,23 @@
     <el-dialog title="审核确认" :visible.sync="audit.visible" width="80%" @close="auditDialogCancel()">
       <div>
         <div class="search-line">
-          <el-form  ref="auditForm" :model="audit.form" class="search-form">
+          <el-form ref="auditForm" :model="audit.form" class="search-form">
             <el-form-item label="通过原因" v-if="audit.flag">
-              <el-input :autosize="{minRows: 3,maxRows: 10}" maxlength="500" show-word-limit  v-model="audit.form.successDescription" type="textarea" placeholder="请输入通过原因(可选)"></el-input>
+              <el-input :autosize="{minRows: 3,maxRows: 10}" maxlength="500" show-word-limit
+                        v-model="audit.form.successDescription" type="textarea"
+                        placeholder="请输入通过原因(可选)"></el-input>
             </el-form-item>
             <el-form-item label="打回原因" v-else>
-              <el-input :autosize="{minRows: 3,maxRows: 10}" maxlength="500" show-word-limit  v-model="audit.form.failureReason" type="textarea" placeholder="请输入打回原因(可选)"></el-input>
+              <el-input :autosize="{minRows: 3,maxRows: 10}" maxlength="500" show-word-limit
+                        v-model="audit.form.failureReason" type="textarea"
+                        placeholder="请输入打回原因(可选)"></el-input>
             </el-form-item>
           </el-form>
         </div>
         <div slot="footer" class="dialog-footer" :style="{textAlign: 'right'}">
-          <el-button :type="audit.flag ? 'success': 'danger'" @click="updateAuditAction">{{audit.flag ? '打回' : '通过'}}</el-button>
+          <el-button :type="audit.flag ? 'success': 'danger'" @click="updateAuditAction">
+            {{ audit.flag ? '打回' : '通过' }}
+          </el-button>
         </div>
       </div>
     </el-dialog>
@@ -131,8 +137,8 @@ export default {
         reportName: "",
         requestUser: "",
         auditPhase: "",
-        startTimeAt: '',
-        endTimeAt: '',
+        startTimeAt: null,
+        endTimeAt: null,
         creatTimeAt: '',
       },
       tableData: [],
@@ -140,11 +146,11 @@ export default {
         flag: false,
         visible: false,
         row: null, // 当前行
-       form: {
-         successDescription: '',
-         failureReason: '',
-         failureFlag: false, // 默认成功
-       }
+        form: {
+          successDescription: '',
+          failureReason: '',
+          failureFlag: false, // 默认成功
+        }
       },
       ...backendStyle.data()
     }
@@ -175,17 +181,20 @@ export default {
       this.audit.visible = true;
     },
     updateAuditAction() {
-      let value = {...this.audit.row,reportId: this.audit.row.id,... this.audit.form}
+      let value = {...this.audit.row, reportId: this.audit.row.id, ...this.audit.form}
       this.auditUpdate(value).then(() => {
         this.$message.success("审核完成 !!!")
-        this.audit = {}
+        this.audit = {
+          visible: false,
+          form: {}
+        }
         // 提交即可 ...
         this.onSubmit()
       })
     },
 
     getDataFunc() {
-      return this.getAllReportsForAudit(this.searchForm, this.pager).then(({result}) => {
+      return this.getAllReportsForAudit(this.getSearchform(), this.pager).then(({result}) => {
         this.tableData = result.content.map((ele, index) => {
           ele.index = index;
           return ele

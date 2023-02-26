@@ -25,6 +25,8 @@ public class DictConstant {
 
     public static final String AUDIT_FINALLY_PHASE = "audit_failure";
 
+    public static final String ATTENDANCE_STATUS = "attendance_status";
+
     public static final Integer FIRST_ITEM_IDENTIFY = -1;
 
 }

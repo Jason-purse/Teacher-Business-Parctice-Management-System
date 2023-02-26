@@ -1,10 +1,13 @@
 package org.example.management.system.controller;
 
+import com.generatera.security.authorization.server.specification.LightningUserContext;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.param.AttendanceParam;
+import org.example.management.system.model.security.SimpleUserPrincipal;
 import org.example.management.system.model.vo.AttendanceVo;
 import org.example.management.system.service.AttendanceService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +31,7 @@ public class AttendanceController {
      * 获取考勤详情 !!!
      */
     @GetMapping("list")
-    public List<AttendanceVo> getAllAttendancesByPage(
+    public Page<AttendanceVo> getAllAttendancesByPage(
             AttendanceParam param,
             Pageable pageable) {
         return attendanceService.getAttendanceInfosByPage(param, pageable);
@@ -39,7 +42,14 @@ public class AttendanceController {
      * 创建考勤 ...
      */
     @PostMapping
-    public void createAttendance(@RequestBody AttendanceParam attendanceParam) {
+    public void createAttendance() {
+        AttendanceParam attendanceParam = new AttendanceParam();
+        LightningUserContext.get()
+                        .getUserPrincipal(SimpleUserPrincipal.class)
+                                .ifPresent(user -> {
+                                    attendanceParam.setUserId(user.getUser().getId());
+                                    attendanceParam.setUsername(user.getName());
+                                });
         attendanceService.createAttendanceInfo(attendanceParam);
     }
 }
