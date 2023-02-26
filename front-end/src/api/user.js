@@ -7,7 +7,7 @@ const loginMainUrl = "/api/login/v1";
 const apiEndpoints = {
   getAllUsersByPageUrl: `${mainUrl}/list`,
   deleteUserByIdUrl: `${mainUrl}/delete`,
-  updateUserUrl: `${mainUrl}`
+  updateUserUrl: `${mainUrl}`,
 }
 const loginEndpoints = {
   registerUrl: `${loginMainUrl}/register`
@@ -47,15 +47,19 @@ export default {
           pager
         }
       })
+        .then(data => {
+          pager.total = data.result.totalElements || 0
+          return data;
+        })
     },
     deleteUserById(id) {
       return request.delete(apiEndpoints.deleteUserByIdUrl.concat(`/${id}`))
     },
     registerUser(param) {
-      return request.post(loginEndpoints.registerUrl,param)
+      return request.post(loginEndpoints.registerUrl, param)
     },
     updateUser(param) {
-      return request.put(apiEndpoints.updateUserUrl,param)
+      return request.put(apiEndpoints.updateUserUrl, param)
     }
   }
 }

@@ -13,8 +13,32 @@ public class AuditParam {
 
     private Integer  reportId;
 
-    private String failureReason;
+    private String reportName;
 
+    private Integer auditUserId;
+
+    private String auditUserName;
+
+   // ------------------ 真正进行审核的需要 -----------------
+    private String failureReason;
+    /**
+     * 成功描述
+     */
+    private String successDescription;
+
+    /**
+     * 是否失败
+     */
     private Boolean failureFlag;
+
+    private String projectName;
+
+    private String submitUserName;
+
+    private Integer auditPhase;
+
+    private Long startTimeAt;
+
+    private Long endTimeAt;
 
 }

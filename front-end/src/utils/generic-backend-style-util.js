@@ -5,12 +5,17 @@
  * 以及表格分页处理 ...
  */
 
-const validTimeRange = function (identity) {
-  let searchForm = this.searchForm;
-  if (searchForm.startTimeAt && searchForm.endTimeAt) {
-    if (!(searchForm.startTimeAt < searchForm.endTimeAt)) {
-      this.$message.warning("结束时间必须大于开始时间 !!!")
-      searchForm[identity] = '';
+const validTimeRange = function (identity, form = 'searchForm') {
+  let searchForm = this[form];
+  if (typeof form === 'object') {
+    searchForm = form;
+  }
+  if (form != null) {
+    if (searchForm.startTimeAt && searchForm.endTimeAt) {
+      if (!(searchForm.startTimeAt < searchForm.endTimeAt)) {
+        this.$message.warning("结束时间必须大于开始时间 !!!")
+        searchForm[identity] = '';
+      }
     }
   }
 }
@@ -25,22 +30,37 @@ export default {
         endTimeAt: this.searchForm.endTimeAt?.getTime()
       };
     },
-    onSubmit() {
-      let searchForm = this.searchForm;
-      this.getDataFunc(searchForm).then(response => {
-      }, error => {
-        this.$message.warning(error?.message || "系统错误 !!!`")
-      })
+    onSubmit(form = 'searchForm') {
+      let searchForm = this[form];
+      if (typeof form === 'object') {
+        searchForm = form;
+      }
+      this.getDataFunc(searchForm)
+        .then((result) => {
+          // 第一页不需要额外处理 ...
+          if(this.pager.page > 0 && result && result.totalPages && result.totalPages <= 1) {
+            this.pager.page = 0;
+            this.onSubmit()
+          }
+          this.pager.total = result?.totalElements || 0
+        })
+        .catch(error => {
+          this.$message.warning(error?.message || "系统错误 !!!`")
+        })
     },
     onReset() {
       this.$refs['searchForm'].resetFields()
       console.log(this.$refs)
+    },
+    onCancel(form) {
+      this[form].visible = false;
+      this.$refs[form]?.resetFields()
     }
   },
   data() {
     return {
       pager: {
-        page: 0,
+        page: 1,
         size: 10,
         total: 0
       }

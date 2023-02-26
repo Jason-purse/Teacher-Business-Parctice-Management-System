@@ -6,6 +6,7 @@ import com.jianyue.lightning.boot.starter.util.OptionalFlux;
 import com.jianyue.lightning.boot.starter.util.lambda.LambdaUtils;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.example.management.system.model.constant.DictConstant;
 import org.example.management.system.model.entity.Dict;
 import org.example.management.system.model.entity.Project;
 import org.example.management.system.model.param.ProjectParam;
@@ -36,16 +37,19 @@ public class ProjectService {
 
     private final DictService dictService;
 
+    private final ReportService reportService;
+
     public void createProject(ProjectParam param) {
        Project project = BeanUtils.transformFrom(param, Project.class);
         assert project != null;
-        Dict dataType = dictService.getDictByItemType("project_status");
-        Dict item = dictService.getFirstDataItemInFlow(dataType.getId());
+        Dict item = dictService.getFirstDataItemInFlow(DictConstant.PROJECT_STATUS);
         project.setStatus(item.getId());
 
         LocalDateTime now = LocalDateTime.now();
         project.setCreateAt(DateTimeUtils.getTimeOfDay(now));
         project.setCreateTimeStr(DateTimeUtils.getTimeStr(now));
+        // 可以删除空项目
+        project.setFinished(true);
         // 设置项目状态
         // 不需要做重复性判断
         projectRepository.save(project);
@@ -67,7 +71,13 @@ public class ProjectService {
     }
 
     public void deleteProjectById(Integer id) {
-        projectRepository.deleteById(id);
+        Optional<Project> project = projectRepository.findById(id);
+        project.ifPresent(ele -> {
+            Assert.isTrue(ele.getFinished(),"当前项目正在进行中,无法删除 !!!");
+            projectRepository.deleteById(id);
+            // 删除关联的项目
+            reportService.deleteReportsByProjectId(ele.getId());
+        });
     }
 
     public Page<Project> findProjects(ProjectParam param, Pageable pageable) {

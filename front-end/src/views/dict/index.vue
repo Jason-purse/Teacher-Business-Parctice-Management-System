@@ -66,7 +66,7 @@ export default {
     ...backendStyle.methods,
     ...dict.methods,
     getDataFunc() {
-      this.getAllDictByPage(this.searchForm, this.pager).then(({result}) => {
+      return this.getAllDictByPage(this.searchForm, this.pager).then(({result}) => {
         this.tableData = result.content;
       })
     },

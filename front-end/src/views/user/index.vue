@@ -149,9 +149,12 @@ export default {
     ...dict.methods,
     ...user.methods,
     getDataFunc() {
-      return this.getAllUsersByPage(this.searchForm, this.pager).then(({result}) => {
+      let data = this.getAllUsersByPage(this.searchForm, this.pager).then(({result}) => {
         this.tableData = result.content;
+        return result
       })
+      console.log("data ", data)
+      return data
     },
     saveUser() {
       if (!this.drawerAction) {
@@ -167,7 +170,7 @@ export default {
       }
     },
     openDrawer(action) {
-      if(action) {
+      if (action) {
         this.drawerAction = true
       }
       this.drawerFlag = true
@@ -195,19 +198,19 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .scroll-view {
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    max-height: 100%;
-    position: relative;
+.scroll-view {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  max-height: 100%;
+  position: relative;
 
-    .search-form {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-    }
+  .search-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
   }
+}
 </style>

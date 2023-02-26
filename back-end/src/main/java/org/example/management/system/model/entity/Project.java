@@ -37,6 +37,11 @@ public class Project implements Serializable {
      */
     private Integer status;
 
+    /**
+     * 是否完成
+     */
+    private Boolean finished;
+
 
     private String createTimeStr;
 

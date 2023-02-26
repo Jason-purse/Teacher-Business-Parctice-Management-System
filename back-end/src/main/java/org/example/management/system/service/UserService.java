@@ -14,6 +14,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.entity.Attendance;
+import org.example.management.system.model.entity.RoleRRAuditPhase;
+import org.example.management.system.model.entity.RoleRRU;
 import org.example.management.system.model.entity.User;
 import org.example.management.system.model.param.UserParam;
 import org.example.management.system.model.security.SimpleUserPrincipal;
@@ -37,6 +39,7 @@ import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.jianyue.lightning.boot.starter.util.OptionalFlux.of;
@@ -49,6 +52,8 @@ import static com.jianyue.lightning.boot.starter.util.OptionalFlux.of;
 public class UserService implements LightningUserDetailService {
 
     private final UserRepository userRepository;
+
+    private final RoleService roleService;
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return SimpleUserPrincipal.unAuthenticated(
@@ -119,6 +124,41 @@ public class UserService implements LightningUserDetailService {
                             all.getPageable(), all.getTotalElements()
                     );
                 })
+                .getResult();
+    }
+
+    public Page<UserVo> getAllUserDetailsForAudit(Integer auditPhaseId,UserParam userParam,Pageable pageable) {
+        if(ElvisUtil.stringElvis(userParam.getUsername(),null) != null  ||
+           userParam.getStartTimeAt() != null || userParam.getEndTimeAt() != null) {
+
+            // 先查询然后查询角色表 ...
+            List<User> all = userRepository.findAll(new ComplexSpecification(userParam.getUsername(),userParam.getEmail(), userParam.getStartTimeAt(), userParam.getEndTimeAt()));
+            if(all.size() == 0) {
+                return Page.empty();
+            }
+            List<Integer> userIds = all.stream().map(User::getId).toList();
+            Page<RoleRRU> roleRRUS = roleService.getUserIdForAuditPhase(auditPhaseId, userIds, pageable);
+            return getUserVos(pageable,roleRRUS);
+        }
+        else {
+            Page<RoleRRU> roleRRUS = roleService.getUserIdForAuditPhase(auditPhaseId, pageable);
+            if(roleRRUS.getNumberOfElements() == 0) {
+                // 表示没有
+                return new PageImpl<>(Collections.emptyList(),pageable,roleRRUS.getTotalElements());
+            }
+            else {
+                return getUserVos(pageable, roleRRUS);
+            }
+        }
+    }
+
+    private Page<UserVo> getUserVos(Pageable pageable, Page<RoleRRU> roleRRUS) {
+        List<RoleRRU> content = roleRRUS.getContent();
+        List<Integer> userIds = content.stream().map(RoleRRU::getUserId).distinct().toList();
+        List<User> all = userRepository.findAllById(userIds);
+        return OptionalFlux.of(all)
+                .map(StreamUtil.listMap(BeanUtils.transformFrom(UserVo.class)))
+                .map(values -> new PageImpl<>(values, pageable, roleRRUS.getTotalElements()))
                 .getResult();
     }
 

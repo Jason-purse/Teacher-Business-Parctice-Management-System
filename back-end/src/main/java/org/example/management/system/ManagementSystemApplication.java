@@ -1,7 +1,6 @@
 package org.example.management.system;
 
 
-import com.generatera.oauth2.resource.server.config.token.LightningOAuth2UserPrincipal;
 import com.generatera.security.authorization.server.specification.LightningUserPrincipal;
 import com.generatera.security.authorization.server.specification.components.token.JwtClaimsToUserPrincipalMapper;
 import com.generatera.security.authorization.server.specification.components.token.format.jwt.JwtEncodingContext;
@@ -17,11 +16,12 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
+@Sql("classpath:/schema.sql")
 @EnableJpaRepositories
 @EnableConfigurationProperties(SystemConfigProperties.class)
 @SpringBootApplication

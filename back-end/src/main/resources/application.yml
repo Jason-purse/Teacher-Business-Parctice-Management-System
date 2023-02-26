@@ -23,6 +23,9 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
+#  sql:
+#    init:
+#      mode: always
 lightning:
   security:
     auth:
@@ -38,6 +41,7 @@ lightning:
                 - /swagger-ui.html
                 - /v2/api-docs
                 - /webjars/**
+                - /h2-console/**
     app:
       auth:
         server:
@@ -49,7 +53,6 @@ lightning:
           jwk-source-category: jwk_or_issuer_url
 server:
   port: 8090
-
 springfox:
   documentation:
     swagger-ui:

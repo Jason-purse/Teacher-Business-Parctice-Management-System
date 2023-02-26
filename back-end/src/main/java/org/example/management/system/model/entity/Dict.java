@@ -28,7 +28,7 @@ public class Dict implements Serializable {
     /**
      * 等于 0 表示顶级字典项
      */
-    private Integer parentDataType;
+    private String parentDataType;
 
     private String itemValue;
 
@@ -36,11 +36,11 @@ public class Dict implements Serializable {
      * 支持流程？
      */
     @Column(name = "next_data_type")
-    private Integer nextDataType;
+    private Integer nextDataTypeID;
 
 
     @Column(name = "previous_data_type")
-    private Integer previousDataType;
+    private Integer previousDataTypeID;
 
     /**
      * 支持流程

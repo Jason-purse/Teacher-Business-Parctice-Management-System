@@ -28,10 +28,12 @@ public class Report implements Serializable {
 
     private String reportUrl;
 
-
+    /**
+     * 报告的类型,一般是id
+     */
     private Integer reportType;
 
-    private String reportFormat;
+    private Integer reportFormat;
 
     private String reportName;
 
@@ -44,6 +46,8 @@ public class Report implements Serializable {
     private String auditUserName;
 
     private String failureReason;
+
+    private String successDescription
 
     /**
      * 审核阶段

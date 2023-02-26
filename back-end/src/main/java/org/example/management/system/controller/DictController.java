@@ -39,8 +39,9 @@ public class DictController {
         return dictService.getAllDictDataTypesByPage(param,pageable);
     }
 
-    @GetMapping("by/datatype")
-    public List<Dict> getAllDictItemsByParentType(Integer parentDataType) {
+    @GetMapping("by/datatype/{itemtype}")
+    public List<Dict> getAllDictItemsByParentType(@PathVariable("itemtype") String parentDataType) {
         return dictService.getDictItemsBy(parentDataType);
     }
+
 }

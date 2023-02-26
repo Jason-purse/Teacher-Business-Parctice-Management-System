@@ -11,6 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/admin/user/v1")
 @RequiredArgsConstructor
@@ -54,5 +57,14 @@ public class UserController {
     @GetMapping("list")
     public Page<UserVo> getAllUserDetails(UserParam userParam, @ApiParam("分页参数") Pageable pageable) {
         return userService.getAllUserDetailsByPage(userParam, pageable);
+    }
+
+    /**
+     * 获取所有用户数据并组装为true ..
+     * @return
+     */
+    @GetMapping("list/audit")
+    public Page<UserVo> getAllUserDetailsForAudit(Integer auditPhaseId,UserParam userParam,Pageable pageable) {
+        return userService.getAllUserDetailsForAudit(auditPhaseId,userParam,pageable);
     }
 }

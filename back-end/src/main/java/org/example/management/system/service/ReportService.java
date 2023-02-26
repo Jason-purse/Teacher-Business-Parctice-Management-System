@@ -3,10 +3,13 @@ package org.example.management.system.service;
 import com.generatera.security.authorization.server.specification.LightningUserContext;
 import com.jianyue.lightning.boot.starter.util.BeanUtils;
 import lombok.RequiredArgsConstructor;
+import org.example.management.system.model.constant.DictConstant;
 import org.example.management.system.model.entity.Dict;
+import org.example.management.system.model.entity.Project;
 import org.example.management.system.model.entity.Report;
 import org.example.management.system.model.param.ReportParam;
 import org.example.management.system.model.security.SimpleUserPrincipal;
+import org.example.management.system.repository.ProjectRepository;
 import org.example.management.system.repository.ReportRepository;
 import org.example.management.system.utils.DateTimeUtils;
 import org.springframework.data.domain.Example;
@@ -26,7 +29,10 @@ public class ReportService {
 
     private final DictService dictService;
 
+    private final ProjectRepository projectRepository;
+
     public void createReport(ReportParam reportParam) {
+
         Optional<Report> reportContainer = reportRepository.findOne(Example.of(
                 Report
                         .builder()
@@ -42,20 +48,24 @@ public class ReportService {
         Dict item = dictService.getDictItemById(reportParam.getReportType());
 
         // 表示 第一项(没事)
-        if (item.getPreviousDataType() != null && item.getPreviousDataType() != -1) {
+        if (item.getPreviousDataTypeID() != null && item.getPreviousDataTypeID() != -1) {
             Optional<Report> one = reportRepository.findOne(
                     Example.of(
                             Report
                                     .builder()
-                                    .reportType(item.getPreviousDataType())
+                                    .reportType(item.getPreviousDataTypeID())
                                     .projectId(reportParam.getProjectId())
                                     .build()
                     )
             );
 
             // 判断结束,允许创建 ...
-            Assert.isTrue(one.isPresent() && one.get().getFinished() != null && one.get().getFinished(), "无法创建报告类型为 " + item.getItemValue() + "的报告,因为前置报告不存在或者正在审核中 !!!");
+            Assert.isTrue(one.isPresent() && one.get().getFinished() != null && one.get().getFinished(), "无法创建报告类型为 " + item.getItemValue() + "的报告,因为" + (one.isPresent() ? "前置报告正在审核中 !!!" : "前置报告没有提交并审核 !!!"));
         }
+
+        // 并且更新项目状态为不可修改 ..
+        Optional<Project> project = projectRepository.findById(reportParam.getProjectId());
+        Assert.isTrue(project.isPresent(), "无法提交报告，因为无对应项目,请检查 !!!");
 
         Report value = BeanUtils.transformFrom(reportParam, Report.class);
         assert value != null;
@@ -64,22 +74,22 @@ public class ReportService {
         value.setCreateTimeStr(DateTimeUtils.getTimeStr(now));
         value.setUpdateAt(value.getCreateAt());
         value.setUpdateTimeStr(value.getCreateTimeStr());
-
-        LightningUserContext
-                .get()
-                .getUserPrincipal(SimpleUserPrincipal.class)
-                .ifPresent(simpleUserPrincipal -> {
-                    value.setSubmitUserId(simpleUserPrincipal.getUser().getId());
-                    value.setSubmitUserName(simpleUserPrincipal.getUsername());
-                });
-
-
         // 设置状态
         value.setStatus(dictService.getFirstAuditStatus().getId());
         value.setFinished(false);
         // 失败状态可以修改 ...
-        value.setCanModify(false);
+        value.setCanModify(true);
         reportRepository.save(value);
+
+        Project projectValue = project.get();
+        // 设置进入下一个阶段 ...
+        Integer status = projectValue.getStatus();
+        Dict dict = dictService.getDictItemById(status);
+        Dict nextStatus = dictService.getDictItemById(dict.getNextDataTypeID());
+        // 表示无法被删除,且进入进行中
+        projectValue.setFinished(false);
+        projectValue.setStatus(nextStatus.getId());
+        projectRepository.save(projectValue);
     }
 
     public void updateReport(ReportParam reportParam) {
@@ -98,5 +108,31 @@ public class ReportService {
                         .projectId(projectId)
                         .build()
         ));
+    }
+
+    public void deleteReport(Integer id) {
+        Optional<Report> report = reportRepository.findById(id);
+        report.ifPresent(ele -> {
+            Assert.isTrue(ele.getCanModify() != null && ele.getCanModify(), "报告正在审核中,无法删除 !!!");
+            reportRepository.deleteById(id);
+
+            long count = reportRepository.count(Example.of(Report.builder().projectId(ele.getProjectId()).build()));
+            if (count == 0) {
+                // 修改项目状态
+                Optional<Project> project = projectRepository.findById(ele.getProjectId());
+                project.ifPresent(value -> {
+                    // 设置可以修改
+                    value.setFinished(true);
+                    // 直接变成未开始 ..
+                    value.setStatus(dictService.getFirstDataItemInFlow(DictConstant.PROJECT_STATUS).getId());
+                    projectRepository.save(value);
+                });
+            }
+
+        });
+    }
+
+    public void deleteReportsByProjectId(Integer projectId) {
+        reportRepository.deleteAllByProjectId(projectId);
     }
 }
