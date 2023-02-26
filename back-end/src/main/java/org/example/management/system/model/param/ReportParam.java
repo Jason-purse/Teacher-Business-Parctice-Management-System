@@ -40,4 +40,7 @@ public class ReportParam {
 
     private String status;
 
+
+    private Boolean restore;
+
 }

@@ -97,7 +97,13 @@ public class ReportService {
         Assert.isTrue(reportContainer.isPresent(), "当前报告不存在!!!");
         Report report = reportContainer.get();
         Assert.isTrue(report.getCanModify() == null || report.getCanModify(), "当前报告处于审核中,无法修改!!!");
-        BeanUtils.updateProperties(reportParam, reportParam);
+        BeanUtils.updateProperties(reportParam, report);
+        if(reportParam.getRestore() != null && reportParam.getRestore()) {
+            report.setStatus(dictService.getFirstAuditStatus().getId());
+            report.setAuditUserId(null);
+            report.setAuditUserName(null);
+            report.setFailureFlag(null);
+        }
         reportRepository.save(report);
     }
 

@@ -49,6 +49,7 @@ public class Report implements Serializable {
 
     private String failureReason;
 
+    private Boolean failureFlag;
     private String successDescription;
 
     /**

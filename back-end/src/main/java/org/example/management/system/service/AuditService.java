@@ -49,23 +49,40 @@ public class AuditService {
     public void updateAudit(AuditParam auditParam) {
         Optional<Report> reportContainer = reportRepository.findById(auditParam.getReportId());
         Assert.isTrue(reportContainer.isPresent(), "当前报告不存在 !!!");
+
+        Dict statusItem = dictService.getDictByItemType("audit_success");
         Report report = reportContainer.get();
+        Assert.isTrue(!statusItem.getId().equals(report.getStatus()),"当前报告已经审核完成,不能重复审核 !!!");
+        Dict firstAuditStatus = dictService.getFirstAuditStatus();
+        Assert.isTrue(!report.getStatus().equals(firstAuditStatus.getId())
+                && report.getAuditUserId() != null && report.getAuditUserId().equals(auditParam.getAuditUserId())
+
+                ,"无法审核此报告,此报告状态为" + firstAuditStatus.getItemValue());
         report.setFailureReason(ElvisUtil.stringElvis(auditParam.getFailureReason(), ""));
+        // 设置失败标识
+        report.setFailureFlag(auditParam.getFailureFlag());
         // 失败之后,可以修改 !!!
         if (auditParam.getFailureFlag()) {
             report.setCanModify(true);
             // 审核失败 !!
             Dict item = dictService.getDictByItemType(AUDIT_FINALLY_PHASE);
+            Assert.isTrue(!item.getId().equals(report.getStatus()), "此报告已经被审核过,不能重复审核 !!!");
             // 审核失败 !!!
             report.setStatus(item.getId());
+            report.setFailureReason(auditParam.getFailureReason());
         } else {
             // 表示成功 !!! 进入下一个阶段
             Dict item = dictService.getDictItemById(report.getAuditPhase());
+            report.setSuccessDescription(auditParam.getSuccessDescription());
             boolean nextPhase = false;
             if (item.getSupportFlow() != null && item.getSupportFlow()) {
                 if (item.getNextDataTypeID() != null) {
                     // 表示还有下一个阶段
                     report.setAuditPhase(item.getNextDataTypeID());
+                    // 审核人 ... 滞空,需要重新指派 ...
+                    report.setAuditUserId(null);
+                    report.setAuditUserName(null);
+                    report.setStatus(firstAuditStatus.getId());
                     // 状态不需要设置,然后直接进入下一个阶段的进行中
                     nextPhase = true;
                 }
@@ -73,10 +90,13 @@ public class AuditService {
 
             // 表示完成 ..
             if (!nextPhase) {
-                Dict statusItem = dictService.getDictByItemType("audit_success");
                 report.setStatus(statusItem.getId());
+                // 置为空,表示已经完成 ...
+                report.setAuditPhase(null);
                 // 完成 ...
                 report.setFinished(true);
+                // 可以被删除 !!!
+                report.setCanModify(true);
             }
         }
 
@@ -99,8 +119,12 @@ public class AuditService {
             Integer nextDataTypeID = firstAuditStatus.getNextDataTypeID();
             // 进入下一个阶段 ..
             ele.setStatus(nextDataTypeID);
-            // 进入审核阶段的第一个阶段
-            ele.setAuditPhase(dictService.getFirstDataItemInFlow(DictConstant.AUDIT_PHASE).getId());
+
+            // 其余情况已经自动转变 ...
+            if(ele.getAuditPhase() == null) {
+                // 进入审核阶段的第一个阶段
+                ele.setAuditPhase(dictService.getFirstDataItemInFlow(DictConstant.AUDIT_PHASE).getId());
+            }
             // 不能修改 !!!!
             ele.setCanModify(false);
             reportRepository.save(ele);

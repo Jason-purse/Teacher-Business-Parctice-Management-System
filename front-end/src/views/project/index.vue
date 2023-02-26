@@ -81,14 +81,19 @@
                     </template>
                   </el-table-column>
                   <el-table-column label="审核状态" prop="status" align="center">
-                    <template v-slot="{row: {status}}">
-                      {{ mapDictItemValue('auditStatus', status) }}
+                    <template v-slot="{row}">
+                      <el-link type="primary" @click="openDescriptionDialog(row)">
+                        {{ mapDictItemValue('auditStatus', row.status) }}
+                      </el-link>
                     </template>
                   </el-table-column>
                   <el-table-column label="操作" align="center">
                     <template v-slot="{row}">
                       <template v-if="!row.auditUserId">
                         <el-button size="small" type="primary" @click="addAuditUser(row)">指派审核</el-button>
+                      </template>
+                      <template v-else-if="row.failureFlag !== null">
+                        <el-button size="small" type="success" @click="restoreReportAction(row)">重新申请</el-button>
                       </template>
                       <el-button size="small" type="danger" @click="deleteReportDialogHandle(row)">删除</el-button>
                     </template>
@@ -110,7 +115,8 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template v-slot="props">
-            <el-button type="danger" size="small" @click="deleteDialogHandle(props)">删除</el-button>
+            <el-button type="warning" size="small" @click="deleteDialogHandle(props)">删除</el-button>
+            <el-button type="danger" size="small" @click="forceDeleteDialogHandle(props)">强制删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -244,6 +250,18 @@
         </template>
       </div>
     </el-dialog>
+
+    <el-dialog
+      title="审核结果-历史记录"
+      :visible.sync="auditResult.visible"
+      width="60%"
+      style="max-height: 600px;"
+      @close="auditResult.visible = false; auditResult.description = ''">
+      <span>{{ auditResult.description }}</span>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="auditResult.visible = false; auditResult.description = ''">关闭</el-button>
+  </span>
+    </el-dialog>
   </div>
 
 </template>
@@ -257,6 +275,7 @@ import userApi from "@/api/user"
 import attachmentApi from "@/api/attachment";
 import {getAccessToken} from "@/utils/auth";
 import auditApi from "@/api/audit";
+import {mapState} from "vuex";
 
 export default {
   name: "index",
@@ -265,6 +284,10 @@ export default {
       audit: {
         // 当前报告数据
         data: {},
+        visible: false
+      },
+      auditResult: {
+        description: '',
         visible: false
       },
       userData: {
@@ -333,6 +356,7 @@ export default {
   },
 
   methods: {
+    mapState,
     getAccessToken,
     ...backendStyle.methods,
     ...projectApi,
@@ -344,12 +368,19 @@ export default {
         this.userData.data = content || []
       })
     },
+    openDescriptionDialog({failureReason, successDescription, failureFlag}) {
+      this.auditResult.visible = true;
+      console.log(failureReason)
+      this.auditResult.description = (failureFlag ? failureReason : successDescription) || '没有任何说明 !!';
+    },
     getDataFunc() {
       return this.getAllProjectsByPage(this.getSearchform(), this.pager).then(({result}) => {
-        this.tableData = result.content.map((ele,index) => {{
-          ele.index = index;
-          return ele;
-        }})
+        this.tableData = result.content.map((ele, index) => {
+          {
+            ele.index = index;
+            return ele;
+          }
+        })
         return result
       })
     },
@@ -427,9 +458,7 @@ export default {
           };
         })
       } else {
-        this.currentRow = {
-
-        }
+        this.currentRow = {}
       }
     },
     deleteDialogHandle({row: {id, name}}) {
@@ -452,12 +481,32 @@ export default {
       });
     },
 
+    forceDeleteDialogHandle({row: {id, name}}) {
+      this.$confirm(`确定强制删除项目${name}? 这会删除项目有关的所有东西，包括提交的报告。`, '强制删除', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this
+          .deleteProjectById(id, {force: true})
+          .then(() => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+            this.onSubmit()
+          })
+
+      }).catch(() => {
+      });
+    },
+
     // 更新当前项目  以及它的报告列表
     updateReportList() {
-        this.getProjectById(this.currentRow.row.id).then(({result}) => {
-          // 直接刷新
-          this.$set(this.tableData,this.currentRow.row.index,result)
-        })
+      this.getProjectById(this.currentRow.row.id).then(({result}) => {
+        // 直接刷新
+        this.$set(this.tableData, this.currentRow.row.index, result)
+      })
       this.loadReports(this.currentRow.row.id).then(({result}) => {
         this.currentRow.reportList = result;
       })
@@ -469,8 +518,15 @@ export default {
       this.audit.data = data;
     },
 
+    restoreReportAction(row) {
+      let params = {...row, restore: true}
+      this.updateReport(params).then(() => {
+        this.updateReportList()
+      })
+    },
+
     deleteReportDialogHandle(row) {
-      let {reportName, id,projectId} = row;
+      let {reportName, id, projectId} = row;
       this.$confirm(`确定删除报告${reportName}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

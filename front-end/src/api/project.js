@@ -30,9 +30,10 @@ export default {
     return request.put(apiEndpoints.updateProjectUrl, param)
   },
 
-  deleteProjectById(id) {
-    return request.delete(apiEndpoints.deleteProjectByIdUrl.concat(id))
+  deleteProjectById(id,params) {
+    return request.delete(apiEndpoints.deleteProjectByIdUrl.concat(id),{params})
   },
+
   getProjectById(id) {
     return request.get(apiEndpoints.getProjectByIdUrl.concat(`/${id}`))
   }

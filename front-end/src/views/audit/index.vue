@@ -66,10 +66,20 @@
         </template>
       </el-table-column>
       <el-table-column label="提交时间" prop="createTimeStr" />
+      <el-table-column label="状态" align="center">
+        <template v-slot="{row: {status}}">
+          {{mapDictItemValue('auditStatus',status)}}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="250px" align="center">
         <template v-slot="{row}">
-          <el-button @click="commit('allow',row)" type="success">通过</el-button>
-          <el-button @click="commit('reject',row)" type="danger">打回</el-button>
+          <template v-if="row.failureFlag === null">
+            <el-button @click="commit('allow',row)" type="success">通过</el-button>
+            <el-button @click="commit('reject',row)" type="danger">打回</el-button>
+          </template>
+          <template v-else>
+            已审核
+          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -110,7 +120,6 @@
 import backendStyle from '../../utils/generic-backend-style-util'
 import auditApi from "@/api/audit";
 import dictApi from "@/api/dict"
-import audit from "@/api/audit";
 
 export default {
   name: "index",
@@ -143,6 +152,9 @@ export default {
 
   created() {
     this.getAuditPhase();
+    this.getReportTypes()
+    this.getReportFormat()
+    this.getAuditStatus();
     this.onSubmit()
   },
 
@@ -154,6 +166,7 @@ export default {
       this.audit.row = row;
       if (val === 'allow') {
         this.audit.flag = true;
+        this.audit.form.failureFlag = false;
       } else if (val === 'reject') {
         this.audit.flag = false;
         // 失败
@@ -162,9 +175,10 @@ export default {
       this.audit.visible = true;
     },
     updateAuditAction() {
-      let value = {...this.audit.row}
+      let value = {...this.audit.row,reportId: this.audit.row.id,... this.audit.form}
       this.auditUpdate(value).then(() => {
         this.$message.success("审核完成 !!!")
+        this.audit = {}
         // 提交即可 ...
         this.onSubmit()
       })

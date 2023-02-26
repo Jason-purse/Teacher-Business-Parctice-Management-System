@@ -49,7 +49,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("{id}")
-    public void deleteProjectById(@PathVariable("id") Integer id) {
-        projectService.deleteProjectById(id);
+    public void deleteProjectById(@PathVariable("id") Integer id,@RequestParam(required = false) Boolean force) {
+        projectService.deleteProjectById(id,force);
     }
 }

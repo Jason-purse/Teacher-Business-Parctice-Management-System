@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -70,10 +71,13 @@ public class ProjectService {
         // // TODO: 2023/2/22 删除条件待定
     }
 
-    public void deleteProjectById(Integer id) {
+    @Transactional
+    public void deleteProjectById(Integer id,Boolean force) {
         Optional<Project> project = projectRepository.findById(id);
         project.ifPresent(ele -> {
-            Assert.isTrue(ele.getFinished(),"当前项目正在进行中,无法删除 !!!");
+            if(!force) {
+                Assert.isTrue(ele.getFinished(),"当前项目正在进行中,无法删除 !!!");
+            }
             projectRepository.deleteById(id);
             // 删除关联的项目
             reportService.deleteReportsByProjectId(ele.getId());
