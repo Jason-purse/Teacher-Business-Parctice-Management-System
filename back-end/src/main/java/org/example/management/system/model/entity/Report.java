@@ -47,7 +47,7 @@ public class Report implements Serializable {
 
     private String failureReason;
 
-    private String successDescription
+    private String successDescription;
 
     /**
      * 审核阶段
