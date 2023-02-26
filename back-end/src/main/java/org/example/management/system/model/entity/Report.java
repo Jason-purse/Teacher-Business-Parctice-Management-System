@@ -22,6 +22,8 @@ public class Report implements Serializable {
 
     private Integer projectId;
 
+    private String projectName;
+
 
     private String description;
 

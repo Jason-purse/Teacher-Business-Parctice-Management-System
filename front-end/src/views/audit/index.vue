@@ -44,10 +44,28 @@
       style="width: 100%">
       <el-table-column label="项目名称" prop="projectName"/>
       <el-table-column label="报告名称" prop="reportName"/>
-      <el-table-column label="发起人" prop="requestUser"/>
-      <el-table-column label="审核阶段" prop="auditPhase"/>
-      <el-table-column label="报告类型" prop="reportType"/>
-      <el-table-column label="报告格式" prop="reportFormat"/>
+      <el-table-column label="发起人" prop="submitUserName"/>
+      <el-table-column label="审核阶段" prop="auditPhase">
+        <template v-slot="{row:{auditPhase}}">
+          {{mapDictItemValue('auditPhase',auditPhase)}}
+        </template>
+      </el-table-column>
+      <el-table-column label="报告类型" prop="reportType">
+        <template v-slot="{row:{reportType}}">
+          {{mapDictItemValue('reportTypes',reportType)}}
+        </template>
+      </el-table-column>
+      <el-table-column label="报告格式" prop="reportFormat">
+        <template v-slot="{row:{reportFormat}}">
+          {{mapDictItemValue('reportFormat',reportFormat)}}
+        </template>
+      </el-table-column>
+      <el-table-column label="文件预览">
+        <template v-slot="{row}">
+          点击文件预览
+        </template>
+      </el-table-column>
+      <el-table-column label="提交时间" prop="createTimeStr" />
       <el-table-column label="操作" width="250px" align="center">
         <template v-slot="{row}">
           <el-button @click="commit('allow',row)" type="success">通过</el-button>

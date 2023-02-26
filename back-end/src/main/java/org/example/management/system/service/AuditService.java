@@ -1,6 +1,5 @@
 package org.example.management.system.service;
 
-import com.generatera.security.authorization.server.specification.LightningUserContext;
 import com.jianyue.lightning.boot.starter.util.ElvisUtil;
 import com.jianyue.lightning.boot.starter.util.OptionalFlux;
 import com.jianyue.lightning.boot.starter.util.lambda.LambdaUtils;
@@ -10,15 +9,12 @@ import org.example.management.system.model.entity.Dict;
 import org.example.management.system.model.entity.Project;
 import org.example.management.system.model.entity.Report;
 import org.example.management.system.model.param.AuditParam;
-import org.example.management.system.model.security.SimpleUserPrincipal;
 import org.example.management.system.repository.ProjectRepository;
 import org.example.management.system.repository.ReportRepository;
 import org.example.management.system.utils.DateTimeUtils;
 import org.example.management.system.utils.EscapeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -26,9 +22,14 @@ import org.springframework.util.Assert;
 import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+
+import static org.example.management.system.model.constant.DictConstant.AUDIT_FINALLY_PHASE;
+import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.startsWith;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +55,7 @@ public class AuditService {
         if (auditParam.getFailureFlag()) {
             report.setCanModify(true);
             // 审核失败 !!
-            Dict item = dictService.getDictByItemType("audit_failure");
+            Dict item = dictService.getDictByItemType(AUDIT_FINALLY_PHASE);
             // 审核失败 !!!
             report.setStatus(item.getId());
         } else {
@@ -109,20 +110,43 @@ public class AuditService {
     public Page<Report> getAllReportsForAuditByPage(AuditParam param, Pageable pageable) {
         AuditComplexSpecification auditComplexSpecification = new AuditComplexSpecification();
         auditComplexSpecification.setAuditParam(param);
+
+        AtomicReference<List<Project>> all = new AtomicReference<>();
         OptionalFlux
                 .of(ElvisUtil.stringElvis(param.getProjectName(), null))
                 .consume(projectName -> {
-                    List<Project> all = projectRepository.findAll(Example.of(
+                    all.set(projectRepository.findAll(Example.of(
                             Project.builder()
                                     .name(projectName)
                                     .build()
-                    ));
-                    if (all.size() > 0) {
-                        auditComplexSpecification.setProjectIds(all.stream().map(Project::getId).toList());
+                            , ExampleMatcher.matching().withMatcher(LambdaUtils.getPropertyNameForLambda(Project::getName), startsWith()))));
+                    if (all.get().size() > 0) {
+                        auditComplexSpecification.setProjectIds(all.get().stream().map(Project::getId).toList());
                     }
                 });
 
-        return reportRepository.findAll(auditComplexSpecification, pageable);
+
+        Page<Report> page = reportRepository.findAll(auditComplexSpecification, pageable);
+        if (all.get() == null) {
+            if (page.getContent().size() > 0) {
+                List<Integer> list = page.getContent().stream().map(Report::getProjectId).distinct().toList();
+                all.set(projectRepository.findAllById(list));
+            }
+        }
+
+        if (page.getContent().size() > 0) {
+            List<Project> projects = all.get();
+            Map<Integer, String> map = projects.stream().collect(Collectors.toMap(Project::getId, Project::getName));
+            List<Report> reports
+                    = page.getContent()
+                    .stream()
+                    .peek(ele -> {
+                        String projectName = map.get(ele.getProjectId());
+                        ele.setProjectName(projectName);
+                    }).toList();
+            return new PageImpl<>(reports, pageable, page.getTotalElements());
+        }
+        return page;
     }
 
     class AuditComplexSpecification implements Specification<Report> {
