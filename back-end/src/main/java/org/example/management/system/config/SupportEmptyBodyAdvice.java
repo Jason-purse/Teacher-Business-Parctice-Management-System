@@ -17,12 +17,16 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 public class SupportEmptyBodyAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(@NotNull MethodParameter returnType, @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
-        return returnType.getParameterType() == void.class || Void.class == returnType.getParameterType();
+//        return returnType.getParameterType() == void.class || Void.class == returnType.getParameterType();
+        return true;
     }
 
     @Override
     public Object beforeBodyWrite(Object body, @NotNull MethodParameter returnType, @NotNull MediaType selectedContentType, @NotNull Class<? extends HttpMessageConverter<?>> selectedConverterType, @NotNull ServerHttpRequest request, @NotNull ServerHttpResponse response) {
-        // 直接返回success !!!
-        return ResultExt.success();
+        if(body == null) {
+            // 直接返回success !!!
+            return ResultExt.success();
+        }
+        return body;
     }
 }
