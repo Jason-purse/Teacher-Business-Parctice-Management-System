@@ -14,7 +14,8 @@ const getDefaultState = () => {
     accessToken: getAccessToken(),
     refreshToken: getRefreshToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    userInfo: {}
   }
 }
 
@@ -35,6 +36,9 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_USERINFO: (state,userinfo) => {
+    state.userinfo = userinfo
   }
 }
 
@@ -102,7 +106,7 @@ const actions = {
       commit('RESET_STATE')
       resolve()
     })
-  }
+  },
 }
 
 export default {
