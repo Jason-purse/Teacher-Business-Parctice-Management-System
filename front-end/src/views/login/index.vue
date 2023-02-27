@@ -95,6 +95,7 @@ export default {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             const component = this.$message.success('登陆成功 !!!')
+            sessionStorage.setItem('isFirst', true)
             this.loading = false
             setTimeout(() => {
               this.$router.push({ path: this.redirect || '/' })

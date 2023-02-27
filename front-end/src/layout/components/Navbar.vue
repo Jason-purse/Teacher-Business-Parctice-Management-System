@@ -26,7 +26,29 @@
       :visible.sync="drawerVisable"
       size="20%"
     >
-      <span />
+      <el-form ref="form" :model="userInfo" label-width="80px">
+        <el-form-item label="姓名">
+          <div>{{ userInfo.username }}</div>
+          <!--          <el-input v-model="userInfo.username" />-->
+        </el-form-item>
+        <el-form-item label="昵称">
+          <div>{{ userInfo.nickname ? userInfo.nickname : '暂无' }}</div>
+        </el-form-item>
+        <el-form-item label="手机">
+          <div>{{ userInfo.phone ? userInfo.phone : '暂无' }}</div>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <div>{{ userInfo.email ? userInfo.email : '暂无'}}</div>
+          <!--          <el-input v-model="userInfo.email" />-->
+        </el-form-item>
+        <el-form-item label="简介">
+          <div>{{ userInfo.description ? userInfo.description : '暂无'}}</div>
+          <!--          <el-input v-model="userInfo.description" />-->
+        </el-form-item>
+        <el-form-item label="性别">
+          <div>{{ userInfo.gex ? userInfo.gex : '暂无'}}</div>
+        </el-form-item>
+      </el-form>
     </el-drawer>
   </div>
 </template>
@@ -44,7 +66,8 @@ export default {
   },
   data() {
     return {
-      drawerVisable: false
+      drawerVisable: false,
+      userInfo: {}
     }
   },
   computed: {
@@ -68,6 +91,9 @@ export default {
     getInfo() {
       this.getCurrentUserInfo().then(res => {
         console.log(res, 'info')
+        if (res.code === 200) {
+          this.userInfo = res.result
+        }
       })
     }
   }
