@@ -3,6 +3,8 @@ package org.example.management.system.service;
 import com.jianyue.lightning.boot.starter.util.lambda.LambdaUtils;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.example.management.system.model.constant.DictConstant;
+import org.example.management.system.model.entity.Dict;
 import org.example.management.system.model.entity.RoleRRAuditPhase;
 import org.example.management.system.model.entity.RoleRRU;
 import org.example.management.system.model.param.RoleWithAuditPhaseParam;
@@ -23,6 +25,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +35,8 @@ public class RoleService {
     private final RoleRRURepository rruRepository;
 
     private final RoleRRAuditPhaseRepository rrAuditPhaseRepository;
+
+    private final DictService dictService;
 
     public void updateUserWithRole(UserWithRoleParam param) {
 
@@ -96,6 +101,19 @@ public class RoleService {
         RoleRRAuditPhase roleRRAuditPhase = one.get();
 
         return rruRepository.findAll(new ForUserComplexSpecification(userIds, roleRRAuditPhase.getRoleId()), pageable);
+    }
+
+    public List<Dict> getUserRoles(Integer userId) {
+        List<RoleRRU> all = rruRepository.findAll(Example.of(RoleRRU.builder()
+                .userId(userId)
+                .build()));
+        if(all.size() > 0) {
+            List<Integer> roleIds = all.stream().map(RoleRRU::getRoleId).toList();
+            List<Dict> roles = dictService.getDictItemsBy(DictConstant.ROLE);
+            return roles.stream().filter(ele -> roleIds.contains(ele.getId()))
+                    .toList();
+        }
+        return Collections.emptyList();
     }
 
     @AllArgsConstructor

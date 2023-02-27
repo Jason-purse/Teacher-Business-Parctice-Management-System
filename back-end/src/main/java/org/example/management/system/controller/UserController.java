@@ -81,7 +81,6 @@ public class UserController {
                 .orElseThrow(() -> new IllegalStateException("当前不存在用户信息 !!!"))
                 .getUser();
         UserVo userVo = userService.getUserInfoById(user.getId());
-
         assert userVo != null;
         return userVo;
     }

@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.entity.Attendance;
+import org.example.management.system.model.entity.Dict;
 import org.example.management.system.model.entity.RoleRRU;
 import org.example.management.system.model.entity.User;
 import org.example.management.system.model.param.UserParam;
@@ -173,7 +174,15 @@ public class UserService implements LightningUserDetailService {
     public UserVo getUserInfoById(Integer id) {
         Optional<User> user = userRepository.findById(id);
         Assert.isTrue(user.isPresent(),"当前用户不存在 !!!");
-        return BeanUtils.transformFrom(user.get(), UserVo.class);
+        UserVo userVo = BeanUtils.transformFrom(user.get(), UserVo.class);
+        assert userVo != null;
+        List<Dict> roles = roleService.getUserRoles(id);
+        if(roles.size() > 0) {
+            userVo.setRoles(
+                    roles.stream().map(Dict::getItemType).toList()
+            );
+        }
+        return userVo;
     }
 
     @Data

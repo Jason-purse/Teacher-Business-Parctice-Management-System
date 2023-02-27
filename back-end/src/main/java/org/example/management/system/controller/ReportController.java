@@ -7,6 +7,7 @@ import org.example.management.system.model.entity.Report;
 import org.example.management.system.model.entity.User;
 import org.example.management.system.model.param.ReportParam;
 import org.example.management.system.model.security.SimpleUserPrincipal;
+import org.example.management.system.model.vo.ReportVo;
 import org.example.management.system.service.ReportService;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +36,7 @@ public class ReportController {
     }
 
     @GetMapping("list/{projectid}")
-    public List<Report> getReportList(@PathVariable("projectid") Integer projectId) {
+    public List<ReportVo> getReportList(@PathVariable("projectid") Integer projectId) {
         return reportService.getReportList(projectId);
     }
 

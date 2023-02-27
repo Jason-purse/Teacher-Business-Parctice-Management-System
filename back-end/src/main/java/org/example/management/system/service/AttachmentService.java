@@ -126,6 +126,10 @@ public class AttachmentService {
         return new PageImpl<>(Collections.emptyList(), pageable, all.getTotalElements());
     }
 
+    public List<Attachment> getAllAttachmentInfosByIds(List<Integer> list) {
+        return attachmentRepository.findAllById(list);
+    }
+
     @AllArgsConstructor
     class CollectionSpecification<T> implements Specification<Report> {
         private String name;

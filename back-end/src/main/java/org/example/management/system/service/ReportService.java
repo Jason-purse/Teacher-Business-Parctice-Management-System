@@ -4,11 +4,13 @@ import com.generatera.security.authorization.server.specification.LightningUserC
 import com.jianyue.lightning.boot.starter.util.BeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.constant.DictConstant;
+import org.example.management.system.model.entity.Attachment;
 import org.example.management.system.model.entity.Dict;
 import org.example.management.system.model.entity.Project;
 import org.example.management.system.model.entity.Report;
 import org.example.management.system.model.param.ReportParam;
 import org.example.management.system.model.security.SimpleUserPrincipal;
+import org.example.management.system.model.vo.ReportVo;
 import org.example.management.system.repository.ProjectRepository;
 import org.example.management.system.repository.ReportRepository;
 import org.example.management.system.utils.DateTimeUtils;
@@ -19,7 +21,10 @@ import org.springframework.util.Assert;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +35,8 @@ public class ReportService {
     private final DictService dictService;
 
     private final ProjectRepository projectRepository;
+
+    private final AttachmentService attachmentService;
 
     public void createReport(ReportParam reportParam) {
 
@@ -113,12 +120,23 @@ public class ReportService {
     }
 
 
-    public List<Report> getReportList(Integer projectId) {
-        return reportRepository.findAll(Example.of(
+    public List<ReportVo> getReportList(Integer projectId) {
+        List<Report> all = reportRepository.findAll(Example.of(
                 Report.builder()
                         .projectId(projectId)
                         .build()
         ));
+        List<Integer> list = all.stream().map(Report::getReportUrlId).distinct().toList();
+        List<Attachment> attachments = attachmentService.getAllAttachmentInfosByIds(list);
+        Stream<ReportVo> stream = all.stream().map(BeanUtils.transformFrom(ReportVo.class));
+        if(attachments.size() > 0) {
+            Map<Integer, String> collect = attachments.stream().collect(Collectors.toMap(Attachment::getId, Attachment::getFileUrl));
+            stream = stream.peek(ele -> {
+                String fileUrl = collect.get(ele.getId());
+                ele.setReportUrlStr(fileUrl);
+            });
+        }
+        return stream.toList();
     }
 
     public void deleteReport(Integer id) {

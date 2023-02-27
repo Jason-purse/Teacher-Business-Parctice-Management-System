@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -27,6 +28,8 @@ public class UserVo {
      * 头像地址 ...
      */
     private String avatarUrl;
+
+    private List<String> roles;
 
 
     private String email;
