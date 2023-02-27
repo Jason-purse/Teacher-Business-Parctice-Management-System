@@ -78,6 +78,9 @@ public class AttendanceService {
         Attendance attendance1 = BeanUtils.transformFrom(attendanceParam, Attendance.class);
         assert attendance1 != null;
         long startTimeOfDay = DateTimeUtils.getStartTimeOfDay();
+        LocalDateTime now = LocalDateTime.now();
+        attendance1.setSignAt(DateTimeUtils.getTimeOfDay(now));
+        attendance1.setSignTimeStr(DateTimeUtils.getTimeStr(now));
         attendance1.setCreateAt(startTimeOfDay);
         attendance1.setCreateTimeStr(DateTimeUtils.getTimeStr(LocalDate.now().atStartOfDay()));
         attendanceRepository.save(attendance1);
@@ -104,6 +107,16 @@ public class AttendanceService {
                 .orElse(Collections.emptyList())
                 .map(ele -> new PageImpl<>(ele, all.getPageable(), all.getTotalElements()))
                 .getResult();
+    }
+
+    public AttendanceVo getCurrentUserToDayAttendanceInfo(Integer userId) {
+        Optional<Attendance> one = attendanceRepository.findOne(Example.of(
+                Attendance.builder()
+                        .userId(userId)
+                        .createAt(DateTimeUtils.getTimeOfDay(LocalDate.now().atStartOfDay()))
+                        .build()
+        ));
+        return one.map(BeanUtils.transformFrom(AttendanceVo.class)).orElse(null);
     }
 
 

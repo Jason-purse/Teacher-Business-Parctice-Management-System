@@ -1,13 +1,13 @@
 import request from '@/utils/request'
 
-
-const mainUrl = "/api/admin/user/v1";
-const loginMainUrl = "/api/login/v1";
+const mainUrl = '/api/admin/user/v1'
+const loginMainUrl = '/api/login/v1'
 
 const apiEndpoints = {
   getAllUsersByPageUrl: `${mainUrl}/list`,
   deleteUserByIdUrl: `${mainUrl}/delete`,
   updateUserUrl: `${mainUrl}`,
+  getCurrentUserInfoUrl: `${mainUrl}/current/userinfo`
 }
 const loginEndpoints = {
   registerUrl: `${loginMainUrl}/register`
@@ -25,7 +25,7 @@ export function getInfo(token) {
   return request({
     url: '/vue-admin-template/user/info',
     method: 'get',
-    params: {token}
+    params: { token }
   })
 }
 
@@ -34,7 +34,6 @@ export function logout() {
   //   url: '/user/logout',
   //   method: 'post'
   // })
-  console.log("退出")
   return Promise.resolve()
 }
 
@@ -49,7 +48,7 @@ export default {
       })
         .then(data => {
           pager.total = data.result.totalElements || 0
-          return data;
+          return data
         })
     },
     deleteUserById(id) {
@@ -60,6 +59,13 @@ export default {
     },
     updateUser(param) {
       return request.put(apiEndpoints.updateUserUrl, param)
+    },
+
+    /**
+     * 获取当前用户信息
+     */
+    getCurrentUserInfo() {
+      return request.get(apiEndpoints.getCurrentUserInfoUrl)
     }
   }
 }

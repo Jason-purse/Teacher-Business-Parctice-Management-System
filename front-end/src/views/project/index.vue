@@ -3,28 +3,29 @@
     <div class="search-line">
       <el-form ref="searchForm" :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="项目名称" prop="name">
-          <el-input v-model="searchForm.name" placeholder="请输入项目名称"></el-input>
+          <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
         </el-form-item>
         <el-form-item label="发起人" prop="username">
-          <el-select v-model="searchForm.username" placeholder="请输入发起人">
-            <el-option label="发起时间" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+          <el-select v-model="searchForm.username" placeholder="请输入发起人" clearable>
+            <el-option label="发起时间" value="shanghai" />
+            <el-option label="区域二" value="beijing" />
           </el-select>
         </el-form-item>
         <el-form-item label="发起开始时间" prop="startTimeAt">
           <el-date-picker
             v-model="searchForm.startTimeAt"
             type="date"
-            placeholder="选择日期" @change="validTimeRange('startTimeAt')">
-          </el-date-picker>
+            placeholder="选择日期"
+            @change="validTimeRange('startTimeAt')"
+          />
         </el-form-item>
         <el-form-item label="发起结束时间" prop="endTimeAt">
           <el-date-picker
             v-model="searchForm.endTimeAt"
             type="date"
+            placeholder="选择日期"
             @change="validTimeRange('endTimeAt')"
-            placeholder="选择日期">
-          </el-date-picker>
+          />
         </el-form-item>
         <el-form-item>
           <el-form-item>
@@ -36,18 +37,19 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-divider class="margin-top-bottom-10"></el-divider>
+    <el-divider class="margin-top-bottom-10" />
     <template>
       <div class="margin-top-bottom-10 margin-left-25">
         <el-button type="success" @click="openProjectDrawer(false)">创建项目</el-button>
       </div>
 
       <el-table
-        @expand-change="loadReportsTrigger"
+        ref="tableData"
         :data="tableData"
         row-key="id"
-        ref="tableData"
-        style="width: 100%">
+        style="width: 100%"
+        @expand-change="loadReportsTrigger"
+      >
         <el-table-column type="expand">
           <template v-slot="{row}">
             <div :style="{margin: '10px'}">
@@ -55,14 +57,15 @@
                 <el-button type="primary" size="small" @click="openDialogCommitReport(row)">提交报告</el-button>
               </div>
               <el-table
+                ref="reportList"
                 size="small"
                 row-key="id"
-                ref="reportList"
-                :data="currentRow.reportList">
+                :data="currentRow.reportList"
+              >
                 <el-table-column label="报告列表">
-                  <el-table-column label="名称" prop="reportName" align="center"/>
-                  <el-table-column label="描述" prop="description" align="center"/>
-                  <el-table-column label="发起人" prop="submitUserName" align="center"/>
+                  <el-table-column label="名称" prop="reportName" align="center" />
+                  <el-table-column label="描述" prop="description" align="center" />
+                  <el-table-column label="发起人" prop="submitUserName" align="center" />
                   <el-table-column label="报告类型" prop="reportType" align="center">
                     <template v-slot="{row: {reportType}}">
                       {{ mapDictItemValue('reportTypes', reportType) }}
@@ -73,8 +76,8 @@
                       {{ mapDictItemValue('reportFormat', reportFormat) }}
                     </template>
                   </el-table-column>
-                  <el-table-column label="发起时间" prop="createTimeStr" align="center"/>
-                  <el-table-column label="审核人" prop="auditUserName" align="center"/>
+                  <el-table-column label="发起时间" prop="createTimeStr" align="center" />
+                  <el-table-column label="审核人" prop="auditUserName" align="center" />
                   <el-table-column label="审核阶段" prop="auditPhase" align="center">
                     <template v-slot="{row: {auditPhase}}">
                       {{ mapDictItemValue('auditPhase', auditPhase) }}
@@ -95,8 +98,12 @@
                       <template v-else-if="row.failureFlag !== null && row.failureFlag">
                         <el-button size="small" type="success" @click="restoreReportAction(row)">重新申请</el-button>
                       </template>
-                      <el-button :disabled="row.finished" size="small" type="danger"
-                                 @click="deleteReportDialogHandle(row)">删除
+                      <el-button
+                        :disabled="row.finished"
+                        size="small"
+                        type="danger"
+                        @click="deleteReportDialogHandle(row)"
+                      >删除
                       </el-button>
                     </template>
                   </el-table-column>
@@ -105,11 +112,11 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column type="index" label="序号"/>
-        <el-table-column label="名称" prop="name"/>
-        <el-table-column label="描述" prop="description"/>
-        <el-table-column label="发起人" prop="username"/>
-        <el-table-column label="发起时间" prop="createTimeStr"/>
+        <el-table-column type="index" label="序号" />
+        <el-table-column label="名称" prop="name" />
+        <el-table-column label="描述" prop="description" />
+        <el-table-column label="发起人" prop="username" />
+        <el-table-column label="发起时间" prop="createTimeStr" />
         <el-table-column label="状态" prop="status">
           <template v-slot="{row: {status}}">
             {{ mapDictItemValue('projectStatus', status) }}
@@ -124,14 +131,14 @@
       </el-table>
       <div style="margin-top: 5px;text-align: right;">
         <el-pagination
-          @current-change="onSubmit"
           small
           background
           :current-page.sync="pager.page"
           :page-size="pager.size"
           layout="prev, pager, next"
-          :total="pager.total">
-        </el-pagination>
+          :total="pager.total"
+          @current-change="onSubmit"
+        />
       </div>
     </template>
 
@@ -139,13 +146,14 @@
       :title="drawerAction ? '项目更新': '新建项目'"
       :visible.sync="drawerFlag"
       size="300px"
-      direction="rtl">
-      <el-form size="small" :model="drawerDialogData" class="search-form" style="padding: 5px">
-        <el-form-item label="项目名称">
-          <el-input v-model="drawerDialogData.name" placeholder="请输入项目名称"></el-input>
+      direction="rtl"
+    >
+      <el-form size="small" ref="drawerRef" :model="drawerDialogData" :rules="rules" class="search-form" style="padding: 5px">
+        <el-form-item label="项目名称" prop="name">
+          <el-input v-model="drawerDialogData.name" placeholder="请输入项目名称" />
         </el-form-item>
-        <el-form-item label="项目描述">
-          <el-input v-model="drawerDialogData.description" placeholder="请输入项目描述"></el-input>
+        <el-form-item label="项目描述" prop="description">
+          <el-input v-model="drawerDialogData.description" placeholder="请输入项目描述" />
         </el-form-item>
         <el-form-item>
           <el-form-item style="margin-top: 20px">
@@ -156,21 +164,21 @@
     </el-drawer>
 
     <el-dialog title="提交报告" :visible.sync="reportForm.visible">
-      <el-form ref="reportForm" :model="reportForm.data">
-        <el-form-item label="报告名称">
-          <el-input v-model="reportForm.data.reportName" autocomplete="off"></el-input>
+      <el-form ref="reportForm" :model="reportForm.data" :rules="reportFormRule">
+        <el-form-item label="报告名称" prop="reportName">
+          <el-input v-model="reportForm.data.reportName" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="报告描述">
-          <el-input v-model="reportForm.data.description" autocomplete="off"></el-input>
+        <el-form-item label="报告描述" prop="description">
+          <el-input v-model="reportForm.data.description" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="报告类型">
+        <el-form-item label="报告类型" prop="reportType">
           <el-select v-model="reportForm.data.reportType" placeholder="请选择报告类型">
-            <el-option v-for="{itemType,itemValue,id} in reportTypes" :key="itemType" :label="itemValue" :value="id"/>
+            <el-option v-for="{itemType,itemValue,id} in reportTypes" :key="itemType" :label="itemValue" :value="id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="报告格式">
+        <el-form-item label="报告格式" prop="reportFormat">
           <el-select v-model="reportForm.data.reportFormat" placeholder="请选择报告格式">
-            <el-option v-for="{itemType,itemValue,id} in reportFormat" :key="itemType" :label="itemValue" :value="id"/>
+            <el-option v-for="{itemType,itemValue,id} in reportFormat" :key="itemType" :label="itemValue" :value="id" />
           </el-select>
         </el-form-item>
         <el-form-item label="上传文件">
@@ -184,7 +192,8 @@
             }"
             :on-success="uploadPostProcess"
             :on-exceed="maxFileLimitTop"
-            :file-list="reportForm.data.fileList">
+            :file-list="reportForm.data.fileList"
+          >
             <el-button size="small" type="primary">上传文件</el-button>
             <div slot="tip" class="el-upload__tip">只能同时上传1个pdf/word文件，且不超过10M</div>
           </el-upload>
@@ -201,22 +210,23 @@
         <div class="search-line">
           <el-form :inline="true" :model="userData.searchForm" class="search-form">
             <el-form-item label="用户名称">
-              <el-input v-model="userData.searchForm.username" placeholder="请输入用户名称"></el-input>
+              <el-input v-model="userData.searchForm.username" placeholder="请输入用户名称" />
             </el-form-item>
             <el-form-item label="注册时间">
               <el-date-picker
                 v-model="userData.searchForm.startTimeAt"
                 type="date"
-                placeholder="选择日期" @change="validTimeRange('startTimeAt'),userData.searchForm">
-              </el-date-picker>
+                placeholder="选择日期"
+                @change="validTimeRange('startTimeAt'),userData.searchForm"
+              />
             </el-form-item>
             <el-form-item label="结束时间">
               <el-date-picker
                 v-model="userData.searchForm.endTimeAt"
                 type="date"
+                placeholder="选择日期"
                 @change="validTimeRange('endTimeAt',userData.searchForm)"
-                placeholder="选择日期">
-              </el-date-picker>
+              />
             </el-form-item>
             <el-form-item>
               <el-form-item>
@@ -225,17 +235,18 @@
             </el-form-item>
           </el-form>
         </div>
-        <el-divider class="margin-top-bottom-10"></el-divider>
+        <el-divider class="margin-top-bottom-10" />
         <template>
           <el-table
             :data="userData.data"
-            style="width: 100%">
-            <el-table-column label="昵称" prop="nickname"/>
-            <el-table-column label="姓名" prop="username"/>
-            <el-table-column label="角色" prop="roles"/>
+            style="width: 100%"
+          >
+            <el-table-column label="昵称" prop="nickname" />
+            <el-table-column label="姓名" prop="username" />
+            <el-table-column label="角色" prop="roles" />
             <el-table-column label="操作" width="250px" align="center">
               <template v-slot="{row}">
-                <el-button @click="createAuditAction(row)" type="primary">指派</el-button>
+                <el-button type="primary" @click="createAuditAction(row)">指派</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -246,8 +257,8 @@
               :current-page.sync="userData.pager.page"
               :page-size="userData.pager.size"
               layout="prev, pager, next"
-              :total="userData.pager.total">
-            </el-pagination>
+              :total="userData.pager.total"
+            />
           </div>
         </template>
       </div>
@@ -257,12 +268,14 @@
       title="审核结果-历史记录"
       :visible.sync="auditResult.visible"
       width="60%"
-      @close="auditResult.visible = false; auditResult.description = ''">
+      @close="auditResult.visible = false; auditResult.description = ''"
+    >
       <span>{{ auditResult.description }}</span>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="auditResult.visible = false; auditResult.description = ''">关闭</el-button>
-  </span>
+        <el-button @click="auditResult.visible = false; auditResult.description = ''">关闭</el-button>
+      </span>
     </el-dialog>
+
   </div>
 
 </template>
@@ -270,18 +283,22 @@
 <script>
 import backendStyle from '../../utils/generic-backend-style-util'
 import projectApi from '@/api/project'
-import reportApi from "@/api/report"
-import dictApi from "@/api/dict";
-import userApi from "@/api/user"
-import attachmentApi from "@/api/attachment";
-import {getAccessToken} from "@/utils/auth";
-import auditApi from "@/api/audit";
-import {mapState} from "vuex";
+import reportApi from '@/api/report'
+import dictApi from '@/api/dict'
+import userApi from '@/api/user'
+import attachmentApi from '@/api/attachment'
+import { getAccessToken } from '@/utils/auth'
+import auditApi from '@/api/audit'
+import { mapState } from 'vuex'
 
 export default {
-  name: "index",
+  name: 'Index',
   data() {
     return {
+      rules: {
+        name: [{ required: true, trigger: ['blur', 'change'], message: '请输入项目名称' }],
+        description: [{ required: true, trigger: ['blur', 'change'], message: '请输入项目描述' }]
+      },
       audit: {
         // 当前报告数据
         data: {},
@@ -309,13 +326,12 @@ export default {
         username: '',
         startTimeAt: null,
         endTimeAt: null,
-        creatTimeAt: null,
+        creatTimeAt: null
       },
       tableData: [],
       ...backendStyle.data(),
       ...attachmentApi.data(),
-      ...dictApi.data()
-      ,
+      ...dictApi.data(),
       drawerFlag: false,
       drawerAction: false, // false 插入 / true 更新
       drawerDialogData: {
@@ -338,10 +354,16 @@ export default {
           description: '',
           reportType: '',
           reportFormat: '',
-          fileList: [],
+          fileList: []
         },
         currentRow: null,
         visible: false
+      },
+      reportFormRule: {
+        reportName: [{ required: true, trigger: ['blur', 'change'], message: '请输入报告名称' }],
+        description: [{ required: true, trigger: ['blur', 'change'], message: '请输入报告描述' }],
+        reportType: [{ required: true, trigger: ['blur', 'change'], message: '请选择报告类型' }],
+        reportFormat: [{ required: true, trigger: ['blur', 'change'], message: '请选择报告格式' }]
       }
     }
   },
@@ -351,9 +373,9 @@ export default {
     this.onSubmit()
     this.getReportTypes()
     this.getReportFormat()
-    this.getAuditPhase();
-    this.getAuditStatus();
-    this.getProjectStatus();
+    this.getAuditPhase()
+    this.getAuditStatus()
+    this.getProjectStatus()
   },
 
   methods: {
@@ -365,21 +387,21 @@ export default {
     ...dictApi.methods,
     ...auditApi.methods,
     getAllUserList() {
-      userApi.methods.getAllUsersByPage(this.userData.searchForm, this.userData.pager).then(({result: {content}}) => {
+      userApi.methods.getAllUsersByPage(this.userData.searchForm, this.userData.pager).then(({ result: { content }}) => {
         this.userData.data = content || []
       })
     },
-    openDescriptionDialog({failureReason, successDescription, failureFlag}) {
-      this.auditResult.visible = true;
+    openDescriptionDialog({ failureReason, successDescription, failureFlag }) {
+      this.auditResult.visible = true
       console.log(failureReason)
-      this.auditResult.description = (failureFlag ? failureReason : successDescription) || '没有任何说明 !!';
+      this.auditResult.description = (failureFlag ? failureReason : successDescription) || '没有任何说明 !!'
     },
     getDataFunc() {
-      return this.getAllProjectsByPage(this.getSearchform(), this.pager).then(({result}) => {
+      return this.getAllProjectsByPage(this.getSearchform(), this.pager).then(({ result }) => {
         this.tableData = result.content.map((ele, index) => {
           {
-            ele.index = index;
-            return ele;
+            ele.index = index
+            return ele
           }
         })
         return result
@@ -396,62 +418,67 @@ export default {
       this.userData.searchForm = {}
       this.audit = {}
     },
-    uploadPostProcess({code}) {
+    uploadPostProcess({ code }) {
       if (code !== 200) {
-        this.$message.error("上传失败!!!")
+        this.$message.error('上传失败!!!')
         setTimeout(() => {
           this.$refs.upload?.clearFiles()
         }, 500)
       } else {
-        this.$message.success("上传成功 !!!")
+        this.$message.success('上传成功 !!!')
       }
     },
 
     createAuditAction(user) {
-      let param = {
+      const param = {
         reportId: this.audit.data.id,
         auditUserId: user.id,
         auditUserName: user.username
       }
       this.createAudit(param).then(() => {
         // 重新加载项目
-        this.updateReportList();
+        this.updateReportList()
         // 关闭弹窗 !!!
         this.auditDialogCancel()
       })
     },
 
     closeDrawer() {
-      this.drawerFlag = false;
+      this.drawerFlag = false
       this.drawerDialogData = {}
     },
     saveProject() {
-      if (!this.drawerAction) {
-        // 保存
-        this.createProject(this.drawerDialogData).then(() => {
-          this.$message.success("新建项目成功 !!!")
-          this.onSubmit()
-          this.closeDrawer()
-        })
-      } else {
-        this.updateProject(this.drawerDialogData).then(() => {
-          this.$message.success("更新项目成功 !!!")
-          this.onSubmit()
-          this.closeDrawer()
-        })
-      }
-
-      // 优化可见性
-      this.currentRow = {
-        row: null,
-        index: -1,
-        reportList: []
-      }
+      this.$refs.drawerRef.validate(valid=>{
+        if (valid) {
+          if (!this.drawerAction) {
+            // 保存
+            this.createProject(this.drawerDialogData).then(() => {
+              this.$message.success('新建项目成功 !!!')
+              this.onSubmit()
+              this.closeDrawer()
+            })
+          } else {
+            this.updateProject(this.drawerDialogData).then(() => {
+              this.$message.success('更新项目成功 !!!')
+              this.onSubmit()
+              this.closeDrawer()
+            })
+          }
+          // 优化可见性
+          this.currentRow = {
+            row: null,
+            index: -1,
+            reportList: []
+          }
+        } else {
+          this.$message.warning('请输入')
+        }
+      })
     },
     openDialogCommitReport(row) {
-      this.reportForm.visible = true;
+      this.reportForm.visible = true
       this.$refs.reportForm?.resetFields()
-      this.reportForm.currentRow = row;
+      this.reportForm.currentRow = row
     },
 
     loadReportsTrigger(row, expand) {
@@ -459,17 +486,17 @@ export default {
         if (this.currentRow.row && this.currentRow.row !== row) {
           this.$refs.tableData.toggleRowExpansion(this.currentRow.row, false)
         }
-        this.loadReports(row.id).then(({result}) => {
+        this.loadReports(row.id).then(({ result }) => {
           this.currentRow = {
             row,
             reportList: result
-          };
+          }
         })
       } else {
         this.currentRow = {}
       }
     },
-    deleteDialogHandle({row: {id, name}}) {
+    deleteDialogHandle({ row: { id, name }}) {
       this.$confirm(`确定删除项目${name}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -481,60 +508,58 @@ export default {
             this.$message({
               type: 'success',
               message: '删除成功!'
-            });
+            })
             this.onSubmit()
           })
-
       }).catch(() => {
-      });
+      })
     },
 
-    forceDeleteDialogHandle({row: {id, name}}) {
+    forceDeleteDialogHandle({ row: { id, name }}) {
       this.$confirm(`确定强制删除项目${name}? 这会删除项目有关的所有东西，包括提交的报告。`, '强制删除', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         this
-          .deleteProjectById(id, {force: true})
+          .deleteProjectById(id, { force: true })
           .then(() => {
             this.$message({
               type: 'success',
               message: '删除成功!'
-            });
+            })
             this.onSubmit()
           })
-
       }).catch(() => {
-      });
+      })
     },
 
     // 更新当前项目  以及它的报告列表
     updateReportList() {
-      this.getProjectById(this.currentRow.row.id).then(({result}) => {
+      this.getProjectById(this.currentRow.row.id).then(({ result }) => {
         // 直接刷新
         this.$set(this.tableData, this.currentRow.row.index, result)
       })
-      this.loadReports(this.currentRow.row.id).then(({result}) => {
-        this.currentRow.reportList = result;
+      this.loadReports(this.currentRow.row.id).then(({ result }) => {
+        this.currentRow.reportList = result
       })
     },
 
     addAuditUser(data) {
-      this.audit.visible = true;
+      this.audit.visible = true
       this.getAllUserList()
-      this.audit.data = data;
+      this.audit.data = data
     },
 
     restoreReportAction(row) {
-      let params = {...row, restore: true}
+      const params = { ...row, restore: true }
       this.updateReport(params).then(() => {
         this.updateReportList()
       })
     },
 
     deleteReportDialogHandle(row) {
-      let {reportName, id, projectId} = row;
+      const { reportName, id, projectId } = row
       this.$confirm(`确定删除报告${reportName}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -546,31 +571,34 @@ export default {
             this.$message({
               type: 'success',
               message: '删除成功!'
-            });
-            this.updateReportList();
+            })
+            this.updateReportList()
           })
-
       }).catch(() => {
-      });
+      })
     },
     commitReport(action) {
-      if (action === 'save-report') {
-        this.createReport({...this.reportForm.data, projectId: this.reportForm.currentRow?.id}).then(() => {
-          this.$message.success("新增报告成功!!!")
-          this.updateReportList();
-
-        })
-      } else if (action === 'update-report') {
-        this.updateReport(this.reportForm.data).then(() => {
-          this.$message.success("更新报告成功 !!!")
-          this.updateReportList();
-        })
-      }
-
-      this.onCancel('reportForm')
+      this.$refs.reportForm.validate(valid => {
+        if (valid) {
+          if (action === 'save-report') {
+            this.createReport({ ...this.reportForm.data, projectId: this.reportForm.currentRow?.id }).then(() => {
+              this.$message.success('新增报告成功!!!')
+              this.updateReportList()
+            })
+          } else if (action === 'update-report') {
+            this.updateReport(this.reportForm.data).then(() => {
+              this.$message.success('更新报告成功 !!!')
+              this.updateReportList()
+            })
+          }
+          this.onCancel('reportForm')
+        } else {
+          this.$message.warning('请输入')
+        }
+      })
     },
     maxFileLimitTop() {
-      this.$message.warning("只能上传一个文件!!!")
+      this.$message.warning('只能上传一个文件!!!')
     }
   }
 }

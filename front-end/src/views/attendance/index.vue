@@ -4,22 +4,21 @@
     <div class="search-line">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="用户名称">
-          <el-input v-model="searchForm.filename" placeholder="请输入用户名称"></el-input>
+          <el-input v-model="searchForm.filename" placeholder="请输入用户名称" clearable />
         </el-form-item>
         <el-form-item label="开始时间">
           <el-date-picker
             v-model="searchForm.startTimeAt"
             type="date"
-            placeholder="选择日期" @change="validTimeRange('startTimeAt')">
-          </el-date-picker>
+            placeholder="选择日期"
+            @change="validTimeRange('startTimeAt')" />
         </el-form-item>
         <el-form-item label="结束时间">
           <el-date-picker
             v-model="searchForm.endTimeAt"
             type="date"
             @change="validTimeRange('endTimeAt')"
-            placeholder="选择日期">
-          </el-date-picker>
+            placeholder="选择日期" />
         </el-form-item>
         <el-form-item>
           <el-form-item>

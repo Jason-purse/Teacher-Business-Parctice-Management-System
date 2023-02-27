@@ -18,8 +18,10 @@ public class ReportParam {
 
     private String description;
 
-
-    private String reportUrl;
+    /**
+     * 指定附件的id
+     */
+    private Integer reportUrlId;
 
 
     private Integer reportType;

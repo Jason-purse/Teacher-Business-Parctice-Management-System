@@ -7,27 +7,52 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <!--          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">-->
+          <el-avatar class="sub-title" icon="el-icon-user-solid" />
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
-            <el-dropdown-item>
-              Home
-            </el-dropdown-item>
-          </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
-            <el-dropdown-item>Github</el-dropdown-item>
-          </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
-            <el-dropdown-item>Docs</el-dropdown-item>
-          </a>
+          <el-dropdown-item>
+            <div @click="drawerVisable = !drawerVisable">个人主页</div>
+          </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
-            <span style="display:block;">Log Out</span>
+            <span style="display:block;">退出登录</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <el-drawer
+      title="个人主页"
+      :visible.sync="drawerVisable"
+      size="20%"
+    >
+    <div style="padding: 0 20px">
+      <el-button type="primary" size="mini">编辑</el-button>
+      <el-form ref="form" :model="userInfo" label-width="40px">
+        <el-form-item label="姓名" >
+          <div>{{ userInfo.username }}</div>
+          <!--          <el-input v-model="userInfo.username" />-->
+        </el-form-item>
+        <el-form-item label="昵称">
+          <div>{{ userInfo.nickname ? userInfo.nickname : '暂无' }}</div>
+        </el-form-item>
+        <el-form-item label="手机">
+          <div>{{ userInfo.phone ? userInfo.phone : '暂无' }}</div>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <div>{{ userInfo.email ? userInfo.email : '暂无'}}</div>
+          <!--          <el-input v-model="userInfo.email" />-->
+        </el-form-item>
+        <el-form-item label="简介">
+          <div>{{ userInfo.description ? userInfo.description : '暂无'}}</div>
+          <!--          <el-input v-model="userInfo.description" />-->
+        </el-form-item>
+        <el-form-item label="性别">
+          <div>{{ userInfo.gex ? userInfo.gex : '暂无'}}</div>
+        </el-form-item>
+      </el-form>
+    </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -35,11 +60,18 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import user from '@/api/user'
 
 export default {
   components: {
     Breadcrumb,
     Hamburger
+  },
+  data() {
+    return {
+      drawerVisable: false,
+      userInfo: {}
+    }
   },
   computed: {
     ...mapGetters([
@@ -47,13 +79,26 @@ export default {
       'avatar'
     ])
   },
+  mounted() {
+    this.getInfo()
+  },
   methods: {
+    ...user.methods,
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      sessionStorage.removeItem('isFirst')
+    },
+    getInfo() {
+      this.getCurrentUserInfo().then(res => {
+        console.log(res, 'info')
+        if (res.code === 200) {
+          this.userInfo = res.result
+        }
+      })
     }
   }
 }

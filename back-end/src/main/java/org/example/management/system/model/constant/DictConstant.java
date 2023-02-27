@@ -19,13 +19,21 @@ public class DictConstant {
 
     public static final String AUDIT_PHASE = "audit_phase";
 
+    public static final String AUDITING = "auditing";
+
     public static final String REPORT_TYPE = "report_type";
 
     public static final String REPORT_FORMAT = "report_format";
 
+    /**
+     * 系统支持的文件格式 ...
+     */
+    public static final String MEDIA_FORMAT = "media_format";
+
     public static final String AUDIT_FINALLY_PHASE = "audit_failure";
 
     public static final String ATTENDANCE_STATUS = "attendance_status";
+
 
     public static final Integer FIRST_ITEM_IDENTIFY = -1;
 

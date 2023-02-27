@@ -17,6 +17,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -521,6 +522,102 @@ public class DictService {
                         .itemType("un_attendanced")
                         .itemValue("未考勤")
                         .parentDataType(ATTENDANCE_STATUS)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(32)
+                        .itemType(MEDIA_FORMAT)
+                        .itemValue("文件类型")
+                        .parentDataType(ROOT)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(33)
+                        .itemType("text/*")
+                        .itemValue("文本")
+                        .parentDataType(MEDIA_FORMAT)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+        dicts.add(
+                Dict.builder()
+                        .id(34)
+                        .itemType("application/pdf")
+                        .itemValue("pdf")
+                        .parentDataType(MEDIA_FORMAT)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(35)
+                        .itemType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                        .itemValue("docx")
+                        .parentDataType(MEDIA_FORMAT)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(36)
+                        .itemType("image/gif")
+                        .itemValue("gif")
+                        .parentDataType(MEDIA_FORMAT)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(37)
+                        .itemType("image/jpeg")
+                        .itemValue("jpeg")
+                        .parentDataType(MEDIA_FORMAT)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+        dicts.add(
+                Dict.builder()
+                        .id(38)
+                        .itemType("image/png")
+                        .itemValue("png")
+                        .parentDataType(MEDIA_FORMAT)
+                        .supportFlow(false)
+                        .createAt(createAt)
+                        .createTimeStr(timeStr)
+                        .build()
+        );
+
+
+        dicts.add(
+                Dict.builder()
+                        .id(39)
+                        .itemType("application/msword")
+                        .itemValue("doc")
+                        .parentDataType(MEDIA_FORMAT)
                         .supportFlow(false)
                         .createAt(createAt)
                         .createTimeStr(timeStr)

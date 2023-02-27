@@ -27,7 +27,7 @@ const mutations = {
   SET_ACCESS_TOKEN: (state, token) => {
     state.accessToken = token
   },
-  SET_REFRESH_TOKEN: (state,token) => {
+  SET_REFRESH_TOKEN: (state, token) => {
     state.refreshToken = token
   },
   SET_NAME: (state, name) => {
@@ -47,7 +47,7 @@ const actions = {
         const { result } = response
         console.log(result)
         commit('SET_ACCESS_TOKEN', result.access_token)
-        commit('SET_REFRESH_TOKEN',result.refresh_token)
+        commit('SET_REFRESH_TOKEN', result.refresh_token)
         setAccessToken(result.access_token)
         setRefreshToken(result.refresh_token)
         resolve()
@@ -69,7 +69,7 @@ const actions = {
 
         const { name, avatar } = data
 
-        console.log("登陆成功响应 !!!")
+        console.log('登陆成功响应 !!!')
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         resolve(data)

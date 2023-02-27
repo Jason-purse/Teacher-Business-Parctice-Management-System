@@ -1,4 +1,4 @@
-import request from "@/utils/request";
+import request from '@/utils/request'
 
 const mainReportUrl = '/api/admin/report/v1'
 const apiEndpoints = {
@@ -14,10 +14,10 @@ export default {
       return request.get(apiEndpoints.getAllReportsUrl.concat(projectId))
     },
     createReport(param) {
-      return request.post(apiEndpoints.createReportUrl,param)
+      return request.post(apiEndpoints.createReportUrl, param)
     },
     updateReport(param) {
-      return request.put(apiEndpoints.updateReportUrl,param)
+      return request.put(apiEndpoints.updateReportUrl, param)
     },
     deleteReport(id) {
       return request.delete(apiEndpoints.deleteReportUrl.concat(`/${id}`))

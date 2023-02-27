@@ -2,15 +2,15 @@ import Cookies from 'js-cookie'
 
 const TokenKey = 'JSESSIONID'
 
-const RefreshTokenKey = "refresh_token";
+const RefreshTokenKey = 'refresh_token'
 
 export function getAccessToken() {
-  let value = Cookies.get(TokenKey)
+  const value = Cookies.get(TokenKey)
   return value && `Bearer ${value}` || value
 }
 
 export function getRefreshToken() {
-  let value = Cookies.get(RefreshTokenKey)
+  const value = Cookies.get(RefreshTokenKey)
   return value && `Bearer ${value}` || value
 }
 
@@ -19,10 +19,8 @@ export function setAccessToken(token) {
 }
 
 export function setRefreshToken(token) {
-  return Cookies.set(RefreshTokenKey,token);
+  return Cookies.set(RefreshTokenKey, token)
 }
-
-
 
 export function removeAccessToken() {
   return Cookies.remove(TokenKey)

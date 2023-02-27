@@ -28,7 +28,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static org.example.management.system.model.constant.DictConstant.AUDIT_FINALLY_PHASE;
+import static org.example.management.system.model.constant.DictConstant.*;
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.startsWith;
 
 @Service
@@ -70,6 +70,13 @@ public class AuditService {
             // 审核失败 !!!
             report.setStatus(item.getId());
             report.setFailureReason(auditParam.getFailureReason());
+            // 改变阶段到前一个 ..
+            Dict dict = dictService.getDictItemById(report.getAuditPhase());
+            if (dict.getPreviousDataTypeID() != null && dict.getPreviousDataTypeID().equals(FIRST_ITEM_IDENTIFY)) {
+                Dict previousDict = dictService.getDictItemById(dict.getPreviousDataTypeID());
+                // 设置为前一个阶段 ..
+                report.setAuditPhase(previousDict.getId());
+            }
         } else {
             // 表示成功 !!! 进入下一个阶段
             Dict item = dictService.getDictItemById(report.getAuditPhase());
@@ -205,57 +212,63 @@ public class AuditService {
 
         @Override
         public Predicate toPredicate(@NotNull Root<Report> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
-            return OptionalFlux
-                    .of(auditParam.getAuditUserId())
-                    .map(userId -> criteriaBuilder.equal(root.get(LambdaUtils.getPropertyNameForLambda(Report::getAuditUserId)), userId))
-                    .combine(
-                            OptionalFlux.of(projectIds)
-                                    .map(ele -> root.get(LambdaUtils.getPropertyNameForLambda(Report::getProjectId))
-                                            .in(projectIds))
-                                    .combine(
-                                            OptionalFlux
-                                                    .of(ElvisUtil.stringElvis(auditParam.getReportName(), null))
-                                                    .map(ele -> criteriaBuilder.like(root.get(LambdaUtils.getPropertyNameForLambda(Report::getReportName)), EscapeUtil.escapeExprSpecialWord(ele.trim()).concat("%")))
-                                            ,
-                                            criteriaBuilder::and
-                                    )
-                                    .combine(
-                                            OptionalFlux
-                                                    .of(ElvisUtil.stringElvis(auditParam.getSubmitUserName(), null))
-                                                    .map(ele -> criteriaBuilder.like(root.get(LambdaUtils.getPropertyNameForLambda(Report::getSubmitUserName)), EscapeUtil.escapeExprSpecialWord(ele.trim()).concat("%")))
-                                            ,
-                                            criteriaBuilder::and
-                                    )
-                                    .combine(
-                                            OptionalFlux.of(
-                                                    auditParam.getAuditPhase()
-                                            ).map(ele -> criteriaBuilder.equal(root.get(LambdaUtils.getPropertyNameForLambda(Report::getAuditPhase)), ele))
-                                            ,
-                                            criteriaBuilder::and
-                                    )
-                                    .combine(
-                                            OptionalFlux
-                                                    .of(auditParam.getStartTimeAt())
-                                                    .map(startTime -> {
-                                                        Path<Long> objectPath = root.get(LambdaUtils.getPropertyNameForLambda(Report::getCreateAt));
-                                                        return OptionalFlux
-                                                                .of(auditParam.getEndTimeAt())
-                                                                .map(endTime -> criteriaBuilder.between(
-                                                                        objectPath,
-                                                                        startTime, endTime)
-                                                                )
-                                                                .orElse(criteriaBuilder.greaterThanOrEqualTo(objectPath, startTime))
-                                                                .<Predicate>getResult();
-                                                    })
-                                                    .orElse(
-                                                            OptionalFlux.of(auditParam.getEndTimeAt())
-                                                                    .map(endTime -> criteriaBuilder.lessThanOrEqualTo(root.get(LambdaUtils.getPropertyNameForLambda(Report::getCreateAt)), endTime))
-                                                    ),
-                                            criteriaBuilder::and
-                                    ),
-                            criteriaBuilder::and
-                    )
-                    .getResult();
+            return OptionalFlux.of(
+                    criteriaBuilder.equal(root.get(LambdaUtils.getPropertyNameForLambda(Report::getStatus)),
+                            dictService.getDictByItemType(AUDITING).getId())
+            ).getResult();
+            // 代码问题,暂时先注释 ..
+            //return OptionalFlux
+            //        .of(auditParam.getAuditUserId())
+            //        .map(userId -> criteriaBuilder.equal(root.get(LambdaUtils.getPropertyNameForLambda(Report::getAuditUserId)), userId))
+            //        .combine(
+            //                OptionalFlux.of(projectIds)
+            //                        .map(ele -> root.get(LambdaUtils.getPropertyNameForLambda(Report::getProjectId))
+            //                                .in(projectIds))
+            //                        .combine(
+            //                                OptionalFlux
+            //                                        .of(ElvisUtil.stringElvis(auditParam.getReportName(), null))
+            //                                        .map(ele -> criteriaBuilder.like(root.get(LambdaUtils.getPropertyNameForLambda(Report::getReportName)), EscapeUtil.escapeExprSpecialWord(ele.trim()).concat("%")))
+            //                                ,
+            //                                criteriaBuilder::and
+            //                        )
+            //                        .combine(
+            //                                OptionalFlux
+            //                                        .of(ElvisUtil.stringElvis(auditParam.getSubmitUserName(), null))
+            //                                        .map(ele -> criteriaBuilder.like(root.get(LambdaUtils.getPropertyNameForLambda(Report::getSubmitUserName)), EscapeUtil.escapeExprSpecialWord(ele.trim()).concat("%")))
+            //                                ,
+            //                                criteriaBuilder::and
+            //                        )
+            //                        .combine(
+            //                                OptionalFlux.of(
+            //                                        auditParam.getAuditPhase()
+            //                                ).map(ele -> criteriaBuilder.equal(root.get(LambdaUtils.getPropertyNameForLambda(Report::getAuditPhase)), ele))
+            //                                ,
+            //                                criteriaBuilder::and
+            //                        )
+            //                        .combine(
+            //                                OptionalFlux
+            //                                        .of(auditParam.getStartTimeAt())
+            //                                        .<Predicate>map(startTime -> {
+            //                                            Path<Long> objectPath = root.get(LambdaUtils.getPropertyNameForLambda(Report::getCreateAt));
+            //                                            return OptionalFlux
+            //                                                    .of(auditParam.getEndTimeAt())
+            //                                                    .map(endTime -> criteriaBuilder.between(
+            //                                                            objectPath,
+            //                                                            startTime, endTime)
+            //                                                    )
+            //                                                    .orElse(criteriaBuilder.greaterThanOrEqualTo(objectPath, startTime))
+            //                                                    .<Predicate>getResult();
+            //                                        })
+            //                                        .orElse(
+            //                                                OptionalFlux.of(auditParam.getEndTimeAt())
+            //                                                        .<Predicate>map(endTime -> criteriaBuilder.lessThanOrEqualTo(root.get(LambdaUtils.getPropertyNameForLambda(Report::getCreateAt)), endTime))
+            //                                        ),
+            //                                criteriaBuilder::and
+            //                        ),
+            //                criteriaBuilder::and
+            //        )
+            //        .getResult();
+            //return null;
         }
     }
 }

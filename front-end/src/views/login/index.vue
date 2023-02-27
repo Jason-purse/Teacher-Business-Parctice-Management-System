@@ -12,18 +12,18 @@
           </div>
         </div>
         <div class="login">
-          <el-form ref="loginForm" :model="loginForm">
-            <el-form-item>
-              <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="账号" />
+          <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
+            <el-form-item prop="username">
+              <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="账号" clearable />
             </el-form-item>
-            <el-form-item>
-              <el-input v-model="loginForm.password" show-password type="password" prefix-icon="el-icon-lock" placeholder="密码"></el-input>
+            <el-form-item prop="password">
+              <el-input v-model="loginForm.password" show-password type="password" prefix-icon="el-icon-lock" placeholder="密码" clearable />
             </el-form-item>
           </el-form>
           <div class="tips">
             密码为8-16位大小写字母、数字至少两种组合，不可包含空格、中文，特殊符号等字符
           </div>
-          <el-button type="primary" size="small" @click="handleLogin" style="width: 100%">登 录</el-button>
+          <el-button type="primary" size="small" style="width: 100%" @click="handleLogin">登 录</el-button>
         </div>
       </div>
     </div>
@@ -35,28 +35,14 @@ import { validUsername } from '@/utils/validate'
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
-      }
-    }
     return {
       loginForm: {
         username: 'test',
         password: '123456'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户账号' }],
+        password: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户密码' }]
       },
       loading: false,
       passwordType: 'password',
@@ -108,12 +94,13 @@ export default {
         if (valid) {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm).then(() => {
-            let component = this.$message.success("登陆成功 !!!")
+            const component = this.$message.success('登陆成功 !!!')
+            sessionStorage.setItem('isFirst', 1)
             this.loading = false
             setTimeout(() => {
               this.$router.push({ path: this.redirect || '/' })
               component.close()
-            },500)
+            }, 500)
           }).catch(() => {
             this.loading = false
           })

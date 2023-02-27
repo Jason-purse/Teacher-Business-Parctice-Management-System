@@ -28,7 +28,7 @@ public class Report implements Serializable {
     private String description;
 
 
-    private String reportUrl;
+    private Integer reportUrlId;
 
     /**
      * 报告的类型,一般是id

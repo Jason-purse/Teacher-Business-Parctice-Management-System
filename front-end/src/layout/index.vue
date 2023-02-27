@@ -8,19 +8,38 @@
       </div>
       <app-main />
     </div>
+    <el-dialog
+      title="提示"
+      :visible.sync="isFirst"
+      width="20%"
+      :before-close="handleClose"
+      :close-on-click-modal="false"
+    >
+      <el-card shadow="hover">
+        <div style="display: flex;justify-content: space-between">
+          <span >今日未打卡</span>
+          <el-button type="primary" size="small">打 卡</el-button>
+        </div>
+      </el-card>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { Navbar, Sidebar, AppMain } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
-
+import attendance from '@/api/attendance'
 export default {
   name: 'Layout',
   components: {
     Navbar,
     Sidebar,
     AppMain
+  },
+  data() {
+    return {
+      isFirst: null
+    }
   },
   mixins: [ResizeMixin],
   computed: {
@@ -42,9 +61,25 @@ export default {
       }
     }
   },
+  mounted() {
+    this.showAttendance()
+    this.getIsAttendance()
+  },
   methods: {
+    ...attendance.methods,
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
+    },
+    showAttendance() {
+      this.isFirst = sessionStorage.getItem('isFirst') == 1 ? true : false
+    },
+    getIsAttendance() {
+      const res = this.getCurrentUserTodayAttendanceInfo()
+      console.log(res, 'res')
+    },
+    handleClose() {
+      sessionStorage.setItem('isFirst', 0)
+      this.isFirst = sessionStorage.getItem('isFirst') == 1 ? true : false
     }
   }
 }

@@ -46,46 +46,46 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    meta: { title: '教师企业实战管理', icon: 'table' },
+    meta: { title: '教师企业实战管理', icon: 'el-icon-menu' },
     redirect: '/project',
     children: [
       {
         path: 'project',
         name: 'project',
         component: () => import('@/views/project/index'),
-        meta: { title: '项目管理', icon: 'table' }
+        meta: { title: '项目管理', icon: 'el-icon-folder-opened' }
       },
       {
         path: 'attachment',
         name: 'attachment',
         component: () => import('@/views/attachment/index'),
-        meta: { title: '附件管理', icon: 'table' }
+        meta: { title: '附件管理', icon: 'el-icon-document' }
       },
       {
         path: 'attendance',
         name: 'attendance',
         component: () => import('@/views/attendance/index'),
-        meta: { title: '考勤管理', icon: 'table' }
+        meta: { title: '考勤管理', icon: 'el-icon-tickets' }
       },
       {
         path: 'audit',
         name: 'audit',
         component: () => import('@/views/audit/index'),
-        meta: { title: '审核管理', icon: 'table' }
+        meta: { title: '审核管理', icon: 'el-icon-edit-outline' }
       },
       {
         path: 'dict',
         name: 'dict',
         component: () => import('@/views/dict/index'),
-        meta: { title: '字典管理', icon: 'table' }
+        meta: { title: '字典管理', icon: 'el-icon-takeaway-box\n' }
       },
       {
         path: 'user',
         name: 'user',
         component: () => import('@/views/user/index'),
-        meta: { title: '用户管理', icon: 'table' }
-      }
-]
+        meta: { title: '用户管理', icon: 'el-icon-user' }
+      },
+    ]
   },
 
   // 404 page must be placed at the end !!!

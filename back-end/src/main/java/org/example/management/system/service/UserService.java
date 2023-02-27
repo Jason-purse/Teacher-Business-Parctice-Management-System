@@ -2,8 +2,7 @@ package org.example.management.system.service;
 
 //import com.generatera.authorization.application.server.form.login.config.components.LightningUserDetailService;
 //import com.generatera.security.authorization.server.specification.LightningUserPrincipal;
-import com.generatera.authorization.application.server.form.login.config.components.LightningUserDetailService;
-import com.generatera.security.authorization.server.specification.LightningUserPrincipal;
+
 import com.jianyue.lightning.boot.starter.util.BeanUtils;
 import com.jianyue.lightning.boot.starter.util.ElvisUtil;
 import com.jianyue.lightning.boot.starter.util.OptionalFlux;
@@ -14,7 +13,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.entity.Attendance;
-import org.example.management.system.model.entity.RoleRRAuditPhase;
 import org.example.management.system.model.entity.RoleRRU;
 import org.example.management.system.model.entity.User;
 import org.example.management.system.model.param.UserParam;
@@ -31,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -39,7 +38,6 @@ import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.jianyue.lightning.boot.starter.util.OptionalFlux.of;
@@ -49,7 +47,7 @@ import static com.jianyue.lightning.boot.starter.util.OptionalFlux.of;
  */
 @Service
 @RequiredArgsConstructor
-public class UserService implements LightningUserDetailService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -98,15 +96,15 @@ public class UserService implements LightningUserDetailService {
         return userVo;
     }
 
-    @Override
-    public LightningUserPrincipal mapAuthenticatedUser(LightningUserPrincipal userPrincipal) {
-        if (userPrincipal instanceof SimpleUserPrincipal principal) {
-            // 给定一个认证的不可变的用户信息 !!!
-            return SimpleUserPrincipal.authenticated(principal.getUser(),principal.getAuthorities());
-        }
-
-        return userPrincipal;
-    }
+    //@Override
+    //public LightningUserPrincipal mapAuthenticatedUser(LightningUserPrincipal userPrincipal) {
+    //    if (userPrincipal instanceof SimpleUserPrincipal principal) {
+    //        // 给定一个认证的不可变的用户信息 !!!
+    //        return SimpleUserPrincipal.authenticated(principal.getUser(),principal.getAuthorities());
+    //    }
+    //
+    //    return userPrincipal;
+    //}
 
     public Page<UserVo> getAllUserDetailsByPage(UserParam userParam, Pageable pageable) {
 

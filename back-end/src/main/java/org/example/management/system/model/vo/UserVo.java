@@ -1,6 +1,5 @@
 package org.example.management.system.model.vo;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,13 +23,19 @@ public class UserVo {
 
     private String description;
 
+    /**
+     * 头像地址 ...
+     */
+    private String avatarUrl;
+
+
     private String email;
 
     private String phone;
 
     private String nickname;
 
-    private String gex;
+    private Integer gex;
 
     private String birthDay;
 

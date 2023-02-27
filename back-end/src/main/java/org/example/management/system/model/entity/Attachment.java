@@ -1,16 +1,23 @@
-package org.example.management.system.model.vo;
+package org.example.management.system.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Entity
+@Table(name = "attachment")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AttachmentVo {
+public class Attachment implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String fileName;
@@ -21,13 +28,11 @@ public class AttachmentVo {
 
     private String createTimeStr;
 
-    private Long createAt;
-
     private Integer mediaType;
 
-    /**
-     * 报告关联数量
-     */
-    private Integer reportRRCount;
+    private Long createAt;
 
+    private Long updateAt;
+
+    private String updateTimeStr;
 }

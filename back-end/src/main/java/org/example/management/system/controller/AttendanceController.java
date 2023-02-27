@@ -52,4 +52,19 @@ public class AttendanceController {
                                 });
         attendanceService.createAttendanceInfo(attendanceParam);
     }
+
+    /**
+     * 当前用户的今日考勤情况
+     */
+    @GetMapping("/currentuser/info")
+    public AttendanceVo currentAttendanceInfo() {
+        AttendanceParam attendanceParam = new AttendanceParam();
+        LightningUserContext.get()
+                    .getUserPrincipal(SimpleUserPrincipal.class)
+                    .ifPresent(ele -> {
+                        attendanceParam.setUserId(ele.getUser().getId());
+                    });
+
+        return attendanceService.getCurrentUserToDayAttendanceInfo(attendanceParam.getUserId());
+    }
 }
