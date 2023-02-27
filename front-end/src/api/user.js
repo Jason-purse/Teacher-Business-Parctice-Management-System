@@ -7,7 +7,7 @@ const apiEndpoints = {
   getAllUsersByPageUrl: `${mainUrl}/list`,
   deleteUserByIdUrl: `${mainUrl}/delete`,
   updateUserUrl: `${mainUrl}`,
-  getCurrentUserInfoUrl: `${mainUrl}`
+  getCurrentUserInfoUrl: `${mainUrl}/current/userinfo`
 }
 const loginEndpoints = {
   registerUrl: `${loginMainUrl}/register`
