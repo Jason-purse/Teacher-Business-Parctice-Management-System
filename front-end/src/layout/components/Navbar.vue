@@ -30,28 +30,27 @@
     >
       <div style="padding: 0 20px">
         <el-button v-if="!isEdit" type="primary" size="mini" @click="isEdit = true">编辑</el-button>
-        <el-button v-if="isEdit" type="primary" size="mini">保存</el-button>
+        <el-button v-if="isEdit" type="primary" size="mini" @click="updateUserInfo">保存</el-button>
         <el-button v-if="isEdit" type="warning" size="mini" @click="isEdit = false">取消</el-button>
         <el-form ref="form" :model="formInfo" label-width="50px" style="margin-top: 10px" :rules="rules">
-          <el-form-item label="姓名" prop="username">
-            <div v-if="!isEdit">{{ userInfo.username }}</div>
-            <el-input v-else v-model="formInfo.username" />
+          <el-form-item label="姓名">
+            <div>{{ userInfo.username }}</div>
           </el-form-item>
           <el-form-item label="昵称" prop="nickname">
             <div v-if="!isEdit">{{ userInfo.nickname ? userInfo.nickname : '暂无' }}</div>
-            <el-input v-else v-model="formInfo.nickname" />
+            <el-input size="small" v-else v-model="formInfo.nickname" />
           </el-form-item>
           <el-form-item label="手机" prop="phone">
             <div v-if="!isEdit">{{ userInfo.phone ? userInfo.phone : '暂无' }}</div>
-            <el-input v-else v-model="formInfo.phone" />
+            <el-input size="small" v-else v-model="formInfo.phone" />
           </el-form-item>
           <el-form-item label="简介" prop="description">
             <div v-if="!isEdit">{{ userInfo.description ? userInfo.description : '暂无' }}</div>
-            <el-input v-else v-model="formInfo.description" />
+            <el-input size="small" v-else v-model="formInfo.description" />
           </el-form-item>
           <el-form-item label="性别" prop="gex">
             <div v-if="!isEdit">{{ userInfo.gex ? userInfo.gex : '暂无' }}</div>
-            <el-input v-else v-model="formInfo.gex" />
+            <el-input size="small" v-else v-model="formInfo.gex" />
           </el-form-item>
           <el-form-item label="邮箱">
             <div>{{ userInfo.email ? userInfo.email : '暂无' }}</div>
@@ -77,12 +76,12 @@ export default {
     return {
       drawerVisable: false,
       userInfo: {},
-      formInfo: {},
+      formInfo: { },
       isEdit: false,
       rules: {
-        username: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户姓名' }],
-        nickname: [{ required: false, trigger: ['blur', 'change'], message: '请输入用户昵称' }],
-        phone: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户手机号' }]
+        // username: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户姓名' }],
+        // nickname: [{ required: false, trigger: ['blur', 'change'], message: '请输入用户昵称' }],
+        // phone: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户手机号' }]
       }
     }
   },
@@ -107,10 +106,14 @@ export default {
     },
     getInfo() {
       this.getCurrentUserInfo().then(res => {
-        console.log(res, 'info')
         if (res.code === 200) {
           this.userInfo = res.result
+          this.formInfo = { ...res.result }
         }
+      })
+    },
+    updateUserInfo() {
+      this.updateUser(this.formInfo).then(res => {
       })
     }
   }

@@ -3,7 +3,7 @@
     <div class="login-container">
       <div class="login-pic">
         <img src="./images/bg.png">
-        <div class="title">lalala</div>
+        <div class="title">教师企业实战管理</div>
       </div>
       <div class="login-form">
         <div class="tab-box">
@@ -12,18 +12,35 @@
           </div>
         </div>
         <div class="login">
-          <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
-            <el-form-item prop="username">
-              <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="账号" clearable />
-            </el-form-item>
-            <el-form-item prop="password">
-              <el-input v-model="loginForm.password" show-password type="password" prefix-icon="el-icon-lock" placeholder="密码" clearable />
-            </el-form-item>
+          <el-form ref="loginForm" :model="tabValue === 'account' ? loginForm : registerForm" :rules="loginRules">
+             <template v-if="tabValue === 'account'">
+               <el-form-item prop="username">
+                 <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="账号" clearable />
+               </el-form-item>
+               <el-form-item prop="password">
+                 <el-input v-model="loginForm.password" show-password type="password" prefix-icon="el-icon-lock" placeholder="密码" clearable />
+               </el-form-item>
+             </template>
+            <template v-else>
+              <el-form-item prop="email">
+                <el-input v-model="registerForm.email" prefix-icon="el-icon-user" placeholder="邮箱" clearable />
+              </el-form-item>
+              <el-form-item prop="username">
+                <el-input v-model="registerForm.username" placeholder="姓名" clearable />
+              </el-form-item>
+              <el-form-item prop="nickname">
+                <el-input v-model="registerForm.nickname" placeholder="昵称" clearable />
+              </el-form-item>
+              <el-form-item prop="password">
+                <el-input v-model="registerForm.password" show-password type="password" prefix-icon="el-icon-lock" placeholder="密码" clearable />
+              </el-form-item>
+            </template>
           </el-form>
           <div class="tips">
             密码为8-16位大小写字母、数字至少两种组合，不可包含空格、中文，特殊符号等字符
           </div>
-          <el-button type="primary" size="small" style="width: 100%" @click="handleLogin">登 录</el-button>
+          <el-button v-if="tabValue === 'account'" type="primary" size="small" style="width: 100%" @click="handleLogin">登 录</el-button>
+          <el-button v-else type="primary" size="small" style="width: 100%" @click="handleRegister">注 册</el-button>
         </div>
       </div>
     </div>
@@ -31,18 +48,34 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+import user from "@/api/user"
 export default {
   name: 'Login',
   data() {
+    const validateEmail = (rule, value, callback) => {
+      const verify = /^\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/;
+      if (!verify.test(value)) {
+        callback(new Error('邮箱格式错误, 请重新输入'))
+      } else {
+        callback()
+      }
+    }
     return {
       loginForm: {
         username: 'test',
         password: '123456'
       },
+      registerForm: {
+        username: '',
+        nickname: '',
+        email: '',
+        password: ''
+      },
       loginRules: {
-        username: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户账号' }],
-        password: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户密码' }]
+        username: [{ required: true, trigger: 'blur', message: '请输入用户账号' }],
+        password: [{ required: true, trigger: 'blur', message: '请输入用户密码' }],
+        nickname: [{ required: true, trigger: 'blur', message: '请输入用户昵称' }],
+        email: [{ required: true, trigger: 'blur', validator: validateEmail }]
       },
       loading: false,
       passwordType: 'password',
@@ -69,6 +102,7 @@ export default {
     }
   },
   methods: {
+    ...user.methods,
     /**
      * 切换tab
      * @param {*} value
@@ -78,6 +112,7 @@ export default {
       // this.$refs['phone'].clearValidate()
       // this.$refs['change'].clearValidate()
       this.tabValue = value
+      this.$refs.loginForm.clearValidate()
     },
     showPwd() {
       if (this.passwordType === 'password') {
@@ -107,6 +142,24 @@ export default {
         } else {
           console.log('error submit!!')
           return false
+        }
+      })
+    },
+    handleRegister() {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          this.registerUser(this.registerForm).then(res => {
+            if (res.code === 200) {
+              this.$message.success('注册用户成功!')
+              this.tabValue = 'account'
+              this.registerForm = {
+                username: '',
+                nickname: '',
+                email: '',
+                password: ''
+              }
+            }
+          })
         }
       })
     }
@@ -146,8 +199,9 @@ $light_gray: #eee;
         width: 100%;
         text-align: center;
         color: #303133;
-        font-size: 18px;
+        font-size: 24px;
         font-weight: 600;
+        margin-top: 20px;
       }
     }
   }
@@ -155,7 +209,8 @@ $light_gray: #eee;
 }
 .login-form {
   width: 320px;
-  height: 70%;
+  //height: 70%;
+  height: fit-content;
   padding: 30px 20px;
   background: #fff;
   border-radius: 10px;

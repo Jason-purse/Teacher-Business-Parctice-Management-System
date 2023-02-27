@@ -9,16 +9,21 @@
       <app-main />
     </div>
     <el-dialog
-      title="提示"
+      title="打卡"
       :visible.sync="isFirst"
       width="20%"
       :before-close="handleClose"
       :close-on-click-modal="false"
     >
       <el-card shadow="hover">
-        <div style="display: flex;justify-content: space-between">
-          <span>今日未打卡</span>
-          <el-button type="primary" size="small">打 卡</el-button>
+        <div style="display: flex;justify-content: space-between;align-items: center">
+          <div class="card-box" v-if="!isAttendance">
+            <i class="el-icon-close card-check"></i>
+            今日未打卡</div>
+          <div class="card-box" v-else>
+            <i class="el-icon-check card-check"></i>
+            今日已打卡</div>
+          <el-button v-if="!isAttendance" type="primary" size="small" style="height: 30px" @click="fetchAttendance">打 卡</el-button>
         </div>
       </el-card>
     </el-dialog>
@@ -39,7 +44,8 @@ export default {
   mixins: [ResizeMixin],
   data() {
     return {
-      isFirst: null
+      isFirst: null,
+      isAttendance: null
     }
   },
   computed: {
@@ -59,11 +65,14 @@ export default {
         withoutAnimation: this.sidebar.withoutAnimation,
         mobile: this.device === 'mobile'
       }
+    },
+    dialogVisiable() {
+      return this.isFirst === true && this.isAttendance == false
     }
   },
-  mounted() {
+  created() {
     this.showAttendance()
-    // this.getIsAttendance()
+    this.getIsAttendance()
   },
   methods: {
     ...attendance.methods,
@@ -74,15 +83,21 @@ export default {
       this.isFirst = sessionStorage.getItem('isFirst') == 1
     },
     getIsAttendance() {
-      // const res = this.getCurrentUserTodayAttendanceInfo()
-      // console.log(res, 8888888888888)
-      // this.getCurrentUserTodayAttendanceInfo().then(res=>{
-      //   console.log(res, 9999999)
-      // })
+      this.getCurrentUserTodayAttendanceInfo().then(res => {
+        this.isAttendance = res
+      })
     },
     handleClose() {
       sessionStorage.setItem('isFirst', 0)
       this.isFirst = sessionStorage.getItem('isFirst') == 1
+    },
+    fetchAttendance() {
+      this.createAttendance().then(res => {
+        if (res.code === 200) {
+          this.$message.success('今日打卡成功')
+          this.getIsAttendance()
+        }
+      })
     }
   }
 }
@@ -131,5 +146,20 @@ export default {
   }
   .sidebar-container {
     background: transparent;
+  }
+  .card-box {
+    display: flex;
+    align-items: center;
+    color:#2b78eb;
+    .card-check {
+      font-size: 30px;
+      width: 40px;
+      line-height: 40px;
+      text-align: center;
+      border-radius: 50%;
+      border: 1px solid #2b78eb;
+
+      margin: 0 10px;
+    }
   }
 </style>
