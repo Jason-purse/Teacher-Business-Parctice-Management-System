@@ -30,6 +30,13 @@ public class Attendance implements Serializable {
 
     private String username;
 
+    private Long signAt;
+
+    private String signTimeStr;
+
+    /**
+     * 表示为今天凌晨
+     */
     private String createTimeStr;
 
     private Long createAt;

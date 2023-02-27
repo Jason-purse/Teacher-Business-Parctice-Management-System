@@ -71,6 +71,14 @@ public class AuditService {
             // 审核失败 !!!
             report.setStatus(item.getId());
             report.setFailureReason(auditParam.getFailureReason());
+
+            // 改变阶段到前一个 ..
+            Dict dict = dictService.getDictItemById(report.getAuditPhase());
+            if (dict.getPreviousDataTypeID() != null) {
+                Dict previousDict = dictService.getDictItemById(dict.getPreviousDataTypeID());
+                // 设置为前一个阶段 ..
+                report.setAuditPhase(previousDict.getId());
+            }
         } else {
             // 表示成功 !!! 进入下一个阶段
             Dict item = dictService.getDictItemById(report.getAuditPhase());
