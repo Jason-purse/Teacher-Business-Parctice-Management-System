@@ -138,8 +138,9 @@ export default {
             this.getCurrentUserInfo().then(res => {
               if (res.code === 200) {
                 this.userInfo = res.result
-                this.formInfo = {...res.result}
-                this.SET_USERINFO({...res.result})
+                this.formInfo = { ...res.result }
+                sessionStorage.setItem('roles', res.result.roles)
+                this.SET_USERINFO({ ...res.result })
               }
             }).finally(() => {
               setTimeout(() => {

@@ -404,7 +404,7 @@ export default {
     },
     openDescriptionDialog({failureReason, successDescription, failureFlag}) {
       this.auditResult.visible = true
-      console.log(failureReason)
+      // console.log(failureReason)
       this.auditResult.description = (failureFlag ? failureReason : successDescription) || '没有任何说明 !!'
     },
     getDataFunc() {

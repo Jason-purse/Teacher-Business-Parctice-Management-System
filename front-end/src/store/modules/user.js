@@ -50,7 +50,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { result } = response
-        console.log(result)
+        // console.log(result)
         commit('SET_ACCESS_TOKEN', result.access_token)
         commit('SET_REFRESH_TOKEN', result.refresh_token)
         setAccessToken(result.access_token)
@@ -74,7 +74,7 @@ const actions = {
 
         const { name, avatar } = data
 
-        console.log('登陆成功响应 !!!')
+        // console.log('登陆成功响应 !!!')
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         resolve(data)

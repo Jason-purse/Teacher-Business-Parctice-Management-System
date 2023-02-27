@@ -30,9 +30,20 @@ export default {
     ]),
     ...mapState('user', ['userInfo']),
     routes() {
-      console.log(this.userInfo, 'userinfo')
-      // const newRoute = this.$router.options.routes.map(item=>item.path == '/').filter(item=> item.metaoles.includes())
-      return this.$router.options.routes
+      const roles = sessionStorage.getItem('roles')
+      // const roles = [ 'teacher', 'auditor' ]
+      if (roles.length == 0) {
+        this.$router.push('/nothing')
+        return []
+      }
+      let newRoute = this.$router.options.routes.filter(item => item.path == '/')[0].children
+      newRoute = newRoute.filter(item => {
+        return roles.some(it => {
+          return item.meta.roles.includes(it)
+        })
+      })
+      return newRoute
+      // return this.$router.options.routes
     },
     activeMenu() {
       const route = this.$route
