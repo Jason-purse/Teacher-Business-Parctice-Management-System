@@ -28,8 +28,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static org.example.management.system.model.constant.DictConstant.AUDITING;
-import static org.example.management.system.model.constant.DictConstant.AUDIT_FINALLY_PHASE;
+import static org.example.management.system.model.constant.DictConstant.*;
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.startsWith;
 
 @Service
@@ -71,10 +70,9 @@ public class AuditService {
             // 审核失败 !!!
             report.setStatus(item.getId());
             report.setFailureReason(auditParam.getFailureReason());
-
             // 改变阶段到前一个 ..
             Dict dict = dictService.getDictItemById(report.getAuditPhase());
-            if (dict.getPreviousDataTypeID() != null) {
+            if (dict.getPreviousDataTypeID() != null && dict.getPreviousDataTypeID().equals(FIRST_ITEM_IDENTIFY)) {
                 Dict previousDict = dictService.getDictItemById(dict.getPreviousDataTypeID());
                 // 设置为前一个阶段 ..
                 report.setAuditPhase(previousDict.getId());

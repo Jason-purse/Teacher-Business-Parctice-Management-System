@@ -56,7 +56,7 @@ public class AttendanceController {
     /**
      * 当前用户的今日考勤情况
      */
-    @PostMapping("/currentuser/info")
+    @GetMapping("/currentuser/info")
     public AttendanceVo currentAttendanceInfo() {
         AttendanceParam attendanceParam = new AttendanceParam();
         LightningUserContext.get()
