@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class SimpleUserPrincipal implements LightningUserPrincipal  {
-    private final List<GrantedAuthority> authorities;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     private final User user;
 
@@ -18,36 +18,40 @@ public class SimpleUserPrincipal implements LightningUserPrincipal  {
 
     private final boolean credentialsNonExpired;
 
+    private final boolean authenticated;
+
     private final boolean enable;
 
     public SimpleUserPrincipal(
             User user,
-            List<GrantedAuthority> authorities,
+            Collection<? extends GrantedAuthority> authorities,
             boolean accountNonExpired,
             boolean accountNonLocked,
             boolean credentialsNonExpired,
-            boolean enable
+            boolean enable,
+            boolean authenticated
     ) {
         this.user = user;
         this.authorities = authorities;
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
+        this.authenticated = authenticated;
         this.enable = enable;
     }
 
     public static SimpleUserPrincipal unAuthenticated(
             User user,
-            List<GrantedAuthority> authorities
+            Collection<? extends GrantedAuthority> authorities
     ) {
-        return new SimpleUserPrincipal(user,authorities,false,false,false,false);
+        return new SimpleUserPrincipal(user,authorities,true,true,true,true,false);
     }
 
     public static SimpleUserPrincipal authenticated(
             User user,
-            List<GrantedAuthority> authorities
+            Collection<? extends GrantedAuthority> authorities
     ) {
-        return new SimpleUserPrincipal(user,authorities,true,true,true,true);
+        return new SimpleUserPrincipal(user,authorities,true,true,true,true,true);
     }
 
     @Override

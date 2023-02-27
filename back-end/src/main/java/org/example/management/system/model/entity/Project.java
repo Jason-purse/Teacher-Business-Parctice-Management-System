@@ -35,10 +35,19 @@ public class Project implements Serializable {
      * started - running - finish
      * 启动 / 进行中 / 完成
      */
-    private String status;
+    private Integer status;
+
+    /**
+     * 是否完成
+     */
+    private Boolean finished;
 
 
     private String createTimeStr;
+
+    private String username;
+
+    private Integer userId;
 
 
     private Long createAt;

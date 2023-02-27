@@ -20,67 +20,13 @@ public class ProjectParam {
      */
     private String description;
 
-    /**
-     * 申请报告文件地址
-     */
-    private String requestReportUrl;
+    private String username;
 
-    /**
-     * request status
-     */
-    private String rrStatus;
+    private Integer userId;
 
-    private String rrUserId;
+    private Long startTimeAt;
 
-    private String rrUsername;
-
-    private String rrAuditUserId;
-
-    private String rrAuditUserName;
-
-    private String rrAuditFailureDescription;
-
-    /**
-     * 阶段性报告文件地址
-     */
-    private String phaseReportUrl;
-
-    private String prStatus;
-
-    private String prUserId;
-
-    private String prUsername;
-
-    private String prAuditUserId;
-
-    private String prAuditUserName;
-
-    private String prAuditFailureDescription;
-
-    /**
-     * 总结报告文件地址
-     */
-    private String summarizeReportUrl;
-
-    /**
-     * 同上面的其他状态,总共有3个
-     *
-     * auditor_audit / leader_audit / enterprise_audit
-     *
-     * 都包含了审核中 和审核完毕的状态
-     */
-    private String srStatus;
-
-    private String srAuditFailureDescription;
-
-    private String srUsername;
-
-    private String srUserId;
-
-
-    private String srAuditUserId;
-
-    private String srAuditUserName;
+    private Long endTimeAt;
 
     /**
      * 项目状态

@@ -15,7 +15,11 @@ public class DateTimeUtils {
     }
 
     public static long getStartTimeOfDay() {
-        return LocalDate.now().atStartOfDay().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        return getTimeOfDay(LocalDate.now().atStartOfDay());
+    }
+
+    public static long getTimeOfDay(LocalDateTime time) {
+        return time.toInstant(ZoneOffset.of("+8")).toEpochMilli();
     }
 
 

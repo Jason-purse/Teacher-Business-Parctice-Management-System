@@ -3,5 +3,60 @@ spring:
     username: admin
     password: admin
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:file:./back-end/data/db
+    url: jdbc:h2:file:./back-end/data/db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    generate-ddl: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:${server.port}
+  application:
+    name: teacher-bp-management-system
+  servlet:
+    multipart:
+      max-file-size: 10MB
+  sql:
+    init:
+      mode: always
+lightning:
+  security:
+    auth:
+      server:
+        common:
+          component:
+            permission:
+              url-white-list:
+                - /api/user/v1/register/**
+                - /api/user/v1/delete/**
+                - /swagger-ui/**
+                - /swagger-resources/**
+                - /swagger-ui.html
+                - /v2/api-docs
+                - /webjars/**
+                - /h2-console/**
+    app:
+      auth:
+        server:
+          config:
+            separation: true
+    resource:
+      server:
+        token-verification-config:
+          jwk-source-category: jwk_or_issuer_url
+server:
+  port: 8090
+springfox:
+  documentation:
+    swagger-ui:
+      base-url: /
+    swagger:
+      v2:
+        enabled: true

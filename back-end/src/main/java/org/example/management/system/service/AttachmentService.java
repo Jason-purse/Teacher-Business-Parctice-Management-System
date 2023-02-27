@@ -23,7 +23,7 @@ public class AttachmentService {
                     .builder()
                     .fileUrl(
                             fileService.saveFile(file.getInputStream(),
-                            "attachment",getFileName(file.getName()))
+                            "attachment",getFileName(file.getOriginalFilename()))
                     )
                     .build();
         }catch (Exception e) {
