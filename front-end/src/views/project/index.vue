@@ -3,10 +3,10 @@
     <div class="search-line">
       <el-form ref="searchForm" :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="项目名称" prop="name">
-          <el-input v-model="searchForm.name" placeholder="请输入项目名称" />
+          <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
         </el-form-item>
         <el-form-item label="发起人" prop="username">
-          <el-select v-model="searchForm.username" placeholder="请输入发起人">
+          <el-select v-model="searchForm.username" placeholder="请输入发起人" clearable>
             <el-option label="发起时间" value="shanghai" />
             <el-option label="区域二" value="beijing" />
           </el-select>
@@ -148,11 +148,11 @@
       size="300px"
       direction="rtl"
     >
-      <el-form size="small" :model="drawerDialogData" class="search-form" style="padding: 5px">
-        <el-form-item label="项目名称">
+      <el-form size="small" ref="drawerRef" :model="drawerDialogData" :rules="rules" class="search-form" style="padding: 5px">
+        <el-form-item label="项目名称" prop="name">
           <el-input v-model="drawerDialogData.name" placeholder="请输入项目名称" />
         </el-form-item>
-        <el-form-item label="项目描述">
+        <el-form-item label="项目描述" prop="description">
           <el-input v-model="drawerDialogData.description" placeholder="请输入项目描述" />
         </el-form-item>
         <el-form-item>
@@ -164,19 +164,19 @@
     </el-drawer>
 
     <el-dialog title="提交报告" :visible.sync="reportForm.visible">
-      <el-form ref="reportForm" :model="reportForm.data">
-        <el-form-item label="报告名称">
+      <el-form ref="reportForm" :model="reportForm.data" :rules="reportFormRule">
+        <el-form-item label="报告名称" prop="reportName">
           <el-input v-model="reportForm.data.reportName" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="报告描述">
+        <el-form-item label="报告描述" prop="description">
           <el-input v-model="reportForm.data.description" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="报告类型">
+        <el-form-item label="报告类型" prop="reportType">
           <el-select v-model="reportForm.data.reportType" placeholder="请选择报告类型">
             <el-option v-for="{itemType,itemValue,id} in reportTypes" :key="itemType" :label="itemValue" :value="id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="报告格式">
+        <el-form-item label="报告格式" prop="reportFormat">
           <el-select v-model="reportForm.data.reportFormat" placeholder="请选择报告格式">
             <el-option v-for="{itemType,itemValue,id} in reportFormat" :key="itemType" :label="itemValue" :value="id" />
           </el-select>
@@ -294,6 +294,10 @@ export default {
   name: 'Index',
   data() {
     return {
+      rules:{
+        name: [{ required: true, trigger: ['blur', 'change'], message: '请输入项目名称' }],
+        description: [{ required: true, trigger: ['blur', 'change'], message: '请输入项目描述' }]
+      },
       audit: {
         // 当前报告数据
         data: {},
@@ -353,6 +357,12 @@ export default {
         },
         currentRow: null,
         visible: false
+      },
+      reportFormRule: {
+        reportName: [{ required: true, trigger: ['blur', 'change'], message: '请输入报告名称' }],
+        description: [{ required: true, trigger: ['blur', 'change'], message: '请输入报告描述' }],
+        reportType: [{ required: true, trigger: ['blur', 'change'], message: '请选择报告类型' }],
+        reportFormat: [{ required: true, trigger: ['blur', 'change'], message: '请选择报告格式' }]
       }
     }
   },
@@ -437,27 +447,32 @@ export default {
       this.drawerDialogData = {}
     },
     saveProject() {
-      if (!this.drawerAction) {
-        // 保存
-        this.createProject(this.drawerDialogData).then(() => {
-          this.$message.success('新建项目成功 !!!')
-          this.onSubmit()
-          this.closeDrawer()
-        })
-      } else {
-        this.updateProject(this.drawerDialogData).then(() => {
-          this.$message.success('更新项目成功 !!!')
-          this.onSubmit()
-          this.closeDrawer()
-        })
-      }
-
-      // 优化可见性
-      this.currentRow = {
-        row: null,
-        index: -1,
-        reportList: []
-      }
+      this.$refs.drawerRef.validate(valid=>{
+        if (valid) {
+          if (!this.drawerAction) {
+            // 保存
+            this.createProject(this.drawerDialogData).then(() => {
+              this.$message.success('新建项目成功 !!!')
+              this.onSubmit()
+              this.closeDrawer()
+            })
+          } else {
+            this.updateProject(this.drawerDialogData).then(() => {
+              this.$message.success('更新项目成功 !!!')
+              this.onSubmit()
+              this.closeDrawer()
+            })
+          }
+          // 优化可见性
+          this.currentRow = {
+            row: null,
+            index: -1,
+            reportList: []
+          }
+        } else {
+          this.$message.warning('请输入')
+        }
+      })
     },
     openDialogCommitReport(row) {
       this.reportForm.visible = true
@@ -562,19 +577,24 @@ export default {
       })
     },
     commitReport(action) {
-      if (action === 'save-report') {
-        this.createReport({ ...this.reportForm.data, projectId: this.reportForm.currentRow?.id }).then(() => {
-          this.$message.success('新增报告成功!!!')
-          this.updateReportList()
-        })
-      } else if (action === 'update-report') {
-        this.updateReport(this.reportForm.data).then(() => {
-          this.$message.success('更新报告成功 !!!')
-          this.updateReportList()
-        })
-      }
-
-      this.onCancel('reportForm')
+      this.$refs.reportForm.validate(valid => {
+        if (valid) {
+          if (action === 'save-report') {
+            this.createReport({ ...this.reportForm.data, projectId: this.reportForm.currentRow?.id }).then(() => {
+              this.$message.success('新增报告成功!!!')
+              this.updateReportList()
+            })
+          } else if (action === 'update-report') {
+            this.updateReport(this.reportForm.data).then(() => {
+              this.$message.success('更新报告成功 !!!')
+              this.updateReportList()
+            })
+          }
+          this.onCancel('reportForm')
+        } else {
+          this.$message.warning('请输入')
+        }
+      })
     },
     maxFileLimitTop() {
       this.$message.warning('只能上传一个文件!!!')

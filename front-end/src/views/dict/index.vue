@@ -1,12 +1,13 @@
 <template>
+  <!--  字典管理-->
   <div>
     <div class="search-line">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="字典项标识符">
-          <el-input v-model="searchForm.itemType" placeholder="请输入字典项标识符"></el-input>
+          <el-input v-model="searchForm.itemType" placeholder="请输入字典项标识符" clearable />
         </el-form-item>
         <el-form-item label="字典项值">
-          <el-input v-model="searchForm.itemValue" placeholder="请输入字典项值"></el-input>
+          <el-input v-model="searchForm.itemValue" placeholder="请输入字典项值" clearable />
         </el-form-item>
         <el-form-item>
           <el-form-item>
