@@ -182,6 +182,9 @@ public class UserService implements LightningUserDetailService {
                     roles.stream().map(Dict::getItemType).toList()
             );
         }
+        else {
+            userVo.setRoles(Collections.emptyList());
+        }
         return userVo;
     }
 
