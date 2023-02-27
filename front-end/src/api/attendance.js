@@ -4,7 +4,8 @@ const mainUrl = 'api/admin/attendance/v1'
 
 const apiEndpoints = {
   createAttendanceUrl: `${mainUrl}`,
-  getAllAttendanceByPageUrl: `${mainUrl}/list`
+  getAllAttendanceByPageUrl: `${mainUrl}/list`,
+  getCurrentUserTodayAttendanceInfoUrl: `${mainUrl}/currentuser/info`
 }
 
 export default {
@@ -16,8 +17,17 @@ export default {
       return request.get(apiEndpoints.getAllAttendanceByPageUrl, {
         params: {
           ...params,
-          pager
+          page: pager.page - 1,
+          size: pager.size
         }
+      })
+    },
+    /**
+     * 查看今日当前用户是否考勤
+     */
+    async getCurrentUserTodayAttendanceInfo() {
+      return await request.get(apiEndpoints.getCurrentUserTodayAttendanceInfoUrl).then(({ result }) => {
+        return result || false
       })
     }
   }

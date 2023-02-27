@@ -19,6 +19,8 @@ public class DictConstant {
 
     public static final String AUDIT_PHASE = "audit_phase";
 
+    public static final String AUDITING = "auditing";
+
     public static final String REPORT_TYPE = "report_type";
 
     public static final String REPORT_FORMAT = "report_format";

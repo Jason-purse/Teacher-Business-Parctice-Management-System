@@ -19,7 +19,8 @@ export default {
       return request.get(apiEndpoints.getAllAttendanceByPageUrl, {
         params: {
           ...param,
-          pager
+          page: pager.page - 1,
+          size: pager.size
         }
       })
     },
