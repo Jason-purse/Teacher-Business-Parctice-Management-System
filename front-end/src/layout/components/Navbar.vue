@@ -38,15 +38,15 @@
           </el-form-item>
           <el-form-item label="昵称" prop="nickname">
             <div v-if="!isEdit">{{ userInfo.nickname ? userInfo.nickname : '暂无' }}</div>
-            <el-input size="small" v-else v-model="formInfo.nickname"/>
+            <el-input size="small" v-else v-model="formInfo.nickname" clearable/>
           </el-form-item>
           <el-form-item label="手机" prop="phone">
             <div v-if="!isEdit">{{ userInfo.phone ? userInfo.phone : '暂无' }}</div>
-            <el-input size="small" v-else v-model="formInfo.phone"/>
+            <el-input size="small" v-else v-model="formInfo.phone" clearable/>
           </el-form-item>
           <el-form-item label="简介" prop="description">
             <div v-if="!isEdit">{{ userInfo.description ? userInfo.description : '暂无' }}</div>
-            <el-input size="small" v-else v-model="formInfo.description"/>
+            <el-input size="small" v-else v-model="formInfo.description" clearable/>
           </el-form-item>
           <el-form-item label="性别" prop="gex">
             <div v-if="!isEdit">
@@ -54,7 +54,7 @@
                 {{ userInfo.gex ? mapDictItemValue('genderStatus',userInfo.gex ): '暂无' }}
               </template>
             </div>
-            <el-select v-else size="small" v-model="formInfo.gex">
+            <el-select v-else size="small" v-model="formInfo.gex" placeholder="请选择性别" clearable>
               <el-option v-for="({itemValue,id}) in genderStatus" :label="itemValue" :key="id" :value="id"/>
             </el-select>
           </el-form-item>
@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapGetters,mapMutations} from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import user from '@/api/user'
@@ -80,6 +80,17 @@ export default {
     Hamburger
   },
   data() {
+    const validatePhone = (rule, value, callback) => {
+      if (value.length < 1) {
+        callback()
+      }
+      const verify = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
+      if (!verify.test(value)) {
+        callback(new Error('请输入正确手机号'))
+      } else {
+        callback()
+      }
+    }
     return {
       drawerVisable: false,
       userInfo: {},
@@ -89,7 +100,7 @@ export default {
       rules: {
         // username: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户姓名' }],
         // nickname: [{ required: false, trigger: ['blur', 'change'], message: '请输入用户昵称' }],
-        // phone: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户手机号' }]
+        phone: [{ required: false, trigger: 'blur', validator: validatePhone }]
       }
     }
   },
@@ -109,6 +120,7 @@ export default {
   methods: {
     ...user.methods,
     ...dict.methods,
+    ...mapMutations('user',['SET_USERINFO']),
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
@@ -122,6 +134,7 @@ export default {
         if (res.code === 200) {
           this.userInfo = res.result
           this.formInfo = {...res.result}
+          this.SET_USERINFO({...res.result})
         }
       })
     },
