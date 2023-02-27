@@ -34,8 +34,7 @@ lightning:
           component:
             permission:
               url-white-list:
-                - /api/user/v1/register/**
-                - /api/user/v1/delete/**
+                - /api/login/v1/**
                 - /swagger-ui/**
                 - /swagger-resources/**
                 - /swagger-ui.html

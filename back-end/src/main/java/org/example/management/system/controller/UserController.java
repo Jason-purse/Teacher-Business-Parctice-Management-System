@@ -1,10 +1,14 @@
 package org.example.management.system.controller;
 
+import com.generatera.security.authorization.server.specification.LightningUserContext;
+import com.jianyue.lightning.boot.starter.util.BeanUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import org.example.management.system.model.entity.User;
 import org.example.management.system.model.param.UserParam;
+import org.example.management.system.model.security.SimpleUserPrincipal;
 import org.example.management.system.model.vo.UserVo;
 import org.example.management.system.service.UserService;
 import org.springframework.data.domain.Page;
@@ -67,4 +71,18 @@ public class UserController {
     public Page<UserVo> getAllUserDetailsForAudit(Integer auditPhaseId,UserParam userParam,Pageable pageable) {
         return userService.getAllUserDetailsForAudit(auditPhaseId,userParam,pageable);
     }
+
+    /**
+     * 当前用户信息
+     */
+    @GetMapping("current/userinfo")
+    public UserVo getCurrentUserInfo() {
+        User user = LightningUserContext.get().getUserPrincipal(SimpleUserPrincipal.class)
+                .orElseThrow(() -> new IllegalStateException("当前不存在用户信息 !!!"))
+                .getUser();
+        UserVo userVo = BeanUtils.transformFrom(user, UserVo.class);
+        assert userVo != null;
+        return userVo;
+    }
+
 }
