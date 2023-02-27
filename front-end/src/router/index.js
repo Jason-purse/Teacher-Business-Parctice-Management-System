@@ -53,38 +53,38 @@ export const constantRoutes = [
         path: 'project',
         name: 'project',
         component: () => import('@/views/project/index'),
-        meta: { title: '项目管理', icon: 'el-icon-folder-opened' }
+        meta: { title: '项目管理', icon: 'el-icon-folder-opened', role: ['admin', 'teacher', 'auditor', 'leader', 'enterprise_principal'] }
       },
       {
         path: 'attachment',
         name: 'attachment',
         component: () => import('@/views/attachment/index'),
-        meta: { title: '附件管理', icon: 'el-icon-document' }
+        meta: { title: '附件管理', icon: 'el-icon-document', role: ['admin'] }
       },
       {
         path: 'attendance',
         name: 'attendance',
         component: () => import('@/views/attendance/index'),
-        meta: { title: '考勤管理', icon: 'el-icon-tickets' }
+        meta: { title: '考勤管理', icon: 'el-icon-tickets', role: ['admin', 'teacher', 'auditor', 'leader', 'enterprise_principal'] }
       },
       {
         path: 'audit',
         name: 'audit',
         component: () => import('@/views/audit/index'),
-        meta: { title: '审核管理', icon: 'el-icon-edit-outline' }
+        meta: { title: '审核管理', icon: 'el-icon-edit-outline', role: ['admin', 'teacher', 'auditor', 'leader', 'enterprise_principal'] }
       },
       {
         path: 'dict',
         name: 'dict',
         component: () => import('@/views/dict/index'),
-        meta: { title: '字典管理', icon: 'el-icon-takeaway-box\n' }
+        meta: { title: '字典管理', icon: 'el-icon-takeaway-box\n', role: ['admin'] }
       },
       {
         path: 'user',
         name: 'user',
         component: () => import('@/views/user/index'),
-        meta: { title: '用户管理', icon: 'el-icon-user' }
-      },
+        meta: { title: '用户管理', icon: 'el-icon-user', role: ['admin'] }
+      }
     ]
   },
 

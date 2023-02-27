@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import Logo from './Logo'
 import SidebarItem from './SidebarItem'
 import variables from '@/styles/variables.scss'
@@ -28,7 +28,10 @@ export default {
     ...mapGetters([
       'sidebar'
     ]),
+    ...mapState('user', ['userInfo']),
     routes() {
+      console.log(this.userInfo, 'userinfo')
+      // const newRoute = this.$router.options.routes.map(item=>item.path == '/').filter(item=> item.metaoles.includes())
       return this.$router.options.routes
     },
     activeMenu() {

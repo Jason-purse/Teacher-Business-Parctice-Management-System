@@ -110,11 +110,9 @@ export default {
       'avatar'
     ])
   },
-  mounted() {
-    this.getInfo()
-  },
 
   created() {
+    // this.getInfo()
     this.getGenderStatus()
   },
   methods: {
