@@ -1,9 +1,10 @@
 <template>
+  <!--  用户管理-->
   <div>
     <div class="search-line">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="用户名称">
-          <el-input v-model="searchForm.username" placeholder="请输入用户名称" />
+          <el-input v-model="searchForm.username" placeholder="请输入用户名称" clearable />
         </el-form-item>
         <el-form-item label="注册时间">
           <el-date-picker

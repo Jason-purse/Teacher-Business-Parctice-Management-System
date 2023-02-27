@@ -12,12 +12,12 @@
           </div>
         </div>
         <div class="login">
-          <el-form ref="loginForm" :model="loginForm">
-            <el-form-item>
-              <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="账号" />
+          <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
+            <el-form-item prop="username">
+              <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="账号" clearable />
             </el-form-item>
-            <el-form-item>
-              <el-input v-model="loginForm.password" show-password type="password" prefix-icon="el-icon-lock" placeholder="密码" />
+            <el-form-item prop="password">
+              <el-input v-model="loginForm.password" show-password type="password" prefix-icon="el-icon-lock" placeholder="密码" clearable />
             </el-form-item>
           </el-form>
           <div class="tips">
@@ -35,28 +35,14 @@ import { validUsername } from '@/utils/validate'
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
-      }
-    }
     return {
       loginForm: {
         username: 'test',
         password: '123456'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户账号' }],
+        password: [{ required: true, trigger: ['blur', 'change'], message: '请输入用户密码' }]
       },
       loading: false,
       passwordType: 'password',

@@ -1,18 +1,19 @@
 <template>
+  <!--  审核管理-->
   <div>
     <div class="search-line">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="项目名称">
-          <el-input v-model="searchForm.projectName" placeholder="请输入项目名称"></el-input>
+          <el-input v-model="searchForm.projectName" placeholder="请输入项目名称" clearable />
         </el-form-item>
         <el-form-item label="报告名称">
-          <el-input v-model="searchForm.reportName" placeholder="请输入项目名称"></el-input>
+          <el-input v-model="searchForm.reportName" placeholder="请输入项目名称" clearable />
         </el-form-item>
         <el-form-item label="报告发起人">
-          <el-input v-model="searchForm.requestUser" placeholder="请输入发起人名称"/>
+          <el-input v-model="searchForm.requestUser" placeholder="请输入发起人名称" clearable/>
         </el-form-item>
         <el-form-item label="审核阶段">
-          <el-select v-model="searchForm.auditPhase" placeholder="请选择审核阶段">
+          <el-select v-model="searchForm.auditPhase" placeholder="请选择审核阶段" clearable>
             <el-option v-for="{itemValue,id} in auditPhase" :label="itemValue" :key="id" :value="id"/>
           </el-select>
         </el-form-item>
@@ -20,16 +21,15 @@
           <el-date-picker
             v-model="searchForm.startTimeAt"
             type="date"
-            placeholder="选择日期" @change="validTimeRange('startTimeAt')">
-          </el-date-picker>
+            placeholder="选择日期"
+            @change="validTimeRange('startTimeAt')" />
         </el-form-item>
         <el-form-item label="或结束时间">
           <el-date-picker
             v-model="searchForm.endTimeAt"
             type="date"
             @change="validTimeRange('endTimeAt')"
-            placeholder="选择日期">
-          </el-date-picker>
+            placeholder="选择日期" />
         </el-form-item>
         <el-form-item>
           <el-form-item>
@@ -38,7 +38,6 @@
         </el-form-item>
       </el-form>
     </div>
-
     <el-table
       :data="tableData"
       style="width: 100%">

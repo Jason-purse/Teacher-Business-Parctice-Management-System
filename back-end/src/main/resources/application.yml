@@ -41,6 +41,7 @@ lightning:
                 - /v2/api-docs
                 - /webjars/**
                 - /h2-console/**
+                - /api/admin/dict/v1/**
     app:
       auth:
         server:
