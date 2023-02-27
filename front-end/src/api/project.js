@@ -16,7 +16,7 @@ export default {
     return request.get(apiEndpoints.getAllProjectsByPageUrl, {
       params: {
         ...param,
-        page: pager.page - 1,
+        page: pager.page,
         size: pager.size
       }
     })

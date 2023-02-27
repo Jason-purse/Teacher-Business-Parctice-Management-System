@@ -80,9 +80,20 @@ public class UserController {
         User user = LightningUserContext.get().getUserPrincipal(SimpleUserPrincipal.class)
                 .orElseThrow(() -> new IllegalStateException("当前不存在用户信息 !!!"))
                 .getUser();
-        UserVo userVo = BeanUtils.transformFrom(user, UserVo.class);
+        UserVo userVo = userService.getUserInfoById(user.getId());
+
         assert userVo != null;
         return userVo;
+    }
+
+    @PutMapping("current/userinfo")
+    public void updateCurrentInfo(@RequestBody UserParam userParam) {
+        User user = LightningUserContext.get()
+                .getUserPrincipal(SimpleUserPrincipal.class)
+                .orElseThrow(() -> new IllegalStateException("当前不存在用户信息 !!!"))
+                .getUser();
+
+        userService.updateCurrentInfo(userParam,user);
     }
 
 }

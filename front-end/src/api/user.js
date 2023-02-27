@@ -6,7 +6,7 @@ const loginMainUrl = '/api/login/v1'
 const apiEndpoints = {
   getAllUsersByPageUrl: `${mainUrl}/list`,
   deleteUserByIdUrl: `${mainUrl}/delete`,
-  updateUserUrl: `${mainUrl}`,
+  updateUserUrl: `${mainUrl}/current/userinfo`,
   getCurrentUserInfoUrl: `${mainUrl}/current/userinfo`
 }
 const loginEndpoints = {
@@ -43,7 +43,8 @@ export default {
       return request.get(apiEndpoints.getAllUsersByPageUrl, {
         params: {
           ...param,
-          pager
+          page: pager.page,
+          size: pager.size
         }
       })
         .then(data => {

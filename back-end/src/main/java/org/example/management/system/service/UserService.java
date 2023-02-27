@@ -3,6 +3,8 @@ package org.example.management.system.service;
 //import com.generatera.authorization.application.server.form.login.config.components.LightningUserDetailService;
 //import com.generatera.security.authorization.server.specification.LightningUserPrincipal;
 
+import com.generatera.authorization.application.server.form.login.config.components.LightningUserDetailService;
+import com.generatera.security.authorization.server.specification.LightningUserPrincipal;
 import com.jianyue.lightning.boot.starter.util.BeanUtils;
 import com.jianyue.lightning.boot.starter.util.ElvisUtil;
 import com.jianyue.lightning.boot.starter.util.OptionalFlux;
@@ -47,20 +49,21 @@ import static com.jianyue.lightning.boot.starter.util.OptionalFlux.of;
  */
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService implements LightningUserDetailService {
 
     private final UserRepository userRepository;
 
     private final RoleService roleService;
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return SimpleUserPrincipal.unAuthenticated(
                 userRepository.findOne(
-                        Example.of(
-                                User.builder()
-                                        .email(email)
-                                        .build()
-                        ))
+                                Example.of(
+                                        User.builder()
+                                                .email(email)
+                                                .build()
+                                ))
                         .orElseThrow(() -> new BadCredentialsException("用户名或者密码错误!!!")),
                 Collections.emptyList()
         );
@@ -75,9 +78,9 @@ public class UserService implements UserDetailsService {
                                 .build()
                 )
         );
-        Assert.isTrue(one.isEmpty(),"当前用户已经注册,请不要重复注册 !!!");
+        Assert.isTrue(one.isEmpty(), "当前用户已经注册,请不要重复注册 !!!");
         User user = BeanUtils.transformFrom(userParam, User.class);
-        assert  user != null;
+        assert user != null;
         LocalDateTime now = LocalDateTime.now();
         user.setCreateAt(DateTimeUtils.getTimeOfDay(now));
         user.setCreateTimeStr(DateTimeUtils.getTimeStr(now));
@@ -90,21 +93,21 @@ public class UserService implements UserDetailsService {
 
     public UserVo getUserDetails(Integer id) {
         Optional<User> user = userRepository.findById(id);
-        Assert.isTrue(user.isPresent(),"没有此用户 !!!");
+        Assert.isTrue(user.isPresent(), "没有此用户 !!!");
         UserVo userVo = BeanUtils.transformFrom(user.get(), UserVo.class);
         assert userVo != null;
         return userVo;
     }
 
-    //@Override
-    //public LightningUserPrincipal mapAuthenticatedUser(LightningUserPrincipal userPrincipal) {
-    //    if (userPrincipal instanceof SimpleUserPrincipal principal) {
-    //        // 给定一个认证的不可变的用户信息 !!!
-    //        return SimpleUserPrincipal.authenticated(principal.getUser(),principal.getAuthorities());
-    //    }
-    //
-    //    return userPrincipal;
-    //}
+    @Override
+    public LightningUserPrincipal mapAuthenticatedUser(LightningUserPrincipal userPrincipal) {
+        if (userPrincipal instanceof SimpleUserPrincipal principal) {
+            // 给定一个认证的不可变的用户信息 !!!
+            return SimpleUserPrincipal.authenticated(principal.getUser(), principal.getAuthorities());
+        }
+
+        return userPrincipal;
+    }
 
     public Page<UserVo> getAllUserDetailsByPage(UserParam userParam, Pageable pageable) {
 
@@ -125,26 +128,24 @@ public class UserService implements UserDetailsService {
                 .getResult();
     }
 
-    public Page<UserVo> getAllUserDetailsForAudit(Integer auditPhaseId,UserParam userParam,Pageable pageable) {
-        if(ElvisUtil.stringElvis(userParam.getUsername(),null) != null  ||
-           userParam.getStartTimeAt() != null || userParam.getEndTimeAt() != null) {
+    public Page<UserVo> getAllUserDetailsForAudit(Integer auditPhaseId, UserParam userParam, Pageable pageable) {
+        if (ElvisUtil.stringElvis(userParam.getUsername(), null) != null ||
+                userParam.getStartTimeAt() != null || userParam.getEndTimeAt() != null) {
 
             // 先查询然后查询角色表 ...
-            List<User> all = userRepository.findAll(new ComplexSpecification(userParam.getUsername(),userParam.getEmail(), userParam.getStartTimeAt(), userParam.getEndTimeAt()));
-            if(all.size() == 0) {
+            List<User> all = userRepository.findAll(new ComplexSpecification(userParam.getUsername(), userParam.getEmail(), userParam.getStartTimeAt(), userParam.getEndTimeAt()));
+            if (all.size() == 0) {
                 return Page.empty();
             }
             List<Integer> userIds = all.stream().map(User::getId).toList();
             Page<RoleRRU> roleRRUS = roleService.getUserIdForAuditPhase(auditPhaseId, userIds, pageable);
-            return getUserVos(pageable,roleRRUS);
-        }
-        else {
+            return getUserVos(pageable, roleRRUS);
+        } else {
             Page<RoleRRU> roleRRUS = roleService.getUserIdForAuditPhase(auditPhaseId, pageable);
-            if(roleRRUS.getNumberOfElements() == 0) {
+            if (roleRRUS.getNumberOfElements() == 0) {
                 // 表示没有
-                return new PageImpl<>(Collections.emptyList(),pageable,roleRRUS.getTotalElements());
-            }
-            else {
+                return new PageImpl<>(Collections.emptyList(), pageable, roleRRUS.getTotalElements());
+            } else {
                 return getUserVos(pageable, roleRRUS);
             }
         }
@@ -160,6 +161,21 @@ public class UserService implements UserDetailsService {
                 .getResult();
     }
 
+    public void updateCurrentInfo(UserParam userParam, User user) {
+        String username = user.getUsername();
+        String email = user.getEmail();
+        BeanUtils.updateProperties(userParam, user);
+        user.setEmail(email);
+        user.setUsername(username);
+        userRepository.save(user);
+    }
+
+    public UserVo getUserInfoById(Integer id) {
+        Optional<User> user = userRepository.findById(id);
+        Assert.isTrue(user.isPresent(),"当前用户不存在 !!!");
+        return BeanUtils.transformFrom(user.get(), UserVo.class);
+    }
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -172,50 +188,51 @@ public class UserService implements UserDetailsService {
         private Long startTimeAt;
 
         private Long endTimeAt;
+
         @Override
         public Predicate toPredicate(@NotNull Root<User> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
             return
-            of(ElvisUtil.stringElvis(email,null))
-                .map(emailEle -> criteriaBuilder.equal(
-                           root.get(LambdaUtils.getPropertyNameForLambda(User::getEmail)),
-                        emailEle.trim()
-                   )
-                )
-                .orElse(
-                    of(ElvisUtil.stringElvis(username,null))
-                        .map(userName -> {
-                            Path<String> path = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getUsername));
-                            return criteriaBuilder.like(path, EscapeUtil.escapeExprSpecialWord(userName.trim()).concat("%"));
-                        })
-                        .<Predicate>getResult()
-                )
-                .combine(
-                        of(startTimeAt)
-                                .<Predicate>map(
-                                        start -> {
-                                            Path<Long> creatAt = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getCreateAt));
-                                            return of(endTimeAt)
-                                                    .map(end -> criteriaBuilder.between(creatAt, start, end))
-                                                    .orElse(() -> criteriaBuilder.greaterThanOrEqualTo(creatAt, start))
-                                                    .getResult();
-                                        }
-                                )
-                                .orElse(
-                                        () ->
-                                                of(endTimeAt)
-                                                        .map(
-                                                                end -> {
-                                                                    Path<Long> creatAt = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getCreateAt));
-                                                                    return criteriaBuilder.lessThanOrEqualTo(creatAt, endTimeAt);
-                                                                }
-                                                        )
-                                                        .getResult()
+                    of(ElvisUtil.stringElvis(email, null))
+                            .map(emailEle -> criteriaBuilder.equal(
+                                            root.get(LambdaUtils.getPropertyNameForLambda(User::getEmail)),
+                                            emailEle.trim()
+                                    )
+                            )
+                            .orElse(
+                                    of(ElvisUtil.stringElvis(username, null))
+                                            .map(userName -> {
+                                                Path<String> path = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getUsername));
+                                                return criteriaBuilder.like(path, EscapeUtil.escapeExprSpecialWord(userName.trim()).concat("%"));
+                                            })
+                                            .<Predicate>getResult()
+                            )
+                            .combine(
+                                    of(startTimeAt)
+                                            .<Predicate>map(
+                                                    start -> {
+                                                        Path<Long> creatAt = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getCreateAt));
+                                                        return of(endTimeAt)
+                                                                .map(end -> criteriaBuilder.between(creatAt, start, end))
+                                                                .orElse(() -> criteriaBuilder.greaterThanOrEqualTo(creatAt, start))
+                                                                .getResult();
+                                                    }
+                                            )
+                                            .orElse(
+                                                    () ->
+                                                            of(endTimeAt)
+                                                                    .map(
+                                                                            end -> {
+                                                                                Path<Long> creatAt = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getCreateAt));
+                                                                                return criteriaBuilder.lessThanOrEqualTo(creatAt, endTimeAt);
+                                                                            }
+                                                                    )
+                                                                    .getResult()
 
 
-                                ),
-                        criteriaBuilder::and
-                )
-            .getResult();
+                                            ),
+                                    criteriaBuilder::and
+                            )
+                            .getResult();
         }
     }
 }

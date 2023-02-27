@@ -6,10 +6,7 @@
           <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
         </el-form-item>
         <el-form-item label="发起人" prop="username">
-          <el-select v-model="searchForm.username" placeholder="请输入发起人" clearable>
-            <el-option label="发起时间" value="shanghai" />
-            <el-option label="区域二" value="beijing" />
-          </el-select>
+          <el-input v-model="searchForm.username" placeholder="请输入发起人" />
         </el-form-item>
         <el-form-item label="发起开始时间" prop="startTimeAt">
           <el-date-picker

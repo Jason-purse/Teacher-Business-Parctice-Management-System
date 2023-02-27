@@ -104,53 +104,52 @@ public class ProjectService {
 
         @Override
         public Predicate toPredicate(@NotNull Root<Project> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
-            //return OptionalFlux
-            //        .of(
-            //                ElvisUtil.stringElvis(name, null)
-            //        )
-            //        .map(projectName -> criteriaBuilder.like(
-            //                root.get(LambdaUtils.getPropertyNameForLambda(Project::getName)),
-            //                EscapeUtil.escapeExprSpecialWord(projectName.trim()).concat("%"))
-            //        )
-            //        .combine(
-            //                OptionalFlux.of(
-            //                                ElvisUtil.stringElvis(username, null)
-            //                        )
-            //                        .map(userName -> criteriaBuilder
-            //                                .like(
-            //                                        root.get(LambdaUtils.getPropertyNameForLambda(Project::getName)),
-            //                                        EscapeUtil.escapeExprSpecialWord(userName.trim()).concat("%")
-            //                                )),
-            //                criteriaBuilder::and
-            //        )
-            //        .combine(
-            //                OptionalFlux.of(startTimeAt)
-            //                        .map(startTime ->
-            //                                OptionalFlux.of(endTimeAt)
-            //                                        .map(endTime -> criteriaBuilder.between(
-            //                                                root.get(LambdaUtils.getPropertyNameForLambda(Project::getCreateAt)),
-            //                                                startTime,
-            //                                                endTime
-            //                                        ))
-            //                                        .orElse(
-            //                                                criteriaBuilder.greaterThanOrEqualTo(
-            //                                                        root.get(LambdaUtils.getPropertyNameForLambda(Project::getCreateAt)),
-            //                                                        startTime
-            //                                                )
-            //                                        )
-            //                                        .<Predicate>getResult()
-            //                        )
-            //                        .orElse(
-            //                                OptionalFlux.of(endTimeAt)
-            //                                        .map(endTime -> criteriaBuilder.lessThanOrEqualTo(
-            //                                                root.get(LambdaUtils.getPropertyNameForLambda(Project::getCreateAt)),
-            //                                                endTime
-            //                                        ))
-            //                        ),
-            //                criteriaBuilder::and
-            //        )
-            //        .getResult();
-            return null;
+            return OptionalFlux
+                    .of(
+                            ElvisUtil.stringElvis(name, null)
+                    )
+                    .map(projectName -> criteriaBuilder.like(
+                            root.get(LambdaUtils.getPropertyNameForLambda(Project::getName)),
+                            EscapeUtil.escapeExprSpecialWord(projectName.trim()).concat("%"))
+                    )
+                    .combine(
+                            OptionalFlux.of(
+                                            ElvisUtil.stringElvis(username, null)
+                                    )
+                                    .map(userName -> criteriaBuilder
+                                            .like(
+                                                    root.get(LambdaUtils.getPropertyNameForLambda(Project::getName)),
+                                                    EscapeUtil.escapeExprSpecialWord(userName.trim()).concat("%")
+                                            )),
+                            criteriaBuilder::and
+                    )
+                    .combine(
+                            OptionalFlux.of(startTimeAt)
+                                    .map(startTime ->
+                                            OptionalFlux.of(endTimeAt)
+                                                    .map(endTime -> criteriaBuilder.between(
+                                                            root.get(LambdaUtils.getPropertyNameForLambda(Project::getCreateAt)),
+                                                            startTime,
+                                                            endTime
+                                                    ))
+                                                    .orElse(
+                                                            criteriaBuilder.greaterThanOrEqualTo(
+                                                                    root.get(LambdaUtils.getPropertyNameForLambda(Project::getCreateAt)),
+                                                                    startTime
+                                                            )
+                                                    )
+                                                    .<Predicate>getResult()
+                                    )
+                                    .orElse(
+                                            OptionalFlux.of(endTimeAt)
+                                                    .map(endTime -> criteriaBuilder.lessThanOrEqualTo(
+                                                            root.get(LambdaUtils.getPropertyNameForLambda(Project::getCreateAt)),
+                                                            endTime
+                                                    ))
+                                    ),
+                            criteriaBuilder::and
+                    )
+                    .getResult();
         }
     }
 
