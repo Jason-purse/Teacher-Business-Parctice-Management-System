@@ -17,7 +17,7 @@
     >
       <el-card shadow="hover">
         <div style="display: flex;justify-content: space-between">
-          <span >今日未打卡</span>
+          <span>今日未打卡</span>
           <el-button type="primary" size="small">打 卡</el-button>
         </div>
       </el-card>
@@ -36,12 +36,12 @@ export default {
     Sidebar,
     AppMain
   },
+  mixins: [ResizeMixin],
   data() {
     return {
       isFirst: null
     }
   },
-  mixins: [ResizeMixin],
   computed: {
     sidebar() {
       return this.$store.state.app.sidebar
@@ -63,7 +63,7 @@ export default {
   },
   mounted() {
     this.showAttendance()
-    this.getIsAttendance()
+    // this.getIsAttendance()
   },
   methods: {
     ...attendance.methods,
@@ -71,15 +71,18 @@ export default {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
     },
     showAttendance() {
-      this.isFirst = sessionStorage.getItem('isFirst') == 1 ? true : false
+      this.isFirst = sessionStorage.getItem('isFirst') == 1
     },
     getIsAttendance() {
-      const res = this.getCurrentUserTodayAttendanceInfo()
-      console.log(res, 'res')
+      // const res = this.getCurrentUserTodayAttendanceInfo()
+      // console.log(res, 8888888888888)
+      // this.getCurrentUserTodayAttendanceInfo().then(res=>{
+      //   console.log(res, 9999999)
+      // })
     },
     handleClose() {
       sessionStorage.setItem('isFirst', 0)
-      this.isFirst = sessionStorage.getItem('isFirst') == 1 ? true : false
+      this.isFirst = sessionStorage.getItem('isFirst') == 1
     }
   }
 }
