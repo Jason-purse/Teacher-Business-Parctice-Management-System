@@ -24,7 +24,7 @@ export default {
       })
     },
     deleteAttachmentById(id) {
-      return request.get(apiEndpoints.deleteAttachmentById.concat(`/${id}`))
+      return request.delete(apiEndpoints.deleteAttachmentById.concat(`/${id}`))
     }
   }
 }
