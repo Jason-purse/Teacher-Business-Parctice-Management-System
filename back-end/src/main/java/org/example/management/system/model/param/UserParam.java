@@ -27,6 +27,11 @@ public class UserParam {
     @ApiModelProperty("用户密码")
     private String password;
 
+    /**
+     * 头像信息url
+     */
+    private String avatarUrl;
+
     @ApiModelProperty("用户个人介绍")
     private String description;
 

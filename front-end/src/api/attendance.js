@@ -1,4 +1,4 @@
-import request from "@/utils/request";
+import request from '@/utils/request'
 
 const mainUrl = 'api/admin/attendance/v1'
 
@@ -19,7 +19,6 @@ export default {
           pager
         }
       })
-
     }
   }
 }

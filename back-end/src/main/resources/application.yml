@@ -23,9 +23,9 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
-  sql:
-    init:
-      mode: always
+#  sql:
+#    init:
+#      mode: always
 lightning:
   security:
     auth:

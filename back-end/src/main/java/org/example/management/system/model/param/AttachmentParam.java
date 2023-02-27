@@ -1,15 +1,18 @@
-package org.example.management.system.model.vo;
+package org.example.management.system.model.param;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 附件参数
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AttachmentVo {
+public class AttachmentParam {
 
     private String fileName;
 
@@ -19,8 +22,10 @@ public class AttachmentVo {
 
     private String createTimeStr;
 
-    private Long createAt;
-
     private Integer mediaType;
 
+    // 查询
+    private Long startTimeAt;
+
+    private Long endTimeAt;
 }
