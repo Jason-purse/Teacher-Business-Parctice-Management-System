@@ -55,7 +55,7 @@ public class AttachmentService {
         contentType = ElvisUtil.stringElvis(contentType, ElvisUtil.stringElvis(file.getOriginalFilename(), file.getName()).substring(file.getOriginalFilename().lastIndexOf(".") + 1));
         String finalContentType = contentType;
         Optional<Dict> dict = items.stream().filter(ele ->
-                MediaType.asMediaType(MimeType.valueOf(ele.getItemType())).isCompatibleWith(new MediaType(finalContentType.trim()))
+                MediaType.asMediaType(MimeType.valueOf(ele.getItemType())).isCompatibleWith(new MediaType(MimeType.valueOf(finalContentType.trim())))
         ).findFirst();
         Assert.isTrue(dict.isPresent(), "当前系统不支持[" + file.getContentType() + "]类型文件上传,请检查 !!!");
         try {
@@ -73,10 +73,11 @@ public class AttachmentService {
                     .createTimeStr(DateTimeUtils.getTimeStr(now))
                     .build();
 
-            AttachmentVo attachmentVo = BeanUtils.transformFrom(attachment, AttachmentVo.class);
 
             // 直接保存 !!!
             attachmentRepository.save(attachment);
+            AttachmentVo attachmentVo = BeanUtils.transformFrom(attachment, AttachmentVo.class);
+
             assert attachmentVo != null;
             return attachmentVo;
         } catch (Exception e) {

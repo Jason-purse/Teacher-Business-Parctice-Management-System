@@ -45,7 +45,7 @@ public class UserParam {
     private String nickname;
 
     @ApiModelProperty("性别")
-    private String gex;
+    private Integer gex;
 
     @ApiModelProperty("生日")
     private String birthDay;

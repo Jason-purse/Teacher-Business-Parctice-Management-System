@@ -14,7 +14,8 @@ const ItemTypes = {
   auditStatus: 'report_status',
   projectStatus: 'project_status',
   genderStatus: 'gender',
-  mediaType: 'media_format'
+  mediaType: 'media_format',
+  roles: 'role'
 }
 
 function getDataItemsByParentType(parentType) {
@@ -30,7 +31,8 @@ export default {
       auditPhase: [],
       projectStatus: [],
       genderStatus: [],
-      mediaType: []
+      mediaType: [],
+      roles: [],
     }
   },
   methods: {
@@ -78,6 +80,12 @@ export default {
     getMediaTypes() {
       return getDataItemsByParentType(ItemTypes.mediaType).then(({result}) => {
         this.mediaType = result
+      })
+    },
+
+    getRoles() {
+      return getDataItemsByParentType(ItemTypes.role).then(({result}) => {
+        this.roles = result
       })
     },
     mapDictItemValue(name, ele) {

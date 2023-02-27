@@ -72,7 +72,7 @@ public class AuditService {
             report.setFailureReason(auditParam.getFailureReason());
             // 改变阶段到前一个 ..
             Dict dict = dictService.getDictItemById(report.getAuditPhase());
-            if (dict.getPreviousDataTypeID() != null && dict.getPreviousDataTypeID().equals(FIRST_ITEM_IDENTIFY)) {
+            if (dict.getPreviousDataTypeID() != null && !dict.getPreviousDataTypeID().equals(FIRST_ITEM_IDENTIFY)) {
                 Dict previousDict = dictService.getDictItemById(dict.getPreviousDataTypeID());
                 // 设置为前一个阶段 ..
                 report.setAuditPhase(previousDict.getId());

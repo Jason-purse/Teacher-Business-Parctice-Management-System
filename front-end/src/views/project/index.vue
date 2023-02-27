@@ -3,10 +3,10 @@
     <div class="search-line">
       <el-form ref="searchForm" :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="项目名称" prop="name">
-          <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
+          <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable/>
         </el-form-item>
         <el-form-item label="发起人" prop="username">
-          <el-input v-model="searchForm.username" placeholder="请输入发起人" />
+          <el-input v-model="searchForm.username" placeholder="请输入发起人"/>
         </el-form-item>
         <el-form-item label="发起开始时间" prop="startTimeAt">
           <el-date-picker
@@ -34,7 +34,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-divider class="margin-top-bottom-10" />
+    <el-divider class="margin-top-bottom-10"/>
     <template>
       <div class="margin-top-bottom-10 margin-left-25">
         <el-button type="success" @click="openProjectDrawer(false)">创建项目</el-button>
@@ -60,9 +60,9 @@
                 :data="currentRow.reportList"
               >
                 <el-table-column label="报告列表">
-                  <el-table-column label="名称" prop="reportName" align="center" />
-                  <el-table-column label="描述" prop="description" align="center" />
-                  <el-table-column label="发起人" prop="submitUserName" align="center" />
+                  <el-table-column label="名称" prop="reportName" align="center"/>
+                  <el-table-column label="描述" prop="description" align="center"/>
+                  <el-table-column label="发起人" prop="submitUserName" align="center"/>
                   <el-table-column label="报告类型" prop="reportType" align="center">
                     <template v-slot="{row: {reportType}}">
                       {{ mapDictItemValue('reportTypes', reportType) }}
@@ -73,8 +73,13 @@
                       {{ mapDictItemValue('reportFormat', reportFormat) }}
                     </template>
                   </el-table-column>
-                  <el-table-column label="发起时间" prop="createTimeStr" align="center" />
-                  <el-table-column label="审核人" prop="auditUserName" align="center" />
+                  <el-table-column label="发起时间" prop="createTimeStr" align="center"/>
+                  <el-table-column label="审核人" prop="auditUserName" align="center"/>
+                  <el-table-column label="文件预览">
+                    <template v-slot="{row}">
+
+                    </template>
+                  </el-table-column>
                   <el-table-column label="审核阶段" prop="auditPhase" align="center">
                     <template v-slot="{row: {auditPhase}}">
                       {{ mapDictItemValue('auditPhase', auditPhase) }}
@@ -109,11 +114,11 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column type="index" label="序号" />
-        <el-table-column label="名称" prop="name" />
-        <el-table-column label="描述" prop="description" />
-        <el-table-column label="发起人" prop="username" />
-        <el-table-column label="发起时间" prop="createTimeStr" />
+        <el-table-column type="index" label="序号"/>
+        <el-table-column label="名称" prop="name"/>
+        <el-table-column label="描述" prop="description"/>
+        <el-table-column label="发起人" prop="username"/>
+        <el-table-column label="发起时间" prop="createTimeStr"/>
         <el-table-column label="状态" prop="status">
           <template v-slot="{row: {status}}">
             {{ mapDictItemValue('projectStatus', status) }}
@@ -145,12 +150,13 @@
       size="300px"
       direction="rtl"
     >
-      <el-form size="small" ref="drawerRef" :model="drawerDialogData" :rules="rules" class="search-form" style="padding: 5px">
+      <el-form size="small" ref="drawerRef" :model="drawerDialogData" :rules="rules" class="search-form"
+               style="padding: 5px">
         <el-form-item label="项目名称" prop="name">
-          <el-input v-model="drawerDialogData.name" placeholder="请输入项目名称" />
+          <el-input v-model="drawerDialogData.name" placeholder="请输入项目名称"/>
         </el-form-item>
         <el-form-item label="项目描述" prop="description">
-          <el-input v-model="drawerDialogData.description" placeholder="请输入项目描述" />
+          <el-input v-model="drawerDialogData.description" placeholder="请输入项目描述"/>
         </el-form-item>
         <el-form-item>
           <el-form-item style="margin-top: 20px">
@@ -163,19 +169,14 @@
     <el-dialog title="提交报告" :visible.sync="reportForm.visible">
       <el-form ref="reportForm" :model="reportForm.data" :rules="reportFormRule">
         <el-form-item label="报告名称" prop="reportName">
-          <el-input v-model="reportForm.data.reportName" autocomplete="off" />
+          <el-input v-model="reportForm.data.reportName" autocomplete="off"/>
         </el-form-item>
         <el-form-item label="报告描述" prop="description">
-          <el-input v-model="reportForm.data.description" autocomplete="off" />
+          <el-input v-model="reportForm.data.description" autocomplete="off"/>
         </el-form-item>
         <el-form-item label="报告类型" prop="reportType">
           <el-select v-model="reportForm.data.reportType" placeholder="请选择报告类型">
-            <el-option v-for="{itemType,itemValue,id} in reportTypes" :key="itemType" :label="itemValue" :value="id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="报告格式" prop="reportFormat">
-          <el-select v-model="reportForm.data.reportFormat" placeholder="请选择报告格式">
-            <el-option v-for="{itemType,itemValue,id} in reportFormat" :key="itemType" :label="itemValue" :value="id" />
+            <el-option v-for="{itemType,itemValue,id} in reportTypes" :key="itemType" :label="itemValue" :value="id"/>
           </el-select>
         </el-form-item>
         <el-form-item label="上传文件">
@@ -187,6 +188,7 @@
             :headers="{
               'Authorization': getAccessToken()
             }"
+            :before-upload="validReportFormat"
             :on-success="uploadPostProcess"
             :on-exceed="maxFileLimitTop"
             :file-list="reportForm.data.fileList"
@@ -207,7 +209,7 @@
         <div class="search-line">
           <el-form :inline="true" :model="userData.searchForm" class="search-form">
             <el-form-item label="用户名称">
-              <el-input v-model="userData.searchForm.username" placeholder="请输入用户名称" />
+              <el-input v-model="userData.searchForm.username" placeholder="请输入用户名称"/>
             </el-form-item>
             <el-form-item label="注册时间">
               <el-date-picker
@@ -232,15 +234,15 @@
             </el-form-item>
           </el-form>
         </div>
-        <el-divider class="margin-top-bottom-10" />
+        <el-divider class="margin-top-bottom-10"/>
         <template>
           <el-table
             :data="userData.data"
             style="width: 100%"
           >
-            <el-table-column label="昵称" prop="nickname" />
-            <el-table-column label="姓名" prop="username" />
-            <el-table-column label="角色" prop="roles" />
+            <el-table-column label="昵称" prop="nickname"/>
+            <el-table-column label="姓名" prop="username"/>
+            <el-table-column label="角色" prop="roles"/>
             <el-table-column label="操作" width="250px" align="center">
               <template v-slot="{row}">
                 <el-button type="primary" @click="createAuditAction(row)">指派</el-button>
@@ -284,17 +286,17 @@ import reportApi from '@/api/report'
 import dictApi from '@/api/dict'
 import userApi from '@/api/user'
 import attachmentApi from '@/api/attachment'
-import { getAccessToken } from '@/utils/auth'
+import {getAccessToken} from '@/utils/auth'
 import auditApi from '@/api/audit'
-import { mapState } from 'vuex'
+import {mapState} from 'vuex'
 
 export default {
   name: 'Index',
   data() {
     return {
       rules: {
-        name: [{ required: true, trigger: ['blur', 'change'], message: '请输入项目名称' }],
-        description: [{ required: true, trigger: ['blur', 'change'], message: '请输入项目描述' }]
+        name: [{required: true, trigger: ['blur', 'change'], message: '请输入项目名称'}],
+        description: [{required: true, trigger: ['blur', 'change'], message: '请输入项目描述'}]
       },
       audit: {
         // 当前报告数据
@@ -336,6 +338,8 @@ export default {
         description: ''
       },
 
+      fileFormats: ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'],
+
       /**
        * 使用它的原因是,tableData中的数据中的row 的reportList发生变化的时候,无法更新试图,这种排他性处理,让
        * 试图通过currentRow.reportList强制刷新
@@ -351,16 +355,17 @@ export default {
           description: '',
           reportType: '',
           reportFormat: '',
+          reportUrlId: '',
           fileList: []
         },
         currentRow: null,
         visible: false
       },
       reportFormRule: {
-        reportName: [{ required: true, trigger: ['blur', 'change'], message: '请输入报告名称' }],
-        description: [{ required: true, trigger: ['blur', 'change'], message: '请输入报告描述' }],
-        reportType: [{ required: true, trigger: ['blur', 'change'], message: '请选择报告类型' }],
-        reportFormat: [{ required: true, trigger: ['blur', 'change'], message: '请选择报告格式' }]
+        reportName: [{required: true, trigger: ['blur', 'change'], message: '请输入报告名称'}],
+        description: [{required: true, trigger: ['blur', 'change'], message: '请输入报告描述'}],
+        reportType: [{required: true, trigger: ['blur', 'change'], message: '请选择报告类型'}],
+        reportFormat: [{required: true, trigger: ['blur', 'change'], message: '请选择报告格式'}]
       }
     }
   },
@@ -384,17 +389,17 @@ export default {
     ...dictApi.methods,
     ...auditApi.methods,
     getAllUserList() {
-      userApi.methods.getAllUsersByPage(this.userData.searchForm, this.userData.pager).then(({ result: { content }}) => {
+      userApi.methods.getAllUsersByPage(this.userData.searchForm, this.userData.pager).then(({result: {content}}) => {
         this.userData.data = content || []
       })
     },
-    openDescriptionDialog({ failureReason, successDescription, failureFlag }) {
+    openDescriptionDialog({failureReason, successDescription, failureFlag}) {
       this.auditResult.visible = true
       console.log(failureReason)
       this.auditResult.description = (failureFlag ? failureReason : successDescription) || '没有任何说明 !!'
     },
     getDataFunc() {
-      return this.getAllProjectsByPage(this.getSearchform(), this.pager).then(({ result }) => {
+      return this.getAllProjectsByPage(this.getSearchform(), this.pager).then(({result}) => {
         this.tableData = result.content.map((ele, index) => {
           {
             ele.index = index
@@ -415,13 +420,14 @@ export default {
       this.userData.searchForm = {}
       this.audit = {}
     },
-    uploadPostProcess({ code }) {
+    uploadPostProcess({code, result}) {
       if (code !== 200) {
         this.$message.error('上传失败!!!')
         setTimeout(() => {
           this.$refs.upload?.clearFiles()
         }, 500)
       } else {
+        this.reportForm.data.reportUrlId = result.id
         this.$message.success('上传成功 !!!')
       }
     },
@@ -440,12 +446,24 @@ export default {
       })
     },
 
+    validReportFormat(file) {
+      let type = file.type;
+      const format = this.reportFormat.findIndex(ele => ele.itemType === type);
+      if (format) {
+        this.reportForm.data.reportFormat = format.id
+        return true;
+      } else {
+        this.$message.warning("当前上传类型和选择类型不符合,请检查 !!")
+        return false;
+      }
+    },
+
     closeDrawer() {
       this.drawerFlag = false
       this.drawerDialogData = {}
     },
     saveProject() {
-      this.$refs.drawerRef.validate(valid=>{
+      this.$refs.drawerRef.validate(valid => {
         if (valid) {
           if (!this.drawerAction) {
             // 保存
@@ -483,7 +501,7 @@ export default {
         if (this.currentRow.row && this.currentRow.row !== row) {
           this.$refs.tableData.toggleRowExpansion(this.currentRow.row, false)
         }
-        this.loadReports(row.id).then(({ result }) => {
+        this.loadReports(row.id).then(({result}) => {
           this.currentRow = {
             row,
             reportList: result
@@ -493,7 +511,7 @@ export default {
         this.currentRow = {}
       }
     },
-    deleteDialogHandle({ row: { id, name }}) {
+    deleteDialogHandle({row: {id, name}}) {
       this.$confirm(`确定删除项目${name}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -512,14 +530,14 @@ export default {
       })
     },
 
-    forceDeleteDialogHandle({ row: { id, name }}) {
+    forceDeleteDialogHandle({row: {id, name}}) {
       this.$confirm(`确定强制删除项目${name}? 这会删除项目有关的所有东西，包括提交的报告。`, '强制删除', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         this
-          .deleteProjectById(id, { force: true })
+          .deleteProjectById(id, {force: true})
           .then(() => {
             this.$message({
               type: 'success',
@@ -533,11 +551,11 @@ export default {
 
     // 更新当前项目  以及它的报告列表
     updateReportList() {
-      this.getProjectById(this.currentRow.row.id).then(({ result }) => {
+      this.getProjectById(this.currentRow.row.id).then(({result}) => {
         // 直接刷新
         this.$set(this.tableData, this.currentRow.row.index, result)
       })
-      this.loadReports(this.currentRow.row.id).then(({ result }) => {
+      this.loadReports(this.currentRow.row.id).then(({result}) => {
         this.currentRow.reportList = result
       })
     },
@@ -549,14 +567,14 @@ export default {
     },
 
     restoreReportAction(row) {
-      const params = { ...row, restore: true }
+      const params = {...row, restore: true}
       this.updateReport(params).then(() => {
         this.updateReportList()
       })
     },
 
     deleteReportDialogHandle(row) {
-      const { reportName, id, projectId } = row
+      const {reportName, id, projectId} = row
       this.$confirm(`确定删除报告${reportName}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -578,7 +596,7 @@ export default {
       this.$refs.reportForm.validate(valid => {
         if (valid) {
           if (action === 'save-report') {
-            this.createReport({ ...this.reportForm.data, projectId: this.reportForm.currentRow?.id }).then(() => {
+            this.createReport({...this.reportForm.data, projectId: this.reportForm.currentRow?.id}).then(() => {
               this.$message.success('新增报告成功!!!')
               this.updateReportList()
             })
