@@ -26,8 +26,10 @@
       :visible.sync="drawerVisable"
       size="20%"
     >
-      <el-form ref="form" :model="userInfo" label-width="80px">
-        <el-form-item label="姓名">
+    <div style="padding: 0 20px">
+      <el-button type="primary" size="mini">编辑</el-button>
+      <el-form ref="form" :model="userInfo" label-width="40px">
+        <el-form-item label="姓名" >
           <div>{{ userInfo.username }}</div>
           <!--          <el-input v-model="userInfo.username" />-->
         </el-form-item>
@@ -49,6 +51,7 @@
           <div>{{ userInfo.gex ? userInfo.gex : '暂无'}}</div>
         </el-form-item>
       </el-form>
+    </div>
     </el-drawer>
   </div>
 </template>
@@ -87,6 +90,7 @@ export default {
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      sessionStorage.removeItem('isFirst')
     },
     getInfo() {
       this.getCurrentUserInfo().then(res => {

@@ -276,16 +276,6 @@
       </span>
     </el-dialog>
 
-    <el-dialog
-      title="提示"
-      :visible.sync="attendanceDialog"
-      width="30%">
-      <span>这是一段信息</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="attendanceDialog = false">取 消</el-button>
-        <el-button type="primary" @click="attendanceDialog = false">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 
 </template>
@@ -305,8 +295,6 @@ export default {
   name: 'Index',
   data() {
     return {
-      isFirst: null,
-      attendanceDialog: false ,
       rules: {
         name: [{ required: true, trigger: ['blur', 'change'], message: '请输入项目名称' }],
         description: [{ required: true, trigger: ['blur', 'change'], message: '请输入项目描述' }]
@@ -611,9 +599,6 @@ export default {
     },
     maxFileLimitTop() {
       this.$message.warning('只能上传一个文件!!!')
-    },
-    showAttendance() {
-      this.isFirst = sessionStorage.getItem('isFirst')
     }
   }
 }
