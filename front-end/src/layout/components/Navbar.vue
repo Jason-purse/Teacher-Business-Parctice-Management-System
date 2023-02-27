@@ -7,13 +7,13 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-<!--          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">-->
-          <el-avatar class="sub-title" icon="el-icon-user-solid"></el-avatar>
+          <!--          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">-->
+          <el-avatar class="sub-title" icon="el-icon-user-solid" />
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <el-dropdown-item>
-           <div @click="drawerVisable = !drawerVisable">个人主页</div>
+            <div @click="drawerVisable = !drawerVisable">个人主页</div>
           </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">退出登录</span>
@@ -24,8 +24,9 @@
     <el-drawer
       title="个人主页"
       :visible.sync="drawerVisable"
-      size="20%">
-      <span></span>
+      size="20%"
+    >
+      <span />
     </el-drawer>
   </div>
 </template>
@@ -34,6 +35,7 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import user from '@/api/user'
 
 export default {
   components: {
@@ -51,13 +53,22 @@ export default {
       'avatar'
     ])
   },
+  mounted() {
+    this.getInfo()
+  },
   methods: {
+    ...user.methods,
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+    getInfo() {
+      this.getCurrentUserInfo().then(res => {
+        console.log(res, 'info')
+      })
     }
   }
 }
