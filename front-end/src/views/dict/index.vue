@@ -19,14 +19,15 @@
 
     <el-table
       :data="tableData"
-      style="width: 100%">
+      style="width: 100%"
+    >
       <el-table-column type="index" label="序号" />
-      <el-table-column label="标识符" prop="itemType" align="center"/>
-      <el-table-column label="字典项值" prop="itemValue" align="center"/>
-      <el-table-column label="创建时间" prop="createTimeStr" align="center"/>
-<!--      <el-table-column label="操作" width="250px" align="center">-->
-<!--        <el-button @click="commit('reject')" type="danger">删除</el-button>-->
-<!--      </el-table-column>-->
+      <el-table-column label="标识符" prop="itemType" align="center" />
+      <el-table-column label="字典项值" prop="itemValue" align="center" />
+      <el-table-column label="创建时间" prop="createTimeStr" align="center" />
+      <!--      <el-table-column label="操作" width="250px" align="center">-->
+      <!--        <el-button @click="commit('reject')" type="danger">删除</el-button>-->
+      <!--      </el-table-column>-->
     </el-table>
 
     <div style="margin-top: 5px;text-align: right;">
@@ -36,8 +37,8 @@
         :current-page.sync="pager.page"
         :page-size="pager.size"
         layout="prev, pager, next"
-        :total="pager.total">
-      </el-pagination>
+        :total="pager.total"
+      />
     </div>
   </div>
 
@@ -45,10 +46,10 @@
 
 <script>
 import backendStyle from '../../utils/generic-backend-style-util'
-import dict from "@/api/dict";
+import dict from '@/api/dict'
 
 export default {
-  name: "index",
+  name: 'Index',
   data() {
     return {
       searchForm: {
@@ -67,16 +68,9 @@ export default {
     ...backendStyle.methods,
     ...dict.methods,
     getDataFunc() {
-      return this.getAllDictByPage(this.getSearchform(), this.pager).then(({result}) => {
-        this.tableData = result.content;
+      return this.getAllDictByPage(this.getSearchform(), this.pager).then(({ result }) => {
+        this.tableData = result.content
       })
-    },
-    commit(val) {
-      if (val === 'allow') {
-        this.$message("调用接口")
-      } else if (val === 'reject') {
-        this.$message("驳回")
-      }
     }
   }
 }

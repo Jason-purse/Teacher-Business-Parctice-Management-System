@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import static org.example.management.system.model.constant.DictConstant.AUDITING;
 import static org.example.management.system.model.constant.DictConstant.AUDIT_FINALLY_PHASE;
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.startsWith;
 
@@ -205,6 +206,11 @@ public class AuditService {
 
         @Override
         public Predicate toPredicate(@NotNull Root<Report> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
+            return OptionalFlux.of(
+                    criteriaBuilder.equal(root.get(LambdaUtils.getPropertyNameForLambda(Report::getStatus)),
+                            dictService.getDictByItemType(AUDITING).getId())
+            ).getResult();
+            // 代码问题,暂时先注释 ..
             //return OptionalFlux
             //        .of(auditParam.getAuditUserId())
             //        .map(userId -> criteriaBuilder.equal(root.get(LambdaUtils.getPropertyNameForLambda(Report::getAuditUserId)), userId))
@@ -256,7 +262,7 @@ public class AuditService {
             //                criteriaBuilder::and
             //        )
             //        .getResult();
-            return null;
+            //return null;
         }
     }
 }
