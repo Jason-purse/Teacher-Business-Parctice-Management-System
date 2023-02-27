@@ -3,22 +3,23 @@
     <div class="search-line">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="用户名称">
-          <el-input v-model="searchForm.username" placeholder="请输入用户名称"></el-input>
+          <el-input v-model="searchForm.username" placeholder="请输入用户名称" />
         </el-form-item>
         <el-form-item label="注册时间">
           <el-date-picker
             v-model="searchForm.startTimeAt"
             type="date"
-            placeholder="选择日期" @change="validTimeRange('startTimeAt')">
-          </el-date-picker>
+            placeholder="选择日期"
+            @change="validTimeRange('startTimeAt')"
+          />
         </el-form-item>
         <el-form-item label="结束时间">
           <el-date-picker
             v-model="searchForm.endTimeAt"
             type="date"
+            placeholder="选择日期"
             @change="validTimeRange('endTimeAt')"
-            placeholder="选择日期">
-          </el-date-picker>
+          />
         </el-form-item>
         <el-form-item>
           <el-form-item>
@@ -27,24 +28,29 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-divider class="margin-top-bottom-10"></el-divider>
+    <el-divider class="margin-top-bottom-10" />
     <template>
       <div class="margin-top-bottom-10 margin-left-25">
         <el-button type="success" @click="openDrawer(false)">创建用户</el-button>
       </div>
       <el-table
         :data="tableData"
-        style="width: 100%">
-        <el-table-column label="昵称" prop="nickname"/>
-        <el-table-column label="姓名" prop="username"/>
-        <el-table-column label="邮箱" prop="email"/>
-        <el-table-column label="电话" prop="phone"/>
-        <el-table-column label="个人简介" prop="description"/>
-
-        <el-table-column label="创建时间" prop="createTimeStr"/>
+        style="width: 100%"
+      >
+        <el-table-column label="昵称" prop="nickname" />
+        <el-table-column label="姓名" prop="username" />
+        <el-table-column label="邮箱" prop="email" />
+        <el-table-column label="电话" prop="phone" />
+        <el-table-column label="个人简介" prop="description" />
+        <el-table-column label="性别">
+          <template v-slot="{row: {gex}}">
+            {{ mapDictItemValue('genderStatus',gex) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="创建时间" prop="createTimeStr" />
         <el-table-column label="操作" width="250px" align="center">
           <template v-slot="props">
-            <el-button @click="deleteDialogHandle(props)" type="danger">删除</el-button>
+            <el-button type="danger" @click="deleteDialogHandle(props)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -55,46 +61,52 @@
           :current-page.sync="pager.page"
           :page-size="pager.size"
           layout="prev, pager, next"
-          :total="pager.total">
-        </el-pagination>
+          :total="pager.total"
+        />
       </div>
     </template>
     <el-drawer
       :title="drawerAction ? '新增用户': '用户更新'"
       :visible.sync="drawerFlag"
       size="400px"
-      direction="rtl">
+      direction="rtl"
+    >
       <div class="scroll-view">
         <el-form size="small" :model="drawerDialogData" class="search-form" style="padding: 5px">
           <el-form-item label="用户名">
-            <el-input v-model="drawerDialogData.username" placeholder="请输入用户名"></el-input>
-          </el-form-item>
-          <el-form-item label="个人简介">
-            <el-input v-model="drawerDialogData.description" type="textarea"
-                      size="medium"
-                      :autosize="{minRows: 3,maxRows: 6}"
-                      maxlength="300"
-                      show-word-limit
-                      placeholder="请输入个人简介"></el-input>
-          </el-form-item>
-          <el-form-item label="email">
-            <el-input v-model="drawerDialogData.email" placeholder="请输入邮箱信息"></el-input>
+            <el-input v-model="drawerDialogData.username" placeholder="请输入用户名" />
           </el-form-item>
           <el-form-item label="昵称">
-            <el-input v-model="drawerDialogData.nickname" placeholder="请输入昵称"></el-input>
+            <el-input v-model="drawerDialogData.nickname" placeholder="请输入昵称" />
+          </el-form-item>
+          <el-form-item label="个人简介">
+            <el-input
+              v-model="drawerDialogData.description"
+              type="textarea"
+              size="medium"
+              :autosize="{minRows: 3,maxRows: 6}"
+              maxlength="300"
+              show-word-limit
+              placeholder="请输入个人简介"
+            />
+          </el-form-item>
+          <el-form-item label="email">
+            <el-input v-model="drawerDialogData.email" placeholder="请输入邮箱信息" />
+          </el-form-item>
+          <el-form-item label="phone">
+            <el-input v-model="drawerDialogData.phone" placeholder="请输入手机号码" />
           </el-form-item>
           <el-form-item label="性别">
             <el-select v-model="drawerDialogData.gex" placeholder="请选择性别">
-              <el-option label="发起时间" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+              <el-option v-for="({itemType,itemValue,id}) in genderStatus" :key="itemType" :label="itemValue" :value="id" />
             </el-select>
           </el-form-item>
           <el-form-item label="出生日期">
             <el-date-picker
               v-model="drawerDialogData.birthday"
               type="date"
-              placeholder="请选择出生日期">
-            </el-date-picker>
+              placeholder="请选择出生日期"
+            />
           </el-form-item>
           <el-form-item>
             <el-form-item style="margin-top: 20px">
@@ -111,12 +123,12 @@
 
 <script>
 import backendStyle from '../../utils/generic-backend-style-util'
-import dict from "@/api/dict";
-import user from "@/api/user";
-import {auto} from "html-webpack-plugin/lib/chunksorter";
+import dict from '@/api/dict'
+import user from '@/api/user'
+import { auto } from 'html-webpack-plugin/lib/chunksorter'
 
 export default {
-  name: "index",
+  name: 'Index',
   data() {
     return {
       searchForm: {
@@ -137,11 +149,13 @@ export default {
         gex: ''
       },
       ...backendStyle.data(),
+      ...dict.data()
     }
   },
 
   created() {
-    this.getDataFunc()
+    this.getGenderStatus()
+    this.onSubmit()
   },
   methods: {
     auto,
@@ -149,20 +163,20 @@ export default {
     ...dict.methods,
     ...user.methods,
     getDataFunc() {
-      return this.getAllUsersByPage(this.getSearchform(), this.pager).then(({result}) => {
-        this.tableData = result.content;
+      return this.getAllUsersByPage(this.getSearchform(), this.pager).then(({ result }) => {
+        this.tableData = result.content
         return result
       })
     },
     saveUser() {
       if (!this.drawerAction) {
         this.registerUser(this.drawerDialogData).then(() => {
-          this.$message.success("注册成功 !!!")
+          this.$message.success('注册成功 !!!')
           this.getDataFunc()
         })
       } else {
         this.updateUser(this.drawerDialogData).then(() => {
-          this.$message.success("更新成功 !!!")
+          this.$message.success('更新成功 !!!')
           this.getDataFunc()
         })
       }
@@ -173,7 +187,7 @@ export default {
       }
       this.drawerFlag = true
     },
-    deleteDialogHandle({row: {id, username}}) {
+    deleteDialogHandle({ row: { id, username }}) {
       this.$confirm(`确定删除用户${username}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -184,12 +198,11 @@ export default {
             this.$message({
               type: 'success',
               message: '删除成功!'
-            });
+            })
             this.getDataFunc()
           })
-
       }).catch(() => {
-      });
+      })
     }
   }
 }

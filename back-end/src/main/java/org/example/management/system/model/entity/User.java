@@ -32,7 +32,7 @@ public class User implements Serializable {
 
     private String nickname;
 
-    private String gex;
+    private Integer gex;
 
     private String birthDay;
 

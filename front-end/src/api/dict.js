@@ -1,6 +1,6 @@
-import request from "@/utils/request";
+import request from '@/utils/request'
 
-const mainUrl = "/api/admin/dict/v1"
+const mainUrl = '/api/admin/dict/v1'
 
 const apiEndpoints = {
   getAllDictByPageUrl: `${mainUrl}/list/page`,
@@ -12,7 +12,8 @@ const ItemTypes = {
   reportFormat: 'report_format',
   auditPhase: 'audit_phase',
   auditStatus: 'report_status',
-  projectStatus: 'project_status'
+  projectStatus: 'project_status',
+  genderStatus: 'gender'
 }
 
 function getDataItemsByParentType(parentType) {
@@ -26,7 +27,8 @@ export default {
       reportFormat: [],
       auditStatus: [],
       auditPhase: [],
-      projectStatus: []
+      projectStatus: [],
+      genderStatus: []
     }
   },
   methods: {
@@ -40,39 +42,45 @@ export default {
     },
     getReportTypes() {
       return getDataItemsByParentType(ItemTypes.reportType)
-        .then(({result}) => {
+        .then(({ result }) => {
           this.reportTypes = result || []
         })
     },
     getReportFormat() {
-      return getDataItemsByParentType(ItemTypes.reportFormat).then(({result}) => {
+      return getDataItemsByParentType(ItemTypes.reportFormat).then(({ result }) => {
         this.reportFormat = result || []
       })
     },
     getAuditStatus() {
-      return getDataItemsByParentType(ItemTypes.auditStatus).then(({result}) => {
+      return getDataItemsByParentType(ItemTypes.auditStatus).then(({ result }) => {
         this.auditStatus = result || []
       })
     },
     getAuditPhase() {
-      return getDataItemsByParentType(ItemTypes.auditPhase).then(({result}) => {
-        this.auditPhase = result;
+      return getDataItemsByParentType(ItemTypes.auditPhase).then(({ result }) => {
+        this.auditPhase = result
       })
     },
     getProjectStatus() {
-      return getDataItemsByParentType(ItemTypes.projectStatus).then(({result}) => {
-        this.projectStatus = result;
-      });
+      return getDataItemsByParentType(ItemTypes.projectStatus).then(({ result }) => {
+        this.projectStatus = result
+      })
+    },
+
+    getGenderStatus() {
+      return getDataItemsByParentType(ItemTypes.genderStatus).then(({ result }) => {
+        this.genderStatus = result
+      })
     },
     mapDictItemValue(name, ele) {
-      let data = this[name] || []
+      const data = this[name] || []
       if (data) {
-        let value = data.filter(({id, itemValue}) => id === ele)
+        const value = data.filter(({ id, itemValue }) => id == ele)
         if (value.length > 0) {
-          return value[0].itemValue;
+          return value[0].itemValue
         }
       }
-      return '----';
+      return '----'
     }
   }
 }
