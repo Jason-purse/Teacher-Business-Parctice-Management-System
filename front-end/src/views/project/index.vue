@@ -75,9 +75,9 @@
                   </el-table-column>
                   <el-table-column label="发起时间" prop="createTimeStr" align="center"/>
                   <el-table-column label="审核人" prop="auditUserName" align="center"/>
-                  <el-table-column label="文件预览">
+                  <el-table-column label="文件预览" >
                     <template v-slot="{row}">
-
+                        <el-link size="small" @click="pdfPreviewAction">点击预览</el-link>
                     </template>
                   </el-table-column>
                   <el-table-column label="审核阶段" prop="auditPhase" align="center">
@@ -274,7 +274,10 @@
         <el-button @click="auditResult.visible = false; auditResult.description = ''">关闭</el-button>
       </span>
     </el-dialog>
-
+    <pdf  ref="pdf"
+         :src="pdfPreview.url"
+         :page="pdfPreview.pageNum">
+    </pdf>
   </div>
 
 </template>
@@ -294,6 +297,12 @@ export default {
   name: 'Index',
   data() {
     return {
+
+      pdfPreview: {
+        url: '',
+        pageNum: '',
+        pageRotate: '',
+      },
       rules: {
         name: [{required: true, trigger: ['blur', 'change'], message: '请输入项目名称'}],
         description: [{required: true, trigger: ['blur', 'change'], message: '请输入项目描述'}]
@@ -444,6 +453,10 @@ export default {
         // 关闭弹窗 !!!
         this.auditDialogCancel()
       })
+    },
+
+    pdfPreviewAction({reportUrl}) {
+      this.pdfPreview.url = reportUrl;
     },
 
     validReportFormat(file) {
