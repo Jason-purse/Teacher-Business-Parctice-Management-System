@@ -8,8 +8,7 @@
         </el-form-item>
         <el-form-item label="文件类型">
           <el-select v-model="searchForm.fileType" placeholder="请选择文件类型">
-            <el-option label="发起时间" value="shanghai" />
-            <el-option label="区域二" value="beijing" />
+            <el-option v-for="({itemValue,id}) in mediaType" :key="id" :label="itemValue" :value="id" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -22,13 +21,18 @@
     <el-table
       :data="tableData"
       style="width: 100%"
+      row-key="id"
     >
       <el-table-column type="selection" align="center" />
       <el-table-column type="index" label="序号" align="center" />
       <el-table-column label="名称" prop="fileName" align="center" />
       <el-table-column label="类型" prop="mediaType" align="center" />
       <el-table-column label="创建时间" prop="createTimeStr" align="center" />
-      <el-table-column label="唯一标识" prop="identifier" align="center" />
+      <el-table-column label="文件类型" prop="identifier" align="center">
+        <template v-slot="{row: {mediaType}}">
+          {{ mapDictItemValue('mediaType',mediaType) }}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center">
         <template v-slot="{row}">
           <el-button type="danger" size="small" @click="deleteAttachmentAction(row)">删除</el-button>
@@ -52,6 +56,7 @@
 <script>
 import backendStyle from '../../utils/generic-backend-style-util'
 import attachment from '@/api/attachment'
+import dict from '@/api/dict'
 export default {
   name: 'Index',
   data() {
@@ -61,16 +66,20 @@ export default {
         filename: '',
         fileType: ''
       },
-      ...backendStyle.data()
+      ...backendStyle.data(),
+      ...dict.data()
     }
   },
   created() {
     this.onSubmit()
+    this.getMediaTypes()
   },
   methods: {
     ...backendStyle.methods,
     ...attachment.methods,
-    deleteAttachmentAction({ id }) {
+    ... dict.methods,
+    deleteAttachmentAction(row) {
+      const { id } = row
       this.$confirm(`确定删除此附件${name}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

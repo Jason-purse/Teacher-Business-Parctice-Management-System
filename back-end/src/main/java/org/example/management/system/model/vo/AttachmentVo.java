@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AttachmentVo {
 
+    private Integer id;
+
     private String fileName;
 
     private String fileUrl;
@@ -22,5 +24,10 @@ public class AttachmentVo {
     private Long createAt;
 
     private Integer mediaType;
+
+    /**
+     * 报告关联数量
+     */
+    private Integer reportRRCount;
 
 }

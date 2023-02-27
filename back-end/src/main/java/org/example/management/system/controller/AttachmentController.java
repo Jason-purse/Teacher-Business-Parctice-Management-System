@@ -34,7 +34,7 @@ public class AttachmentController {
 
     /**
      * 删除附件 ...
-     * @param fileUrl 文件 url
+     * @param id 文件 id
      */
     @DeleteMapping("{id}")
     public void deleteAttachment(@PathVariable("id") Integer id) {
