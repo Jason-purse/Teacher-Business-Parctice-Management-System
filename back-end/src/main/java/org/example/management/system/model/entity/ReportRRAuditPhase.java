@@ -19,6 +19,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "report_rr_audit_phase")
 public class ReportRRAuditPhase implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
