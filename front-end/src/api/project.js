@@ -1,6 +1,6 @@
-import request from "@/utils/request";
+import request from '@/utils/request'
 
-const mainUrl = "/api/admin/project/v1";
+const mainUrl = '/api/admin/project/v1'
 const apiEndpoints = {
 
   getAllProjectsByPageUrl: `${mainUrl}/list`,
@@ -16,7 +16,7 @@ export default {
     return request.get(apiEndpoints.getAllProjectsByPageUrl, {
       params: {
         ...param,
-        page: pager.page,
+        page: pager.page - 1,
         size: pager.size
       }
     })
@@ -30,8 +30,8 @@ export default {
     return request.put(apiEndpoints.updateProjectUrl, param)
   },
 
-  deleteProjectById(id,params) {
-    return request.delete(apiEndpoints.deleteProjectByIdUrl.concat(id),{params})
+  deleteProjectById(id, params) {
+    return request.delete(apiEndpoints.deleteProjectByIdUrl.concat(id), { params })
   },
 
   getProjectById(id) {

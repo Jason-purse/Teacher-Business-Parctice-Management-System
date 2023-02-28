@@ -23,9 +23,9 @@ const validTimeRange = function(identity, form = 'searchForm') {
 export default {
   methods: {
     validTimeRange,
-    getSearchform() {
+    getSearchform(form = this.searchForm) {
       return {
-        ...this.searchForm,
+        ...form,
         startTimeAt: this.searchForm.startTimeAt?.getTime(),
         endTimeAt: this.searchForm.endTimeAt?.getTime()
       }
@@ -35,11 +35,11 @@ export default {
       if (typeof form === 'object') {
         searchForm = form
       }
-      this.getDataFunc(searchForm)
+      this.getDataFunc(this.getSearchform(searchForm))
         .then((result) => {
           // 第一页不需要额外处理 ...
-          if (this.pager.page > 0 && result && result.totalPages && result.totalPages <= 1) {
-            this.pager.page = 0
+          if (this.pager.page > 1 && result && result.totalPages && result.totalPages <= 1) {
+            this.pager.page = 1
             this.onSubmit()
           }
           this.pager.total = result?.totalElements || 0
@@ -55,6 +55,14 @@ export default {
     onCancel(form) {
       this[form].visible = false
       this.$refs[form]?.resetFields()
+    },
+    entryKeyDown(event) {
+      // 判断是否为回车键
+      this.onSubmit()
+    },
+    datepickerInputFocus(name) {
+      console.log('失去焦点')
+      this.$refs[name].focus()
     }
   },
   data() {

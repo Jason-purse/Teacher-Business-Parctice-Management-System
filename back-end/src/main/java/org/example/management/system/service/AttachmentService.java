@@ -16,6 +16,7 @@ import org.example.management.system.model.vo.AttachmentVo;
 import org.example.management.system.repository.AttachmentRepository;
 import org.example.management.system.repository.ReportRepository;
 import org.example.management.system.utils.DateTimeUtils;
+import org.example.management.system.utils.EscapeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -161,7 +162,7 @@ public class AttachmentService {
                     .map(type -> criteriaBuilder.equal(root.get(LambdaUtils.getPropertyNameForLambda(Attachment::getMediaType)), type))
                     .combine(
                             OptionalFlux.of(ElvisUtil.stringElvis(fileName, null))
-                                    .map(name -> criteriaBuilder.like(root.get(LambdaUtils.getPropertyNameForLambda(Attachment::getFileName)), name))
+                                    .map(name -> criteriaBuilder.like(root.get(LambdaUtils.getPropertyNameForLambda(Attachment::getFileName)), EscapeUtil.escapeExprSpecialWord(name).concat("%")))
                             ,
                             criteriaBuilder::and
                     )

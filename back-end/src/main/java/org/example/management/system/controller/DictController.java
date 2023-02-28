@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.entity.Dict;
 import org.example.management.system.model.param.DictParam;
 import org.example.management.system.service.DictService;
+import org.example.management.system.utils.PageUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class DictController {
 
     @GetMapping("list/page")
     public Page<Dict> getAllDictDataTypesByPage(DictParam param, Pageable pageable) {
-        return dictService.getAllDictDataTypesByPage(param,pageable);
+        return dictService.getAllDictDataTypesByPage(param, PageUtil.getPageable(pageable));
     }
 
     @GetMapping("by/datatype/{itemtype}")

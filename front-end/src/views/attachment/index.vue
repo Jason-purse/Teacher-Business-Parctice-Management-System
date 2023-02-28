@@ -2,12 +2,12 @@
   <!--附件管理-->
   <div>
     <div class="search-line">
-      <el-form :inline="true" :model="searchForm" class="search-form">
-        <el-form-item label="附件名称">
-          <el-input v-model="searchForm.filename" placeholder="请输入附件名称" />
+      <el-form :inline="true" :model="searchForm" class="search-form" @keydown.enter.native="onSubmit">
+        <el-form-item label="附件名称" prop="fileName">
+          <el-input v-model="searchForm.fileName" placeholder="请输入附件名称" />
         </el-form-item>
-        <el-form-item label="文件类型">
-          <el-select v-model="searchForm.fileType" placeholder="请选择文件类型">
+        <el-form-item label="文件类型" prop="mediaType">
+          <el-select v-model="searchForm.mediaType" placeholder="请选择文件类型" clearable>
             <el-option v-for="({itemValue,id}) in mediaType" :key="id" :label="itemValue" :value="id" />
           </el-select>
         </el-form-item>
@@ -47,6 +47,7 @@
         :page-size="pager.size"
         layout="prev, pager, next"
         :total="pager.total"
+        @current-change="onSubmit"
       />
     </div>
   </div>
@@ -63,8 +64,8 @@ export default {
     return {
       tableData: [],
       searchForm: {
-        filename: '',
-        fileType: ''
+        fileName: '',
+        mediaType: ''
       },
       ...backendStyle.data(),
       ...dict.data()
@@ -103,6 +104,7 @@ export default {
           ele.index = index
           return ele
         })
+        return result
       })
     }
   }

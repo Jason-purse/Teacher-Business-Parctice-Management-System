@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.param.AttachmentParam;
 import org.example.management.system.model.vo.AttachmentVo;
 import org.example.management.system.service.AttachmentService;
+import org.example.management.system.utils.PageUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.Assert;
@@ -50,6 +51,6 @@ public class AttachmentController {
      */
     @GetMapping("list")
     public Page<AttachmentVo> getAllAttachmentInfoByPage(AttachmentParam attachmentParam, Pageable pageable) {
-        return attachmentService.getAllAttachmentInfoByPage(attachmentParam,pageable);
+        return attachmentService.getAllAttachmentInfoByPage(attachmentParam, PageUtil.getPageable(pageable));
     }
 }

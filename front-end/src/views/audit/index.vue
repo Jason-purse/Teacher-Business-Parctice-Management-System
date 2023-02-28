@@ -2,7 +2,7 @@
   <!--  审核管理-->
   <div>
     <div class="search-line">
-      <el-form :inline="true" :model="searchForm" class="search-form">
+      <el-form :inline="true" :model="searchForm" class="search-form" @keydown.enter.native="onSubmit">
         <el-form-item label="项目名称">
           <el-input v-model="searchForm.projectName" placeholder="请输入项目名称" clearable />
         </el-form-item>
@@ -10,7 +10,7 @@
           <el-input v-model="searchForm.reportName" placeholder="请输入项目名称" clearable />
         </el-form-item>
         <el-form-item label="报告发起人">
-          <el-input v-model="searchForm.requestUser" placeholder="请输入发起人名称" clearable />
+          <el-input v-model="searchForm.submitUserName" placeholder="请输入发起人名称" clearable />
         </el-form-item>
         <el-form-item label="审核阶段">
           <el-select v-model="searchForm.auditPhase" placeholder="请选择审核阶段" clearable>
@@ -64,7 +64,7 @@
       </el-table-column>
       <el-table-column label="文件预览">
         <template v-slot="{row}">
-          点击文件预览
+          <el-link @click="pdfPreviewAction(row)">点击文件浏览</el-link>
         </template>
       </el-table-column>
       <el-table-column label="提交时间" prop="createTimeStr" />
@@ -125,10 +125,31 @@
         </div>
         <div slot="footer" class="dialog-footer" :style="{textAlign: 'right'}">
           <el-button :type="audit.flag ? 'success': 'danger'" @click="updateAuditAction">
-            {{ audit.flag ? '通过': '打回' }}
+            {{ audit.flag ? '通过' : '打回' }}
           </el-button>
         </div>
       </div>
+    </el-dialog>
+
+    <el-dialog
+      title="文件浏览"
+      class="preview-dialog"
+      width="fit-content"
+      :visible.sync="pdfPreview.visible"
+      @close="closePdfPreview"
+    >
+
+      <pdf
+        v-if="pdfPreview.fileType.includes('pdf')"
+        :key="pdfPreview.url"
+        :page="pdfPreview.pageNum"
+        :src="pdfPreview.url"
+        @num-pages="pdfPreview.totalPages =$event"
+        @error="previewError"
+      />
+      <template v-else>
+        <vue-office-docx :key="pdfPreview.url" :src="pdfPreview.url" />
+      </template>
     </el-dialog>
   </div>
 
@@ -138,16 +159,27 @@
 import backendStyle from '../../utils/generic-backend-style-util'
 import auditApi from '@/api/audit'
 import dictApi from '@/api/dict'
+import pdf from 'vue-pdf'
+import VueOfficeDocx from '@vue-office/docx'
 
 export default {
   name: 'Index',
+  components: { pdf, VueOfficeDocx },
   data() {
     return {
       ...dictApi.data(),
+      pdfPreview: {
+        url: '',
+        pageNum: 1,
+        totalPages: 1,
+        pageRotate: '',
+        fileType: '',
+        visible: false
+      },
       searchForm: {
         projectName: '',
         reportName: '',
-        requestUser: '',
+        submitUserName: '',
         auditPhase: '',
         startTimeAt: null,
         endTimeAt: null,
@@ -174,12 +206,26 @@ export default {
     this.getReportFormat()
     this.getAuditStatus()
     this.onSubmit()
+    this.getMediaTypes()
   },
 
   methods: {
     ...backendStyle.methods,
     ...auditApi.methods,
     ...dictApi.methods,
+    previewError() {
+      this.$message.error('预览文件失败,无法加载此文件 !!!')
+      this.pdfPreview = { visible: false, pageNum: 1, url: '', totalPages: 1, fileType: '' }
+    },
+    closePdfPreview() {
+      this.pdfPreview.visible = false
+    },
+    pdfPreviewAction({ reportUrlStr, mediaType }) {
+      // window.location.origin +
+      this.pdfPreview.url = reportUrlStr.replace(/\\/g, '/')
+      this.pdfPreview.visible = true
+      this.pdfPreview.fileType = this.mapDictItemType('mediaType', mediaType)
+    },
     commit(val, row) {
       this.audit.row = row
       if (val === 'allow') {
@@ -221,6 +267,24 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+::v-deep .preview-dialog {
+  .el-dialog__body {
+    overflow: auto;
+    min-height: 600px;
+    height: 80vh;
+    max-height: 700px;
+    width: 80vw;
+    min-width: 960px;
+    max-width: 90vw;
+  }
 
+  .docx-wrapper {
+    background: none;
+
+    .docx {
+      box-shadow: none;
+    }
+  }
+}
 </style>

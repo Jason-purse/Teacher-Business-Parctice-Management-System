@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.entity.Report;
 import org.example.management.system.model.param.AuditParam;
 import org.example.management.system.model.security.SimpleUserPrincipal;
+import org.example.management.system.model.vo.ReportVo;
 import org.example.management.system.service.AuditService;
+import org.example.management.system.utils.PageUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -44,10 +46,10 @@ public class AuditController {
     }
 
     @GetMapping
-    public Page<Report> getAllReportsForAuditByPage(AuditParam param, Pageable pageable) {
+    public Page<ReportVo> getAllReportsForAuditByPage(AuditParam param, Pageable pageable) {
         LightningUserContext.get()
                 .getUserPrincipal(SimpleUserPrincipal.class)
                 .ifPresent(user -> param.setAuditUserId(user.getUser().getId()));
-        return auditService.getAllReportsForAuditByPage(param,pageable);
+        return auditService.getAllReportsForAuditByPage(param, PageUtil.getPageable(pageable));
     }
 }

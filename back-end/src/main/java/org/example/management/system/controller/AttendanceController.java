@@ -7,6 +7,7 @@ import org.example.management.system.model.param.AttendanceParam;
 import org.example.management.system.model.security.SimpleUserPrincipal;
 import org.example.management.system.model.vo.AttendanceVo;
 import org.example.management.system.service.AttendanceService;
+import org.example.management.system.utils.PageUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class AttendanceController {
     public Page<AttendanceVo> getAllAttendancesByPage(
             AttendanceParam param,
             Pageable pageable) {
-        return attendanceService.getAttendanceInfosByPage(param, pageable);
+        return attendanceService.getAttendanceInfosByPage(param, PageUtil.getPageable(pageable));
     }
 
 

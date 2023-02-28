@@ -1,6 +1,7 @@
 package org.example.management.system.service;
 
 import com.jianyue.lightning.boot.starter.util.BeanUtils;
+import com.jianyue.lightning.boot.starter.util.ElvisUtil;
 import com.jianyue.lightning.boot.starter.util.OptionalFlux;
 import com.jianyue.lightning.boot.starter.util.StreamUtil;
 import com.jianyue.lightning.boot.starter.util.lambda.LambdaUtils;
@@ -11,6 +12,7 @@ import org.example.management.system.model.param.AttendanceParam;
 import org.example.management.system.model.vo.AttendanceVo;
 import org.example.management.system.repository.AttendanceRepository;
 import org.example.management.system.utils.DateTimeUtils;
+import org.example.management.system.utils.EscapeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -133,10 +135,10 @@ public class AttendanceService {
         @Override
         public Predicate toPredicate(@NotNull Root<Attendance> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
 
-            return OptionalFlux.of(username)
+            return OptionalFlux.of(ElvisUtil.stringElvis(username,null))
                     .map(userName -> {
                         Path<String> path = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getUsername));
-                        return criteriaBuilder.like(path, username);
+                        return criteriaBuilder.like(path, EscapeUtil.escapeExprSpecialWord(username).concat("%"));
                     })
                     .combine(
                             OptionalFlux

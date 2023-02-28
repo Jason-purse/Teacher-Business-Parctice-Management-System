@@ -1,14 +1,17 @@
 package org.example.management.system.service;
 
+import com.jianyue.lightning.boot.starter.util.BeanUtils;
 import com.jianyue.lightning.boot.starter.util.ElvisUtil;
 import com.jianyue.lightning.boot.starter.util.OptionalFlux;
 import com.jianyue.lightning.boot.starter.util.lambda.LambdaUtils;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.constant.DictConstant;
+import org.example.management.system.model.entity.Attachment;
 import org.example.management.system.model.entity.Dict;
 import org.example.management.system.model.entity.Project;
 import org.example.management.system.model.entity.Report;
 import org.example.management.system.model.param.AuditParam;
+import org.example.management.system.model.vo.ReportVo;
 import org.example.management.system.repository.ProjectRepository;
 import org.example.management.system.repository.ReportRepository;
 import org.example.management.system.utils.DateTimeUtils;
@@ -22,11 +25,14 @@ import org.springframework.util.Assert;
 import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.example.management.system.model.constant.DictConstant.*;
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.startsWith;
@@ -40,6 +46,8 @@ public class AuditService {
     private final DictService dictService;
 
     private final ProjectRepository projectRepository;
+
+    private final AttachmentService attachmentService;
 
     /**
      * 提交报告之后,自动变更为待审核 ..
@@ -161,46 +169,88 @@ public class AuditService {
         });
     }
 
-    public Page<Report> getAllReportsForAuditByPage(AuditParam param, Pageable pageable) {
+    public Page<ReportVo> getAllReportsForAuditByPage(AuditParam param, Pageable pageable) {
         AuditComplexSpecification auditComplexSpecification = new AuditComplexSpecification();
         auditComplexSpecification.setAuditParam(param);
-
-        AtomicReference<List<Project>> all = new AtomicReference<>();
+        AtomicReference<Page<Project>> all = new AtomicReference<>();
         OptionalFlux
                 .of(ElvisUtil.stringElvis(param.getProjectName(), null))
                 .consume(projectName -> {
-                    all.set(projectRepository.findAll(Example.of(
+                    // 尝试分页, 因为多个报告对应一个项目 ...
+                    all.set(projectRepository.findAll(
+                            Example.of(
                             Project.builder()
                                     .name(projectName)
                                     .build()
-                            , ExampleMatcher.matching().withMatcher(LambdaUtils.getPropertyNameForLambda(Project::getName), startsWith()))));
-                    if (all.get().size() > 0) {
-                        auditComplexSpecification.setProjectIds(all.get().stream().map(Project::getId).toList());
+                            , ExampleMatcher.matching().withMatcher(LambdaUtils.getPropertyNameForLambda(Project::getName), startsWith()))
+                            ,pageable)
+                    );
+                    if (all.get().hasContent()) {
+                        auditComplexSpecification.setProjectIds(all.get().getContent().stream().map(Project::getId).toList());
                     }
                 });
 
 
-        Page<Report> page = reportRepository.findAll(auditComplexSpecification, pageable);
-        if (all.get() == null) {
-            if (page.getContent().size() > 0) {
-                List<Integer> list = page.getContent().stream().map(Report::getProjectId).distinct().toList();
-                all.set(projectRepository.findAllById(list));
-            }
+        if (all.get() != null &&  !all.get().hasContent()) {
+            // 不用查了,直接返回空 ..
+            // 因为连项目都没有,肯定没有报告 ... 直接返回 empty ..
+            return Page.empty();
         }
 
+        Page<Report> page = reportRepository.findAll(auditComplexSpecification, pageable);
+
         if (page.getContent().size() > 0) {
-            List<Project> projects = all.get();
+            List<Project> projects = null;
+            if(all.get() != null) {
+                projects = all.get().getContent();
+            }
+            else {
+                // 需要查询
+                List<Integer> projectIds = page.getContent().stream().map(Report::getProjectId).distinct().toList();
+                // 查询完毕 ..
+                projects = projectRepository.findAllById(projectIds);
+            }
             Map<Integer, String> map = projects.stream().collect(Collectors.toMap(Project::getId, Project::getName));
-            List<Report> reports
+            List<Integer> list = page.getContent().stream().map(Report::getReportUrlId).distinct().toList();
+            List<Attachment> attachments = attachmentService.getAllAttachmentInfosByIds(list);
+            Map<Integer, Attachment> collect = attachments.stream().collect(Collectors.toMap(Attachment::getId, Function.identity()));
+            // 设置文件格式 ...
+            List<Dict> dict = dictService.getDictItemsBy(DictConstant.REPORT_FORMAT);
+            Map<String, Integer> mediaTypeMaps = dict.stream().collect(Collectors.toMap(Dict::getItemType, Dict::getId));
+            List<ReportVo> reports
                     = page.getContent()
                     .stream()
+                    .map(BeanUtils.transformFrom(ReportVo.class))
                     .peek(ele -> {
                         String projectName = map.get(ele.getProjectId());
                         ele.setProjectName(projectName);
+
+                        // 设置 媒体类型
+                        if(attachments.size() > 0) {
+                            Attachment attachment = collect.get(ele.getReportUrlId());
+                            if(attachment != null) {
+                                ele.setReportUrlStr(attachment.getFileUrl());
+                                ele.setMediaType(attachment.getMediaType());
+                                Dict mediaType = dictService.getDictItemById(attachment.getMediaType());
+                                if(mediaType.getItemType().contains("pdf")) {
+                                    Integer value = mediaTypeMaps.get(DictConstant.PDF_REPORT_FORMAT);
+                                    Assert.notNull(value,"字典数据缺失,无法找到报告格式数据项 !!!");
+                                    // 设置报告格式 ...
+                                    ele.setReportFormat(value);
+                                }
+                                else {
+                                    // word
+                                    Integer value = mediaTypeMaps.get(DictConstant.DOCX_REPORT_FORMAT);
+                                    Assert.notNull(value,"字典数据缺失,无法找到报告格式数据项 !!!");
+                                    // 设置报告格式 ...
+                                    ele.setReportFormat(value);
+                                }
+                            }
+                        }
                     }).toList();
             return new PageImpl<>(reports, pageable, page.getTotalElements());
         }
-        return page;
+        return new PageImpl<>(Collections.emptyList(),page.getPageable(),page.getTotalElements());
     }
 
     class AuditComplexSpecification implements Specification<Report> {

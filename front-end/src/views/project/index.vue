@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="search-line">
-      <el-form ref="searchForm" :inline="true" :model="searchForm" class="search-form">
+      <el-form ref="searchForm" :inline="true" :model="searchForm" class="search-form" @keydown.enter.native="entryKeyDown">
         <el-form-item label="项目名称" prop="name">
-          <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
+          <el-input ref="input" v-model="searchForm.name" placeholder="请输入项目名称" clearable />
         </el-form-item>
         <el-form-item label="发起人" prop="username">
           <el-input v-model="searchForm.username" placeholder="请输入发起人" />
@@ -13,15 +13,18 @@
             v-model="searchForm.startTimeAt"
             type="date"
             placeholder="选择日期"
-            @change="validTimeRange('startTimeAt')"
+            @change="validTimeRange('startTimeAt');"
+            @keydown.enter.a.native="entryKeyDown"
           />
         </el-form-item>
         <el-form-item label="发起结束时间" prop="endTimeAt">
           <el-date-picker
+            ref="endTime"
             v-model="searchForm.endTimeAt"
             type="date"
             placeholder="选择日期"
             @change="validTimeRange('endTimeAt')"
+            @keydown.enter.native="entryKeyDown"
           />
         </el-form-item>
         <el-form-item>
@@ -45,6 +48,8 @@
         :data="tableData"
         row-key="id"
         style="width: 100%"
+        class="tableData"
+        @row-click="expandRow"
         @expand-change="loadReportsTrigger"
       >
         <el-table-column type="expand">
@@ -55,6 +60,9 @@
               </div>
               <el-table
                 ref="reportList"
+                :key="row.id"
+                v-loading="currentRow.loading"
+                element-loading-spinner="el-icon-loading"
                 size="small"
                 row-key="id"
                 :data="currentRow.reportList"
@@ -392,7 +400,8 @@ export default {
       currentRow: {
         row: null,
         reportList: [],
-        index: -1
+        index: -1,
+        loading: false
       },
       reportForm: {
         data: {
@@ -442,9 +451,15 @@ export default {
     },
     previewError() {
       this.$message.error('预览文件失败,无法加载此文件 !!!')
+      this.pdfPreview = { visible: false, pageNum: 1, url: '', totalPages: 1, fileType: '' }
+    },
+    expandRow(row) {
+      if (this.currentRow.row !== row) {
+        this.$refs.tableData.toggleRowExpansion(row, [row])
+      }
     },
     closePdfPreview() {
-      this.pdfPreview = { visible: false, pageNum: 1, url: '', totalPages: 1, fileType: '' }
+      this.pdfPreview.visible = false
     },
     openDescriptionDialog({ failureReason, successDescription, failureFlag }) {
       this.auditResult.visible = true
@@ -554,18 +569,31 @@ export default {
     },
 
     loadReportsTrigger(row, expand) {
-      if (expand) {
+      if (expand.indexOf(row) !== -1) {
+        this.currentRow.loading = true
+        // 表示此元素打开
         if (this.currentRow.row && this.currentRow.row !== row) {
           this.$refs.tableData.toggleRowExpansion(this.currentRow.row, false)
+          this.currentRow.reportList = []
+          this.currentRow.row = row
+          this.currentRow.index = this.currentRow.row.index
+        } else if (!this.currentRow.row) {
+          this.currentRow.reportList = []
+          this.currentRow.row = row
+          this.currentRow.index = this.currentRow.row.index
         }
-        this.loadReports(row.id).then(({ result }) => {
-          this.currentRow = {
-            row,
-            reportList: result
-          }
+        // 否则不需要做任何事情 ..
+        this.loadReports(this.currentRow.row.id).then(({ result }) => {
+          this.currentRow.reportList = result
+        }).catch(() => {
+          this.currentRow.reportList = []
         })
-      } else {
-        this.currentRow = {}
+          .finally(() => {
+            const currentRow = this.currentRow
+            setTimeout(() => {
+              currentRow.loading = false
+            }, 300)
+          })
       }
     },
     deleteDialogHandle({ row: { id, name }}) {
@@ -677,6 +705,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.tableData {
+  :hover {
+    cursor: pointer;
+  }
+}
 ::v-deep .preview-dialog {
   .el-dialog__body {
     overflow: auto;

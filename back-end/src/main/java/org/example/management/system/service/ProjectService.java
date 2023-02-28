@@ -118,7 +118,7 @@ public class ProjectService {
                                     )
                                     .map(userName -> criteriaBuilder
                                             .like(
-                                                    root.get(LambdaUtils.getPropertyNameForLambda(Project::getName)),
+                                                    root.get(LambdaUtils.getPropertyNameForLambda(Project::getUsername)),
                                                     EscapeUtil.escapeExprSpecialWord(userName.trim()).concat("%")
                                             )),
                             criteriaBuilder::and

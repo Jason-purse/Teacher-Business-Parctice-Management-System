@@ -7,6 +7,7 @@ import org.example.management.system.model.entity.Project;
 import org.example.management.system.model.param.ProjectParam;
 import org.example.management.system.model.security.SimpleUserPrincipal;
 import org.example.management.system.service.ProjectService;
+import org.example.management.system.utils.PageUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +46,7 @@ public class ProjectController {
 
     @GetMapping("list")
     public Page<Project> findProjects(ProjectParam param, Pageable pageable) {
-        return projectService.findProjects(param,pageable);
+        return projectService.findProjects(param, PageUtil.getPageable(pageable));
     }
 
     @DeleteMapping("{id}")

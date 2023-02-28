@@ -11,6 +11,7 @@ import org.example.management.system.model.param.UserParam;
 import org.example.management.system.model.security.SimpleUserPrincipal;
 import org.example.management.system.model.vo.UserVo;
 import org.example.management.system.service.UserService;
+import org.example.management.system.utils.PageUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -60,7 +61,7 @@ public class UserController {
     @ApiOperation(value = "获取用户列表且分页", notes = "用户名称左like, 邮箱精确匹配, 注册时间(区间匹配,通过提交startTimeAt / endTimeAt 处理),三者皆可空")
     @GetMapping("list")
     public Page<UserVo> getAllUserDetails(UserParam userParam, @ApiParam("分页参数") Pageable pageable) {
-        return userService.getAllUserDetailsByPage(userParam, pageable);
+        return userService.getAllUserDetailsByPage(userParam, PageUtil.getPageable(pageable));
     }
 
     /**
@@ -69,7 +70,7 @@ public class UserController {
      */
     @GetMapping("list/audit")
     public Page<UserVo> getAllUserDetailsForAudit(Integer auditPhaseId,UserParam userParam,Pageable pageable) {
-        return userService.getAllUserDetailsForAudit(auditPhaseId,userParam,pageable);
+        return userService.getAllUserDetailsForAudit(auditPhaseId,userParam, PageUtil.getPageable(pageable));
     }
 
     /**
