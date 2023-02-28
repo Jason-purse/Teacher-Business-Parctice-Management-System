@@ -64,7 +64,7 @@ public class UserController {
     }
 
     /**
-     * 获取所有用户数据并组装为true ..
+     * 获取所有用户数据并组装为审核 ..
      * @return
      */
     @GetMapping("list/audit")

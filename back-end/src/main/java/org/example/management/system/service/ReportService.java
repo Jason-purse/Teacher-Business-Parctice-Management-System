@@ -23,6 +23,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -92,7 +93,6 @@ public class ReportService {
         // 设置进入下一个阶段 ...
         Integer status = projectValue.getStatus();
         Dict dict = dictService.getDictItemById(status);
-
         // 只有第一次才需要改变状态
         Dict flow = dictService.getFirstDataItemInFlow(DictConstant.PROJECT_STATUS);
         if(status.equals(flow.getId())) {
@@ -130,10 +130,32 @@ public class ReportService {
         List<Attachment> attachments = attachmentService.getAllAttachmentInfosByIds(list);
         Stream<ReportVo> stream = all.stream().map(BeanUtils.transformFrom(ReportVo.class));
         if(attachments.size() > 0) {
-            Map<Integer, String> collect = attachments.stream().collect(Collectors.toMap(Attachment::getId, Attachment::getFileUrl));
+            Map<Integer, Attachment> collect = attachments.stream().collect(Collectors.toMap(Attachment::getId, Function.identity()));
             stream = stream.peek(ele -> {
-                String fileUrl = collect.get(ele.getReportUrlId());
-                ele.setReportUrlStr(fileUrl);
+                Attachment attachment = collect.get(ele.getReportUrlId());
+                if(attachment != null) {
+                    ele.setReportUrlStr(attachment.getFileUrl());
+                    ele.setMediaType(attachment.getMediaType());
+
+                    // 设置文件格式 ...
+                    List<Dict> dict = dictService.getDictItemsBy(DictConstant.REPORT_FORMAT);
+                    Map<String, Integer> map = dict.stream().collect(Collectors.toMap(Dict::getItemType, Dict::getId));
+                    Dict mediaType = dictService.getDictItemById(attachment.getMediaType());
+                    if(mediaType.getItemType().contains("pdf")) {
+                        Integer value = map.get(DictConstant.PDF_REPORT_FORMAT);
+                        Assert.notNull(value,"字典数据缺失,无法找到报告格式数据项 !!!");
+                        // 设置报告格式 ...
+                        ele.setReportFormat(value);
+                    }
+                   else {
+                       // word
+                        Integer value = map.get(DictConstant.DOCX_REPORT_FORMAT);
+                        Assert.notNull(value,"字典数据缺失,无法找到报告格式数据项 !!!");
+                        // 设置报告格式 ...
+                        ele.setReportFormat(value);
+                    }
+                }
+
             });
         }
         return stream.toList();

@@ -26,6 +26,9 @@ export default {
     },
     deleteAttachmentById(id) {
       return request.delete(apiEndpoints.deleteAttachmentById.concat(`/${id}`))
+    },
+    getAttachmentStaticResource(fileUrl) {
+      return request.get(fileUrl)
     }
   }
 }

@@ -625,6 +625,19 @@ DictService {
                         .build()
         );
 
+
+        dicts.add(
+                Dict.builder()
+                        .id(40)
+                        .itemType("admin")
+                        .itemValue("管理员")
+                        .parentDataType(ROLE)
+                        .supportFlow(false)
+                        .createTimeStr(timeStr)
+                        .createAt(createAt)
+                        .build()
+        );
+
         dictRepository.saveAll(dicts);
     }
 }

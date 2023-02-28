@@ -32,7 +32,7 @@ export default {
       projectStatus: [],
       genderStatus: [],
       mediaType: [],
-      roles: [],
+      roles: []
     }
   },
   methods: {
@@ -78,13 +78,13 @@ export default {
       })
     },
     getMediaTypes() {
-      return getDataItemsByParentType(ItemTypes.mediaType).then(({result}) => {
+      return getDataItemsByParentType(ItemTypes.mediaType).then(({ result }) => {
         this.mediaType = result
       })
     },
 
     getRoles() {
-      return getDataItemsByParentType(ItemTypes.role).then(({result}) => {
+      return getDataItemsByParentType(ItemTypes.role).then(({ result }) => {
         this.roles = result
       })
     },
@@ -94,6 +94,16 @@ export default {
         const value = data.filter(({ id, itemValue }) => id == ele)
         if (value.length > 0) {
           return value[0].itemValue
+        }
+      }
+      return '----'
+    },
+    mapDictItemType(name, ele) {
+      const data = this[name] || []
+      if (data) {
+        const value = data.filter(({ id, itemValue }) => id == ele)
+        if (value.length > 0) {
+          return value[0].itemType
         }
       }
       return '----'

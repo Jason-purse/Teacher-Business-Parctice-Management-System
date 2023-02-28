@@ -3,10 +3,10 @@
     <div class="search-line">
       <el-form ref="searchForm" :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="项目名称" prop="name">
-          <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable/>
+          <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
         </el-form-item>
         <el-form-item label="发起人" prop="username">
-          <el-input v-model="searchForm.username" placeholder="请输入发起人"/>
+          <el-input v-model="searchForm.username" placeholder="请输入发起人" />
         </el-form-item>
         <el-form-item label="发起开始时间" prop="startTimeAt">
           <el-date-picker
@@ -34,7 +34,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-divider class="margin-top-bottom-10"/>
+    <el-divider class="margin-top-bottom-10" />
     <template>
       <div class="margin-top-bottom-10 margin-left-25">
         <el-button type="success" @click="openProjectDrawer(false)">创建项目</el-button>
@@ -60,9 +60,9 @@
                 :data="currentRow.reportList"
               >
                 <el-table-column label="报告列表">
-                  <el-table-column label="名称" prop="reportName" align="center"/>
-                  <el-table-column label="描述" prop="description" align="center"/>
-                  <el-table-column label="发起人" prop="submitUserName" align="center"/>
+                  <el-table-column label="名称" prop="reportName" align="center" />
+                  <el-table-column label="描述" prop="description" align="center" />
+                  <el-table-column label="发起人" prop="submitUserName" align="center" />
                   <el-table-column label="报告类型" prop="reportType" align="center">
                     <template v-slot="{row: {reportType}}">
                       {{ mapDictItemValue('reportTypes', reportType) }}
@@ -73,8 +73,8 @@
                       {{ mapDictItemValue('reportFormat', reportFormat) }}
                     </template>
                   </el-table-column>
-                  <el-table-column label="发起时间" prop="createTimeStr" align="center"/>
-                  <el-table-column label="审核人" prop="auditUserName" align="center"/>
+                  <el-table-column label="发起时间" prop="createTimeStr" align="center" />
+                  <el-table-column label="审核人" prop="auditUserName" align="center" />
                   <el-table-column label="文件预览">
                     <template v-slot="{row}">
                       <el-link size="small" @click="pdfPreviewAction(row)">点击预览</el-link>
@@ -114,11 +114,11 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column type="index" label="序号"/>
-        <el-table-column label="名称" prop="name"/>
-        <el-table-column label="描述" prop="description"/>
-        <el-table-column label="发起人" prop="username"/>
-        <el-table-column label="发起时间" prop="createTimeStr"/>
+        <el-table-column type="index" label="序号" />
+        <el-table-column label="名称" prop="name" />
+        <el-table-column label="描述" prop="description" />
+        <el-table-column label="发起人" prop="username" />
+        <el-table-column label="发起时间" prop="createTimeStr" />
         <el-table-column label="状态" prop="status">
           <template v-slot="{row: {status}}">
             {{ mapDictItemValue('projectStatus', status) }}
@@ -150,13 +150,19 @@
       size="300px"
       direction="rtl"
     >
-      <el-form size="small" ref="drawerRef" :model="drawerDialogData" :rules="rules" class="search-form"
-               style="padding: 5px">
+      <el-form
+        ref="drawerRef"
+        size="small"
+        :model="drawerDialogData"
+        :rules="rules"
+        class="search-form"
+        style="padding: 5px"
+      >
         <el-form-item label="项目名称" prop="name">
-          <el-input v-model="drawerDialogData.name" placeholder="请输入项目名称"/>
+          <el-input v-model="drawerDialogData.name" placeholder="请输入项目名称" />
         </el-form-item>
         <el-form-item label="项目描述" prop="description">
-          <el-input v-model="drawerDialogData.description" placeholder="请输入项目描述"/>
+          <el-input v-model="drawerDialogData.description" placeholder="请输入项目描述" />
         </el-form-item>
         <el-form-item>
           <el-form-item style="margin-top: 20px">
@@ -169,17 +175,17 @@
     <el-dialog title="提交报告" :visible.sync="reportForm.visible">
       <el-form ref="reportForm" :model="reportForm.data" :rules="reportFormRule">
         <el-form-item label="报告名称" prop="reportName">
-          <el-input v-model="reportForm.data.reportName" autocomplete="off"/>
+          <el-input v-model="reportForm.data.reportName" autocomplete="off" />
         </el-form-item>
         <el-form-item label="报告描述" prop="description">
-          <el-input v-model="reportForm.data.description" autocomplete="off"/>
+          <el-input v-model="reportForm.data.description" autocomplete="off" />
         </el-form-item>
         <el-form-item label="报告类型" prop="reportType">
           <el-select v-model="reportForm.data.reportType" placeholder="请选择报告类型">
-            <el-option v-for="{itemType,itemValue,id} in reportTypes" :key="itemType" :label="itemValue" :value="id"/>
+            <el-option v-for="{itemType,itemValue,id} in reportTypes" :key="itemType" :label="itemValue" :value="id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="上传文件">
+        <el-form-item label="上传文件" prop="fileList">
           <el-upload
             ref="upload"
             :action="uploadActionUrl"
@@ -206,10 +212,15 @@
 
     <el-dialog title="选择指派审核人" :visible.sync="audit.visible" width="80%" @close="auditDialogCancel()">
       <div>
+        <el-steps :active="1">
+          <el-step v-for="({id,itemValue},index) in auditPhase" :key="id" :title="itemValue" :description="audit.auditPhases[index] ? audit.auditPhases[index].username: `请选择${itemValue}指派人`" />
+        </el-steps>
+      </div>
+      <div>
         <div class="search-line">
           <el-form :inline="true" :model="userData.searchForm" class="search-form">
             <el-form-item label="用户名称">
-              <el-input v-model="userData.searchForm.username" placeholder="请输入用户名称"/>
+              <el-input v-model="userData.searchForm.username" placeholder="请输入用户名称" />
             </el-form-item>
             <el-form-item label="注册时间">
               <el-date-picker
@@ -234,15 +245,15 @@
             </el-form-item>
           </el-form>
         </div>
-        <el-divider class="margin-top-bottom-10"/>
+        <el-divider class="margin-top-bottom-10" />
         <template>
           <el-table
             :data="userData.data"
             style="width: 100%"
           >
-            <el-table-column label="昵称" prop="nickname"/>
-            <el-table-column label="姓名" prop="username"/>
-            <el-table-column label="角色" prop="roles"/>
+            <el-table-column label="昵称" prop="nickname" />
+            <el-table-column label="姓名" prop="username" />
+            <el-table-column label="角色" prop="roles" />
             <el-table-column label="操作" width="250px" align="center">
               <template v-slot="{row}">
                 <el-button type="primary" @click="createAuditAction(row)">指派</el-button>
@@ -274,12 +285,27 @@
         <el-button @click="auditResult.visible = false; auditResult.description = ''">关闭</el-button>
       </span>
     </el-dialog>
-    <pdf ref="pdf"
-         :page="pdfPreview.pageNum"
-         @num-pages="pdfPreview.totalPages =$event"
-         @error="() => {}"
-         :src="pdfPreview.url">
-    </pdf>
+    <el-dialog
+      title="文件浏览"
+      class="preview-dialog"
+      width="fit-content"
+      :visible.sync="pdfPreview.visible"
+      @close="closePdfPreview"
+    >
+
+      <pdf
+        v-if="pdfPreview.fileType.includes('pdf')"
+        :key="pdfPreview.url"
+        :page="pdfPreview.pageNum"
+        :src="pdfPreview.url"
+        @num-pages="pdfPreview.totalPages =$event"
+        @error="previewError"
+      />
+      <template v-else>
+        <vue-office-docx :key="pdfPreview.url" :src="pdfPreview.url" />
+      </template>
+    </el-dialog>
+
   </div>
 
 </template>
@@ -291,14 +317,15 @@ import reportApi from '@/api/report'
 import dictApi from '@/api/dict'
 import userApi from '@/api/user'
 import attachmentApi from '@/api/attachment'
-import {getAccessToken} from '@/utils/auth'
+import { getAccessToken } from '@/utils/auth'
 import auditApi from '@/api/audit'
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 import pdf from 'vue-pdf'
 
+import VueOfficeDocx from '@vue-office/docx'
 export default {
   name: 'Index',
-  components: {pdf},
+  components: { pdf, VueOfficeDocx },
   data() {
     return {
 
@@ -307,14 +334,18 @@ export default {
         pageNum: 1,
         totalPages: 1,
         pageRotate: '',
+        fileType: '',
+        visible: false
       },
       rules: {
-        name: [{required: true, trigger: ['blur', 'change'], message: '请输入项目名称'}],
-        description: [{required: true, trigger: ['blur', 'change'], message: '请输入项目描述'}]
+        name: [{ required: true, trigger: ['blur', 'change'], message: '请输入项目名称' }],
+        description: [{ required: true, trigger: ['blur', 'change'], message: '请输入项目描述' }]
       },
       audit: {
         // 当前报告数据
         data: {},
+        // 审核阶段需要设置的数据 ...
+        auditPhases: [],
         visible: false
       },
       auditResult: {
@@ -365,7 +396,7 @@ export default {
       },
       reportForm: {
         data: {
-          name: '',
+          reportName: '',
           description: '',
           reportType: '',
           reportFormat: '',
@@ -376,10 +407,10 @@ export default {
         visible: false
       },
       reportFormRule: {
-        reportName: [{required: true, trigger: ['blur', 'change'], message: '请输入报告名称'}],
-        description: [{required: true, trigger: ['blur', 'change'], message: '请输入报告描述'}],
-        reportType: [{required: true, trigger: ['blur', 'change'], message: '请选择报告类型'}],
-        reportFormat: [{required: true, trigger: ['blur', 'change'], message: '请选择报告格式'}]
+        reportName: [{ required: true, trigger: ['blur', 'change'], message: '请输入报告名称' }],
+        description: [{ required: true, trigger: ['blur', 'change'], message: '请输入报告描述' }],
+        reportType: [{ required: true, trigger: ['blur', 'change'], message: '请选择报告类型' }],
+        reportFormat: [{ required: true, trigger: ['blur', 'change'], message: '请选择报告格式' }]
       }
     }
   },
@@ -392,6 +423,7 @@ export default {
     this.getAuditPhase()
     this.getAuditStatus()
     this.getProjectStatus()
+    this.getMediaTypes()
   },
 
   methods: {
@@ -402,23 +434,28 @@ export default {
     ...reportApi.methods,
     ...dictApi.methods,
     ...auditApi.methods,
+    ... attachmentApi.methods,
     getAllUserList() {
-      userApi.methods.getAllUsersByPage(this.userData.searchForm, this.userData.pager).then(({result: {content}}) => {
+      userApi.methods.getAllUsersByPage(this.userData.searchForm, this.userData.pager).then(({ result: { content }}) => {
         this.userData.data = content || []
       })
     },
-    openDescriptionDialog({failureReason, successDescription, failureFlag}) {
+    previewError() {
+      this.$message.error('预览文件失败,无法加载此文件 !!!')
+    },
+    closePdfPreview() {
+      this.pdfPreview = { visible: false, pageNum: 1, url: '', totalPages: 1, fileType: '' }
+    },
+    openDescriptionDialog({ failureReason, successDescription, failureFlag }) {
       this.auditResult.visible = true
       // console.log(failureReason)
       this.auditResult.description = (failureFlag ? failureReason : successDescription) || '没有任何说明 !!'
     },
     getDataFunc() {
-      return this.getAllProjectsByPage(this.getSearchform(), this.pager).then(({result}) => {
+      return this.getAllProjectsByPage(this.getSearchform(), this.pager).then(({ result }) => {
         this.tableData = result.content.map((ele, index) => {
-          {
-            ele.index = index
-            return ele
-          }
+          ele.index = index
+          return ele
         })
         return result
       })
@@ -434,7 +471,7 @@ export default {
       this.userData.searchForm = {}
       this.audit = {}
     },
-    uploadPostProcess({code, result}) {
+    uploadPostProcess({ code, result }) {
       if (code !== 200) {
         this.$message.error('上传失败!!!')
         setTimeout(() => {
@@ -460,19 +497,21 @@ export default {
       })
     },
 
-    pdfPreviewAction({reportUrlStr}) {
-      this.pdfPreview.url = reportUrlStr;
+    pdfPreviewAction({ reportUrlStr, mediaType }) {
+      // window.location.origin +
+      this.pdfPreview.url = reportUrlStr.replace(/\\/g, '/')
+      this.pdfPreview.visible = true
+      this.pdfPreview.fileType = this.mapDictItemType('mediaType', mediaType)
     },
-
     validReportFormat(file) {
-      let type = file.type;
-      const format = this.reportFormat.findIndex(ele => ele.itemType === type);
+      const type = file.type
+      const format = this.reportFormat.findIndex(ele => ele.itemType === type)
       if (format) {
         this.reportForm.data.reportFormat = format.id
-        return true;
+        return true
       } else {
-        this.$message.warning("当前上传类型和选择类型不符合,请检查 !!")
-        return false;
+        this.$message.warning('当前上传类型和选择类型不符合,请检查 !!')
+        return false
       }
     },
 
@@ -519,7 +558,7 @@ export default {
         if (this.currentRow.row && this.currentRow.row !== row) {
           this.$refs.tableData.toggleRowExpansion(this.currentRow.row, false)
         }
-        this.loadReports(row.id).then(({result}) => {
+        this.loadReports(row.id).then(({ result }) => {
           this.currentRow = {
             row,
             reportList: result
@@ -529,7 +568,7 @@ export default {
         this.currentRow = {}
       }
     },
-    deleteDialogHandle({row: {id, name}}) {
+    deleteDialogHandle({ row: { id, name }}) {
       this.$confirm(`确定删除项目${name}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -548,14 +587,14 @@ export default {
       })
     },
 
-    forceDeleteDialogHandle({row: {id, name}}) {
+    forceDeleteDialogHandle({ row: { id, name }}) {
       this.$confirm(`确定强制删除项目${name}? 这会删除项目有关的所有东西，包括提交的报告。`, '强制删除', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         this
-          .deleteProjectById(id, {force: true})
+          .deleteProjectById(id, { force: true })
           .then(() => {
             this.$message({
               type: 'success',
@@ -569,11 +608,11 @@ export default {
 
     // 更新当前项目  以及它的报告列表
     updateReportList() {
-      this.getProjectById(this.currentRow.row.id).then(({result}) => {
+      this.getProjectById(this.currentRow.row.id).then(({ result }) => {
         // 直接刷新
         this.$set(this.tableData, this.currentRow.row.index, result)
       })
-      this.loadReports(this.currentRow.row.id).then(({result}) => {
+      this.loadReports(this.currentRow.row.id).then(({ result }) => {
         this.currentRow.reportList = result
       })
     },
@@ -585,14 +624,14 @@ export default {
     },
 
     restoreReportAction(row) {
-      const params = {...row, restore: true}
+      const params = { ...row, restore: true }
       this.updateReport(params).then(() => {
         this.updateReportList()
       })
     },
 
     deleteReportDialogHandle(row) {
-      const {reportName, id, projectId} = row
+      const { reportName, id } = row
       this.$confirm(`确定删除报告${reportName}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -614,7 +653,7 @@ export default {
       this.$refs.reportForm.validate(valid => {
         if (valid) {
           if (action === 'save-report') {
-            this.createReport({...this.reportForm.data, projectId: this.reportForm.currentRow?.id}).then(() => {
+            this.createReport({ ...this.reportForm.data, projectId: this.reportForm.currentRow?.id }).then(() => {
               this.$message.success('新增报告成功!!!')
               this.updateReportList()
             })
@@ -637,6 +676,22 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+::v-deep .preview-dialog {
+  .el-dialog__body {
+    overflow: auto;
+    min-height: 600px;
+    height: 80vh;
+    max-height: 700px;
+    width: 80vw;
+    min-width: 960px;
+    max-width: 90vw;
+  }
+    .docx-wrapper {
+      background: none;
+      .docx {
+        box-shadow: none;
+      }
+    }
+  }
 </style>

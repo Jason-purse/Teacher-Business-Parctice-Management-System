@@ -34,6 +34,10 @@ public class DictConstant {
 
     public static final String ATTENDANCE_STATUS = "attendance_status";
 
+    public static final String PDF_REPORT_FORMAT = "pdf_report_type";
+
+    public static final String DOCX_REPORT_FORMAT = "word_report_type";
+
 
     public static final Integer FIRST_ITEM_IDENTIFY = -1;
 

@@ -28,6 +28,11 @@ public class UserParam {
     private String password;
 
     /**
+     * 如果为空,则表
+     */
+    private String auditPhase;
+
+    /**
      * 头像信息url
      */
     private String avatarUrl;

@@ -10,7 +10,7 @@
         :collapse-transition="false"
         mode="vertical"
       >
-        <sidebar-item v-for="route in routes" :key="route.path" :item="route" :base-path="route.path"/>
+        <sidebar-item v-for="route in routes" :key="route.path" :item="route" :base-path="route.path" />
       </el-menu>
     </el-scrollbar>
   </div>
@@ -23,7 +23,7 @@ import SidebarItem from './SidebarItem'
 import variables from '@/styles/variables.scss'
 
 export default {
-  components: {SidebarItem, Logo},
+  components: { SidebarItem, Logo },
   computed: {
     ...mapGetters([
       'sidebar'
@@ -32,22 +32,22 @@ export default {
     routes() {
       const roles = sessionStorage.getItem('roles')
       // const roles = [ 'teacher', 'auditor' ]
-      if (roles.length == 0) {
-        this.$router.push('/nothing')
-        return []
-      }
-      let newRoute = this.$router.options.routes.filter(item => item.path == '/')[0].children
-      newRoute = newRoute.filter(item => {
-        return roles.some(it => {
-          return item.meta.roles.includes(it)
-        })
-      })
-      return newRoute
-      // return this.$router.options.routes
+      // if (roles.length == 0) {
+      //   this.$router.push('/nothing')
+      //   return []
+      // }
+      // let newRoute = this.$router.options.routes.filter(item => item.path == '/')[0].children
+      // newRoute = newRoute.filter(item => {
+      //   return roles.some(it => {
+      //     return item.meta.roles.includes(it)
+      //   })
+      // })
+      // return newRoute
+      return this.$router.options.routes
     },
     activeMenu() {
       const route = this.$route
-      const {meta, path} = route
+      const { meta, path } = route
       // if set path, the sidebar will highlight the path you set
       if (meta.activeMenu) {
         return meta.activeMenu

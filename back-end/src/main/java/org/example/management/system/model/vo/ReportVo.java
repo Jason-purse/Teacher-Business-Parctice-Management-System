@@ -23,6 +23,11 @@ public class ReportVo {
     private String reportUrlStr;
 
     /**
+     * media type
+     */
+    private Integer mediaType;
+
+    /**
      * 报告的类型,一般是id
      */
     private Integer reportType;
