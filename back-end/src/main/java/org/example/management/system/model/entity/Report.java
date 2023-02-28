@@ -39,10 +39,17 @@ public class Report implements Serializable {
 
     private String reportName;
 
+
     private Integer submitUserId;
 
     private String submitUserName;
 
+
+    private Boolean assignFlag;
+
+    /**
+     * 当前审核人 ...
+     */
     private Integer auditUserId;
 
     private String auditUserName;

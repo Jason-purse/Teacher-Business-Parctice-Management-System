@@ -1,6 +1,7 @@
 package org.example.management.system.model.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +18,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "report_rr_audit_phase")
 public class ReportRRAuditPhase implements Serializable {
 
@@ -26,7 +28,11 @@ public class ReportRRAuditPhase implements Serializable {
 
     private Integer reportId;
 
+    private Integer auditPhaseId;
+
     private Integer userId;
+
+    private String userName;
 
     private Long createAt;
 

@@ -1,15 +1,15 @@
 <template>
   <div class="navbar">
-    <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar"/>
+    <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
-    <breadcrumb class="breadcrumb-container"/>
+    <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <!--          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">-->
-          <el-avatar class="sub-title" icon="el-icon-user-solid"/>
-          <i class="el-icon-caret-bottom"/>
+          <el-avatar class="sub-title" icon="el-icon-user-solid" />
+          <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <el-dropdown-item>
@@ -26,7 +26,7 @@
       title="个人主页"
       :visible.sync="drawerVisable"
       size="20%"
-      :wrapperClosable="false"
+      :wrapper-closable="false"
     >
       <div style="padding: 0 20px">
         <el-button v-if="!isEdit" type="primary" size="mini" @click="isEdit = true">编辑</el-button>
@@ -38,15 +38,15 @@
           </el-form-item>
           <el-form-item label="昵称" prop="nickname">
             <div v-if="!isEdit">{{ userInfo.nickname ? userInfo.nickname : '暂无' }}</div>
-            <el-input size="small" v-else v-model="formInfo.nickname" clearable/>
+            <el-input v-else v-model="formInfo.nickname" size="small" clearable />
           </el-form-item>
           <el-form-item label="手机" prop="phone">
             <div v-if="!isEdit">{{ userInfo.phone ? userInfo.phone : '暂无' }}</div>
-            <el-input size="small" v-else v-model="formInfo.phone" clearable/>
+            <el-input v-else v-model="formInfo.phone" size="small" clearable />
           </el-form-item>
           <el-form-item label="简介" prop="description">
             <div v-if="!isEdit">{{ userInfo.description ? userInfo.description : '暂无' }}</div>
-            <el-input size="small" v-else v-model="formInfo.description" clearable/>
+            <el-input v-else v-model="formInfo.description" size="small" clearable />
           </el-form-item>
           <el-form-item label="性别" prop="gex">
             <div v-if="!isEdit">
@@ -54,8 +54,8 @@
                 {{ userInfo.gex ? mapDictItemValue('genderStatus',userInfo.gex ): '暂无' }}
               </template>
             </div>
-            <el-select v-else size="small" v-model="formInfo.gex" placeholder="请选择性别" clearable>
-              <el-option v-for="({itemValue,id}) in genderStatus" :label="itemValue" :key="id" :value="id"/>
+            <el-select v-else v-model="formInfo.gex" size="small" placeholder="请选择性别" clearable>
+              <el-option v-for="({itemValue,id}) in genderStatus" :key="id" :label="itemValue" :value="id" />
             </el-select>
           </el-form-item>
           <el-form-item label="邮箱">
@@ -68,11 +68,11 @@
 </template>
 
 <script>
-import {mapGetters,mapMutations} from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import user from '@/api/user'
-import dict from "@/api/dict";
+import dict from '@/api/dict'
 
 export default {
   components: {
@@ -118,7 +118,7 @@ export default {
   methods: {
     ...user.methods,
     ...dict.methods,
-    ...mapMutations('user',['SET_USERINFO']),
+    ...mapMutations('user', ['SET_USERINFO']),
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
@@ -131,8 +131,8 @@ export default {
       this.getCurrentUserInfo().then(res => {
         if (res.code === 200) {
           this.userInfo = res.result
-          this.formInfo = {...res.result}
-          this.SET_USERINFO({...res.result})
+          this.formInfo = { ...res.result }
+          this.SET_USERINFO({ ...res.result })
         }
       })
     },

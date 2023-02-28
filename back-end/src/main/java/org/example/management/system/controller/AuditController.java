@@ -40,6 +40,11 @@ public class AuditController {
         auditService.updateAudit(auditParam);
     }
 
+    /**
+     * 指派其实就是创建一个审核记录 ...
+     *
+     * 然后这一条审核记录会管理这个报告所有的审核阶段的审核人 ...
+     */
     @PostMapping
     public void createAudit(@RequestBody AuditParam param) {
         auditService.createAudit(param);

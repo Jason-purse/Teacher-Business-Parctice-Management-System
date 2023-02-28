@@ -6,13 +6,11 @@ import com.jianyue.lightning.boot.starter.util.OptionalFlux;
 import com.jianyue.lightning.boot.starter.util.lambda.LambdaUtils;
 import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.constant.DictConstant;
-import org.example.management.system.model.entity.Attachment;
-import org.example.management.system.model.entity.Dict;
-import org.example.management.system.model.entity.Project;
-import org.example.management.system.model.entity.Report;
+import org.example.management.system.model.entity.*;
 import org.example.management.system.model.param.AuditParam;
 import org.example.management.system.model.vo.ReportVo;
 import org.example.management.system.repository.ProjectRepository;
+import org.example.management.system.repository.ReportRRAuditPhaseRepository;
 import org.example.management.system.repository.ReportRepository;
 import org.example.management.system.utils.DateTimeUtils;
 import org.example.management.system.utils.EscapeUtil;
@@ -48,6 +46,8 @@ public class AuditService {
     private final ProjectRepository projectRepository;
 
     private final AttachmentService attachmentService;
+
+    private final ReportRRAuditPhaseService reportRRAuditPhaseService;
 
     /**
      * 提交报告之后,自动变更为待审核 ..
@@ -100,9 +100,13 @@ public class AuditService {
                 if (item.getNextDataTypeID() != null) {
                     // 表示还有下一个阶段
                     report.setAuditPhase(item.getNextDataTypeID());
-                    // 审核人 ... 滞空,需要重新指派 ...
-                    report.setAuditUserId(null);
-                    report.setAuditUserName(null);
+                    Optional<ReportRRAuditPhase> rrData = reportRRAuditPhaseService.getReportRRAuditPhaseByReportId(item.getId(), item.getNextDataTypeID());
+                   if(rrData.isPresent()) {
+                       ReportRRAuditPhase reportRRAuditPhase = rrData.get();
+                       report.setAuditUserId(reportRRAuditPhase.getUserId());
+                       report.setAuditUserName(reportRRAuditPhase.getUserName());
+                   }
+                    // 从指派中选择
                     report.setStatus(firstAuditStatus.getId());
                     // 状态不需要设置,然后直接进入下一个阶段的进行中
                     nextPhase = true;
@@ -144,25 +148,41 @@ public class AuditService {
         reportRepository.save(report);
     }
 
+    /**
+     * 这个只会指派一次 ..
+     */
     public void createAudit(AuditParam param) {
         Optional<Report> report = reportRepository.findById(param.getReportId());
         Assert.isTrue(report.isPresent(), "当前指派审核报告不存在,请检查 !!!");
         Dict firstAuditStatus = dictService.getFirstAuditStatus();
         report.ifPresent(ele -> {
-            Assert.isTrue(firstAuditStatus.getId().equals(ele.getStatus()), "无法指派审核报告,此报告正在审核中 !!!");
+            Assert.isTrue(ele.getAssignFlag() == null || !ele.getAssignFlag(), "无法指派审核报告,此报告已经完成指派 !!!");
             ele.setAuditUserId(param.getAuditUserId());
             ele.setAuditUserName(param.getAuditUserName());
             Integer nextDataTypeID = firstAuditStatus.getNextDataTypeID();
-            // 进入下一个阶段 ..
+            // 审核状态 ..
             ele.setStatus(nextDataTypeID);
             // pending 状态
             ele.setFailureFlag(null);
 
-            // 其余情况已经自动转变 ...
-            if (ele.getAuditPhase() == null) {
-                // 进入审核阶段的第一个阶段
-                ele.setAuditPhase(dictService.getFirstDataItemInFlow(DictConstant.AUDIT_PHASE).getId());
-            }
+            LocalDateTime now = LocalDateTime.now();
+            List<ReportRRAuditPhase> reportRRAuditPhases = param.getAuditHandlers().stream().map(rr -> {
+                        return ReportRRAuditPhase.builder()
+                                .reportId(param.getReportId())
+                                .auditPhaseId(rr.getAuditPhaseId())
+                                .userName(rr.getUsername())
+                                .userId(rr.getUserId())
+                                .createAt(DateTimeUtils.getTimeOfDay(now))
+                                .createTimeStr(DateTimeUtils.getTimeStr(now))
+                                .build();
+                    })
+                    .toList();
+
+            // 设置
+            ele.setAuditUserName(reportRRAuditPhases.get(0).getUserName());
+            ele.setAuditPhase(reportRRAuditPhases.get(0).getAuditPhaseId());
+            // 然后开始 配置关系
+            reportRRAuditPhaseService.createReportAndAuditPhaseRRInfo(reportRRAuditPhases);
             // 不能修改 !!!!
             ele.setCanModify(false);
             reportRepository.save(ele);

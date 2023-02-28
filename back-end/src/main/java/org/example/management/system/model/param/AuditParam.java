@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.management.system.model.entity.ReportRRAuditPhase;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,6 +21,8 @@ public class AuditParam {
     private Integer auditUserId;
 
     private String auditUserName;
+
+    private List<ReportRRAuditPhaseParam> auditHandlers;
 
    // ------------------ 真正进行审核的需要 -----------------
     private String failureReason;
