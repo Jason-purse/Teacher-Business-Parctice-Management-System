@@ -100,14 +100,18 @@ public class AuditService {
                 if (item.getNextDataTypeID() != null) {
                     // 表示还有下一个阶段
                     report.setAuditPhase(item.getNextDataTypeID());
-                    Optional<ReportRRAuditPhase> rrData = reportRRAuditPhaseService.getReportRRAuditPhaseByReportId(item.getId(), item.getNextDataTypeID());
+                    Optional<ReportRRAuditPhase> rrData = reportRRAuditPhaseService.getReportRRAuditPhaseByReportId(report.getId(), item.getNextDataTypeID());
                    if(rrData.isPresent()) {
                        ReportRRAuditPhase reportRRAuditPhase = rrData.get();
                        report.setAuditUserId(reportRRAuditPhase.getUserId());
                        report.setAuditUserName(reportRRAuditPhase.getUserName());
+
+                       // 设置处理状态
+                       report.setFailureFlag(null);
                    }
                     // 从指派中选择
-                    report.setStatus(firstAuditStatus.getId());
+                    // 直接继续审核状态
+                    //report.setStatus(firstAuditStatus.getId());
                     // 状态不需要设置,然后直接进入下一个阶段的进行中
                     nextPhase = true;
                 }
@@ -179,12 +183,14 @@ public class AuditService {
                     .toList();
 
             // 设置
+            ele.setAuditUserId(reportRRAuditPhases.get(0).getUserId());
             ele.setAuditUserName(reportRRAuditPhases.get(0).getUserName());
             ele.setAuditPhase(reportRRAuditPhases.get(0).getAuditPhaseId());
             // 然后开始 配置关系
             reportRRAuditPhaseService.createReportAndAuditPhaseRRInfo(reportRRAuditPhases);
             // 不能修改 !!!!
             ele.setCanModify(false);
+            ele.setAssignFlag(true);
             reportRepository.save(ele);
         });
     }

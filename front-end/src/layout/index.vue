@@ -1,12 +1,12 @@
 <template>
   <div :class="classObj" class="app-wrapper">
-    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
-    <sidebar/>
+    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
+    <sidebar />
     <div class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
-        <navbar/>
+        <navbar />
       </div>
-      <app-main/>
+      <app-main />
     </div>
     <template v-if="roles.length!=0">
       <el-dialog
@@ -18,12 +18,12 @@
       >
         <el-card shadow="hover">
           <div style="display: flex;justify-content: space-between;align-items: center">
-            <div class="card-box" v-if="!isAttendance">
-              <i class="el-icon-close card-check"></i>
+            <div v-if="!isAttendance" class="card-box">
+              <i class="el-icon-close card-check" />
               今日未打卡
             </div>
-            <div class="card-box" v-else>
-              <i class="el-icon-check card-check"></i>
+            <div v-else class="card-box">
+              <i class="el-icon-check card-check" />
               今日已打卡
             </div>
             <el-button v-if="!isAttendance" type="primary" size="small" style="height: 30px" @click="fetchAttendance">打
@@ -40,6 +40,7 @@
 import { Navbar, Sidebar, AppMain } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import attendance from '@/api/attendance'
+import { getRoleInfos } from '@/utils/auth'
 
 export default {
   name: 'Layout',
@@ -77,7 +78,7 @@ export default {
       return this.isFirst === true && this.isAttendance == false
     },
     roles() {
-      return sessionStorage.getItem('roles')
+      return getRoleInfos()
     }
   },
   created() {

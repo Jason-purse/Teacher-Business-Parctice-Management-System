@@ -37,8 +37,8 @@ const mutations = {
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
   },
-  SET_USERINFO: (state,userInfo) => {
-    console.log(userInfo,"state")
+  SET_USERINFO: (state, userInfo) => {
+    console.log(userInfo, 'state')
     state.userInfo = userInfo
   }
 }
@@ -107,7 +107,7 @@ const actions = {
       commit('RESET_STATE')
       resolve()
     })
-  },
+  }
 }
 
 export default {

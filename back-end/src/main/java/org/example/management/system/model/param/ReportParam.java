@@ -44,5 +44,4 @@ public class ReportParam {
 
 
     private Boolean restore;
-
 }

@@ -13,14 +13,14 @@
         </div>
         <div class="login">
           <el-form ref="loginForm" :model="tabValue === 'account' ? loginForm : registerForm" :rules="loginRules">
-             <template v-if="tabValue === 'account'">
-               <el-form-item prop="username">
-                 <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="账号" clearable />
-               </el-form-item>
-               <el-form-item prop="password">
-                 <el-input v-model="loginForm.password" show-password type="password" prefix-icon="el-icon-lock" placeholder="密码" clearable />
-               </el-form-item>
-             </template>
+            <template v-if="tabValue === 'account'">
+              <el-form-item prop="username">
+                <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="账号" clearable />
+              </el-form-item>
+              <el-form-item prop="password">
+                <el-input v-model="loginForm.password" show-password type="password" prefix-icon="el-icon-lock" placeholder="密码" clearable />
+              </el-form-item>
+            </template>
             <template v-else>
               <el-form-item prop="email">
                 <el-input v-model="registerForm.email" prefix-icon="el-icon-user" placeholder="邮箱" clearable />
@@ -48,13 +48,14 @@
 </template>
 
 <script>
-import user from "@/api/user"
+import user from '@/api/user'
 import { mapMutations } from 'vuex'
+import { setRoles } from '@/utils/auth'
 export default {
   name: 'Login',
   data() {
     const validateEmail = (rule, value, callback) => {
-      const verify = /^\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/;
+      const verify = /^\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/
       if (!verify.test(value)) {
         callback(new Error('邮箱格式错误, 请重新输入'))
       } else {
@@ -104,8 +105,7 @@ export default {
   },
   methods: {
     ...user.methods,
-    ...mapMutations('user',['SET_USERINFO']),
-    ...user.methods,
+    ...mapMutations('user', ['SET_USERINFO']),
     /**
      * 切换tab
      * @param {*} value
@@ -135,13 +135,12 @@ export default {
             const component = this.$message.success('登陆成功 !!!')
             sessionStorage.setItem('isFirst', 1)
             this.loading = false
-            this.getCurrentUserInfo().then(res => {
-              if (res.code === 200) {
-                this.userInfo = res.result
-                this.formInfo = { ...res.result }
-                sessionStorage.setItem('roles', res.result.roles)
-                this.SET_USERINFO({ ...res.result })
-              }
+            this.getCurrentUserInfo().then(({ result }) => {
+              this.userInfo = result
+              this.formInfo = { ...result }
+              console.log((result.roles || []).map(ele => ele.id))
+              setRoles((result.roles || []).map(ele => ele.itemType))
+              this.SET_USERINFO({ ...result })
             }).finally(() => {
               setTimeout(() => {
                 this.$router.push({ path: this.redirect || '/' })

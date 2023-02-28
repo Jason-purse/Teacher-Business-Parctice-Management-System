@@ -85,7 +85,7 @@ export default {
 
     getRoles() {
       return getDataItemsByParentType(ItemTypes.roles).then(({ result }) => {
-        this.roles = result
+        this.roles = result.filter(ele => ele.itemType !== 'admin')
       })
     },
     mapDictItemValue(name, ele) {

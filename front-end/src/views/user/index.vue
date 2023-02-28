@@ -100,6 +100,9 @@
           <el-form-item label="email">
             <el-input v-model="drawerDialogData.email" placeholder="请输入邮箱信息" />
           </el-form-item>
+          <el-form-item label="密码">
+            <el-input v-model="drawerDialogData.password" placeholder="请输入密码信息" />
+          </el-form-item>
           <el-form-item label="phone">
             <el-input v-model="drawerDialogData.phone" placeholder="请输入手机号码" />
           </el-form-item>
@@ -135,14 +138,13 @@
       title="分配角色"
       :visible.sync="roleForm.visible"
       width="60%"
-      @close="roleForm.visible = false; roleForm.data = {}"
+      @close="roleForm.visible = false; roleForm.data = {};clearRoleStatus()"
     >
       <el-button type="primary" size="small" :disabled="roleForm.disabled" @click="subUserWithRoles">分配</el-button>
       <el-table
-        key="assignRolesTable"
         ref="assignedRoles"
+        key="assignedRolesTable"
         :data="roles"
-        reserve-selection="id"
         row-key="id"
         @select-all="configUserRoles"
         @select="configUserRoles"
@@ -161,6 +163,8 @@ import dict from '@/api/dict'
 import user from '@/api/user'
 import { auto } from 'html-webpack-plugin/lib/chunksorter'
 import role from '@/api/role'
+import { mapMutations, mapState } from 'vuex'
+import { setRoles } from '@/utils/auth'
 
 export default {
   name: 'Index',
@@ -181,7 +185,8 @@ export default {
         birthday: '',
         email: '',
         phone: '',
-        gex: ''
+        gex: '',
+        password: ''
       },
       roleForm: {
         visible: false,
@@ -191,6 +196,7 @@ export default {
           roles: []
         }
       },
+      currentToggleRoleIds: [],
       ...backendStyle.data(),
       ...dict.data()
     }
@@ -207,6 +213,8 @@ export default {
     ...dict.methods,
     ...user.methods,
     ...role.methods,
+    ...mapState('user', ['userInfo']),
+    ...mapMutations('user', ['SET_USERINFO']),
     getDataFunc() {
       return this.getAllUsersByPage(this.getSearchform(), this.pager).then(({ result }) => {
         this.tableData = result.content
@@ -214,8 +222,8 @@ export default {
       })
     },
     defaultAssignRoles() {
-      const values = []
       this.$nextTick(() => {
+        const values = []
         if (this.roleForm.data.roles) {
           const ids = this.roleForm.data.roles.map(ele => ele.id)
           this.roles.forEach(ele => {
@@ -225,7 +233,11 @@ export default {
           })
         }
         values.forEach(ele => {
-          this.$refs.assignedRoles.toggleRowSelection(ele)
+          if (!this.currentToggleRoleIds.includes(ele.id)) {
+            this.$refs.assignedRoles.toggleRowSelection(ele)
+            // 设置正确绑定
+            this.currentToggleRoleIds = [... this.currentToggleRoleIds, ele.id]
+          }
         })
       })
     },
@@ -255,14 +267,27 @@ export default {
       }).then(() => {
         this.$message.success('分配成功 !!!')
         this.onSubmit()
-      }).catch(() => {
+        if (this.roleForm.data.userId === this.userInfo().id) {
+          this.getCurrentUserInfo().then(({ result }) => {
+            // 设置角色
+            console.log((result.roles || []).map(ele => ele.itemType))
+            setRoles((result.roles || []).map(ele => ele.itemType))
+            this.SET_USERINFO(result)
+          })
+        }
+      }).catch((error) => {
+        console.log(error)
         this.$message.error('分配失败 !!!')
       })
         .finally(() => {
+          this.clearRoleStatus()
           this.roleForm.disabled = true
           this.roleForm.data = {}
           this.roleForm.visible = false
         })
+    },
+    clearRoleStatus() {
+      // 啥也不做
     },
     openDrawer(action) {
       if (action) {
@@ -291,6 +316,7 @@ export default {
       this.roleForm.visible = true
       this.roleForm.data.userId = row.id
       this.roleForm.data.roles = row.roles || []
+
       // 设置角色 ..
       this.defaultAssignRoles()
     }

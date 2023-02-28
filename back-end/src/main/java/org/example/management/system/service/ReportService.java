@@ -27,6 +27,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.example.management.system.model.constant.DictConstant.FIRST_ITEM_IDENTIFY;
+
 @Service
 @RequiredArgsConstructor
 public class ReportService {
@@ -111,10 +113,14 @@ public class ReportService {
         Assert.isTrue(report.getCanModify() == null || report.getCanModify(), "当前报告处于审核中,无法修改!!!");
         BeanUtils.updateProperties(reportParam, report);
         if(reportParam.getRestore() != null && reportParam.getRestore()) {
-            report.setStatus(dictService.getFirstAuditStatus().getId());
-            report.setAuditUserId(null);
-            report.setAuditUserName(null);
+            Dict nextDict = dictService.getDictItemById(dictService.getFirstAuditStatus().getNextDataTypeID());
+            // 直接进入下一个 ..
+            report.setStatus(nextDict.getId());
+            //report.setAuditUserId(null);
+            //report.setAuditUserName(null);
             report.setFailureFlag(null);
+            Dict item = dictService.getFirstDataItemInFlow(DictConstant.AUDIT_PHASE);
+            report.setAuditPhase(item.getId());
         }
         reportRepository.save(report);
     }

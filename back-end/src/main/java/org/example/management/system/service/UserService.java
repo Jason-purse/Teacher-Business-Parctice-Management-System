@@ -36,6 +36,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
@@ -86,6 +87,10 @@ public class UserService implements LightningUserDetailService {
         LocalDateTime now = LocalDateTime.now();
         user.setCreateAt(DateTimeUtils.getTimeOfDay(now));
         user.setCreateTimeStr(DateTimeUtils.getTimeStr(now));
+
+        if(StringUtils.hasText(userParam.getPassword())) {
+            user.setPassword("{noop}" + userParam.getPassword().trim());
+        }
         userRepository.save(user);
     }
 

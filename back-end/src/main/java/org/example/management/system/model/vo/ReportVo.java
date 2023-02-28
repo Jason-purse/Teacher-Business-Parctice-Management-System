@@ -27,6 +27,8 @@ public class ReportVo {
      */
     private Integer mediaType;
 
+    private Boolean assignFlag;
+
     /**
      * 报告的类型,一般是id
      */

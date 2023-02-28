@@ -1,7 +1,13 @@
 <template>
   <div>
     <div class="search-line">
-      <el-form ref="searchForm" :inline="true" :model="searchForm" class="search-form" @keydown.enter.native="entryKeyDown">
+      <el-form
+        ref="searchForm"
+        :inline="true"
+        :model="searchForm"
+        class="search-form"
+        @keydown.enter.native="entryKeyDown"
+      >
         <el-form-item label="项目名称" prop="name">
           <el-input ref="input" v-model="searchForm.name" placeholder="请输入项目名称" clearable />
         </el-form-item>
@@ -103,9 +109,15 @@
                   <el-table-column label="操作" align="center">
                     <template v-slot="{row}">
                       <template v-if="!row.auditUserId">
-                        <el-button v-if="roles.includes('admin')" size="small" type="primary" @click="addAuditUser(row)">指派审核</el-button>
+                        <el-button
+                          v-if="roleInfos.includes('admin') && !row.assignFlag"
+                          size="small"
+                          type="primary"
+                          @click="addAuditUser(row)"
+                        >指派审核
+                        </el-button>
                       </template>
-                      <template v-else-if="row.failureFlag !== null && row.failureFlag">
+                      <template v-else-if="row.failureFlag !== null && row.failureFlag && row.submitUserId === currentUserInfo.id">
                         <el-button size="small" type="success" @click="restoreReportAction(row)">重新申请</el-button>
                       </template>
                       <el-button
@@ -218,68 +230,84 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="选择指派审核人" :visible.sync="audit.visible" width="80%" @close="auditDialogCancel()">
-      <div>
-        <el-steps :active="1">
-          <el-step v-for="({id,itemValue},index) in auditPhase" :key="id" :title="itemValue" :description="audit.auditPhases[index] ? audit.auditPhases[index].username: `请选择${itemValue}指派人`" />
-        </el-steps>
-      </div>
-      <div>
-        <div class="search-line">
-          <el-form :inline="true" :model="userData.searchForm" class="search-form">
-            <el-form-item label="用户名称">
-              <el-input v-model="userData.searchForm.username" placeholder="请输入用户名称" />
-            </el-form-item>
-            <el-form-item label="注册时间">
-              <el-date-picker
-                v-model="userData.searchForm.startTimeAt"
-                type="date"
-                placeholder="选择日期"
-                @change="validTimeRange('startTimeAt'),userData.searchForm"
-              />
-            </el-form-item>
-            <el-form-item label="结束时间">
-              <el-date-picker
-                v-model="userData.searchForm.endTimeAt"
-                type="date"
-                placeholder="选择日期"
-                @change="validTimeRange('endTimeAt',userData.searchForm)"
-              />
-            </el-form-item>
-            <el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="getAllUserList">查询</el-button>
-              </el-form-item>
-            </el-form-item>
-          </el-form>
-        </div>
-        <el-divider class="margin-top-bottom-10" />
-        <template>
-          <el-table
-            :data="userData.data"
-            style="width: 100%"
-          >
-            <el-table-column label="昵称" prop="nickname" />
-            <el-table-column label="姓名" prop="username" />
-            <el-table-column label="角色" prop="roles" />
-            <el-table-column label="操作" width="250px" align="center">
-              <template v-slot="{row}">
-                <el-button type="primary" @click="createAuditAction(row)">指派</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <div style="margin-top: 5px;text-align: right;">
-            <el-pagination
-              small
-              background
-              :current-page.sync="userData.pager.page"
-              :page-size="userData.pager.size"
-              layout="prev, pager, next"
-              :total="userData.pager.total"
+    <el-dialog :visible.sync="visible" title="选择指派审核人" width="80%" @close="auditDialogCancel()">
+      <template v-if="exists">
+        <div>
+          <el-steps :active="assignIndex" :align-center="true">
+            <el-step
+              v-for="({id,itemValue},index) in auditPhase"
+              ref="assignStep"
+              :key="id"
+              finish-status="success"
+              simple
+              :status="(assignForm && assignForm[index]) ? 'success' : 'process'"
+              :title="itemValue"
+              description="请指派审核人"
             />
+          </el-steps>
+        </div>
+        <div>
+          <div class="search-line">
+            <el-form :inline="true" :model="userData.searchForm" class="search-form">
+              <el-form-item label="用户名称">
+                <el-input v-model="userData.searchForm.username" placeholder="请输入用户名称" />
+              </el-form-item>
+              <el-form-item label="注册时间">
+                <el-date-picker
+                  v-model="userData.searchForm.startTimeAt"
+                  type="date"
+                  placeholder="选择日期"
+                  @change="validTimeRange('startTimeAt'),userData.searchForm"
+                />
+              </el-form-item>
+              <el-form-item label="结束时间">
+                <el-date-picker
+                  v-model="userData.searchForm.endTimeAt"
+                  type="date"
+                  placeholder="选择日期"
+                  @change="validTimeRange('endTimeAt',userData.searchForm)"
+                />
+              </el-form-item>
+              <el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="getAllUserList">查询</el-button>
+                </el-form-item>
+              </el-form-item>
+            </el-form>
           </div>
-        </template>
-      </div>
+          <el-divider class="margin-top-bottom-10" />
+          <template>
+            <el-table
+              :data="userData.data"
+              style="width: 100%"
+            >
+              <el-table-column label="昵称" prop="nickname" />
+              <el-table-column label="姓名" prop="username" />
+              <el-table-column label="角色" prop="roles">
+                <template v-slot="{row:{roles}}">
+                  {{ roles.map(ele => ele.itemValue) }}
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="250px" align="center">
+                <template v-slot="{row}">
+                  <el-button type="primary" @click="createAuditAction(row)">指派</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <div style="margin-top: 5px;text-align: right;">
+              <el-pagination
+                small
+                background
+                :current-page.sync="userData.pager.page"
+                :page-size="userData.pager.size"
+                layout="prev, pager, next"
+                :total="userData.pager.total"
+              />
+            </div>
+          </template>
+        </div>
+      </template>
+
     </el-dialog>
 
     <el-dialog
@@ -300,7 +328,6 @@
       :visible.sync="pdfPreview.visible"
       @close="closePdfPreview"
     >
-
       <pdf
         v-if="pdfPreview.fileType.includes('pdf')"
         :key="pdfPreview.url"
@@ -325,18 +352,24 @@ import reportApi from '@/api/report'
 import dictApi from '@/api/dict'
 import userApi from '@/api/user'
 import attachmentApi from '@/api/attachment'
-import { getAccessToken } from '@/utils/auth'
+import { getAccessToken, getRoleInfos } from '@/utils/auth'
 import auditApi from '@/api/audit'
 import { mapState } from 'vuex'
 import pdf from 'vue-pdf'
 
 import VueOfficeDocx from '@vue-office/docx'
+
 export default {
   name: 'Index',
   components: { pdf, VueOfficeDocx },
   data() {
     return {
-      roles: sessionStorage.getItem('roles'),
+      roleInfos: getRoleInfos(),
+      currentUserInfo: null,
+      assignForm: [],
+      assignIndex: 1,
+      exists: false,
+      visible: false,
       pdfPreview: {
         url: '',
         pageNum: 1,
@@ -353,8 +386,7 @@ export default {
         // 当前报告数据
         data: {},
         // 审核阶段需要设置的数据 ...
-        auditPhases: [],
-        visible: false
+        auditPhases: []
       },
       auditResult: {
         description: '',
@@ -425,6 +457,7 @@ export default {
   },
 
   created() {
+    console.log('uses')
     // 开始抓取数据  !!!
     this.onSubmit()
     this.getReportTypes()
@@ -433,17 +466,25 @@ export default {
     this.getAuditStatus()
     this.getProjectStatus()
     this.getMediaTypes()
+    this.getCurrentUserInfo().then(({ result }) => {
+      this.currentUserInfo = result
+    })
+  },
+
+  mounted() {
+
   },
 
   methods: {
-    mapState,
+    ...mapState('user', ['userInfo']),
     getAccessToken,
     ...backendStyle.methods,
     ...projectApi,
     ...reportApi.methods,
     ...dictApi.methods,
     ...auditApi.methods,
-    ... attachmentApi.methods,
+    ...attachmentApi.methods,
+    ... userApi.methods,
     getAllUserList() {
       userApi.methods.getAllUsersByPage(this.userData.searchForm, this.userData.pager).then(({ result: { content }}) => {
         this.userData.data = content || []
@@ -481,10 +522,19 @@ export default {
         this.drawerAction = true
       }
       this.drawerFlag = true
+
+      // 关闭报告
+      if (this.currentRow) {
+        this.$refs.tableData.toggleRowExpansion(this.currentRow.row, false)
+      }
     },
     auditDialogCancel() {
       this.userData.searchForm = {}
       this.audit = {}
+      this.assignForm = []
+      this.assignIndex = 1
+      this.exists = false
+      this.visible = false
     },
     uploadPostProcess({ code, result }) {
       if (code !== 200) {
@@ -499,16 +549,35 @@ export default {
     },
 
     createAuditAction(user) {
-      const param = {
-        reportId: this.audit.data.id,
-        auditUserId: user.id,
-        auditUserName: user.username
-      }
-      this.createAudit(param).then(() => {
-        // 重新加载项目
-        this.updateReportList()
-        // 关闭弹窗 !!!
-        this.auditDialogCancel()
+      this.$nextTick(() => {
+        this.assignForm[this.assignIndex - 1] = {
+          reportId: this.audit.data.id,
+          userId: user.id,
+          username: user.username,
+          auditPhaseId: this.auditPhase[this.assignIndex - 1].id
+        }
+
+        // 最后一个直接提交 ...
+        if (this.auditPhase.length === this.assignIndex) {
+          // 提交,加1
+          this.createAudit({
+            reportId: this.audit.data.id,
+            auditHandlers: this.assignForm
+          }).then(() => {
+            this.$message.success('指派成功 !!!')
+            // 关闭弹窗 !!!
+            this.auditDialogCancel()
+            // 重新加载项目
+            this.updateReportList()
+          }).catch(() => {
+            this.$message.error('指派失败 !!!')
+          })
+
+          this.auditDialogCancel()
+          console.log('清理', this.audit.visible)
+          return
+        }
+        this.assignIndex += 1
       })
     },
 
@@ -569,31 +638,31 @@ export default {
     },
 
     loadReportsTrigger(row, expand) {
+      console.log(this.currentRow)
       if (expand.indexOf(row) !== -1) {
-        this.currentRow.loading = true
+        this.currentRow.loading = false
         // 表示此元素打开
         if (this.currentRow.row && this.currentRow.row !== row) {
           this.$refs.tableData.toggleRowExpansion(this.currentRow.row, false)
           this.currentRow.reportList = []
           this.currentRow.row = row
-          this.currentRow.index = this.currentRow.row.index
+          this.currentRow.index = row.index
         } else if (!this.currentRow.row) {
           this.currentRow.reportList = []
           this.currentRow.row = row
-          this.currentRow.index = this.currentRow.row.index
+          this.currentRow.index = row.index
         }
         // 否则不需要做任何事情 ..
-        this.loadReports(this.currentRow.row.id).then(({ result }) => {
+        this.loadReports(row.id).then(({ result }) => {
           this.currentRow.reportList = result
         }).catch(() => {
           this.currentRow.reportList = []
         })
           .finally(() => {
-            const currentRow = this.currentRow
-            setTimeout(() => {
-              currentRow.loading = false
-            }, 300)
+            this.currentRow.loading = false
           })
+      } else {
+        this.currentRow.loading = false
       }
     },
     deleteDialogHandle({ row: { id, name }}) {
@@ -646,8 +715,10 @@ export default {
     },
 
     addAuditUser(data) {
-      this.audit.visible = true
+      this.exists = true
+      this.visible = true
       this.getAllUserList()
+      console.log(data)
       this.audit.data = data
     },
 
@@ -710,6 +781,7 @@ export default {
     cursor: pointer;
   }
 }
+
 ::v-deep .preview-dialog {
   .el-dialog__body {
     overflow: auto;
@@ -720,11 +792,13 @@ export default {
     min-width: 960px;
     max-width: 90vw;
   }
-    .docx-wrapper {
-      background: none;
-      .docx {
-        box-shadow: none;
-      }
+
+  .docx-wrapper {
+    background: none;
+
+    .docx {
+      box-shadow: none;
     }
   }
+}
 </style>

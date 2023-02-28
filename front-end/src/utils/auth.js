@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-const TokenKey = 'JSESSIONID'
+const TokenKey = 'access_token'
 
 const RefreshTokenKey = 'refresh_token'
 
@@ -28,4 +28,13 @@ export function removeAccessToken() {
 
 export function removeRefreshToken() {
   return Cookies.remove(RefreshTokenKey)
+}
+
+export function setRoles(roles) {
+  return Cookies.set('roles', roles)
+}
+
+export function getRoleInfos() {
+  const roles = Cookies.get('roles')
+  return roles && JSON.parse(roles) || []
 }
