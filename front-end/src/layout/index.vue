@@ -1,32 +1,38 @@
 <template>
   <div :class="classObj" class="app-wrapper">
-    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
-    <sidebar />
+    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"/>
+    <sidebar/>
     <div class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
-        <navbar />
+        <navbar/>
       </div>
-      <app-main />
+      <app-main/>
     </div>
-    <el-dialog
-      title="打卡"
-      :visible.sync="isFirst"
-      width="20%"
-      :before-close="handleClose"
-      :close-on-click-modal="false"
-    >
-      <el-card shadow="hover">
-        <div style="display: flex;justify-content: space-between;align-items: center">
-          <div class="card-box" v-if="!isAttendance">
-            <i class="el-icon-close card-check"></i>
-            今日未打卡</div>
-          <div class="card-box" v-else>
-            <i class="el-icon-check card-check"></i>
-            今日已打卡</div>
-          <el-button v-if="!isAttendance" type="primary" size="small" style="height: 30px" @click="fetchAttendance">打 卡</el-button>
-        </div>
-      </el-card>
-    </el-dialog>
+    <template v-if="roles.length!=0">
+      <el-dialog
+        title="打卡"
+        :visible.sync="isFirst"
+        width="20%"
+        :before-close="handleClose"
+        :close-on-click-modal="false"
+      >
+        <el-card shadow="hover">
+          <div style="display: flex;justify-content: space-between;align-items: center">
+            <div class="card-box" v-if="!isAttendance">
+              <i class="el-icon-close card-check"></i>
+              今日未打卡
+            </div>
+            <div class="card-box" v-else>
+              <i class="el-icon-check card-check"></i>
+              今日已打卡
+            </div>
+            <el-button v-if="!isAttendance" type="primary" size="small" style="height: 30px" @click="fetchAttendance">打
+              卡
+            </el-button>
+          </div>
+        </el-card>
+      </el-dialog>
+    </template>
   </div>
 </template>
 
@@ -34,6 +40,7 @@
 import { Navbar, Sidebar, AppMain } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import attendance from '@/api/attendance'
+
 export default {
   name: 'Layout',
   components: {
@@ -68,6 +75,9 @@ export default {
     },
     dialogVisiable() {
       return this.isFirst === true && this.isAttendance == false
+    },
+    roles() {
+      return sessionStorage.getItem('roles')
     }
   },
   created() {
@@ -104,62 +114,67 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "~@/styles/mixin.scss";
-  @import "~@/styles/variables.scss";
+@import "~@/styles/mixin.scss";
+@import "~@/styles/variables.scss";
 
-  .app-wrapper {
-    @include clearfix;
-    position: relative;
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(136deg, #fff4f4 1%, #f0f1f2 42%, #ecf5ff 100%);
-    &.mobile.openSidebar{
-      position: fixed;
-      top: 0;
-    }
-  }
-  .drawer-bg {
-    //background: #000;
-    opacity: 0.3;
-    width: 100%;
-    top: 0;
-    height: 100%;
-    position: absolute;
-    z-index: 999;
-  }
+.app-wrapper {
+  @include clearfix;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(136deg, #fff4f4 1%, #f0f1f2 42%, #ecf5ff 100%);
 
-  .fixed-header {
+  &.mobile.openSidebar {
     position: fixed;
     top: 0;
-    right: 0;
-    z-index: 9;
-    width: calc(100% - #{$sideBarWidth});
-    transition: width 0.28s;
   }
+}
 
-  .hideSidebar .fixed-header {
-    width: calc(100% - 54px)
-  }
+.drawer-bg {
+  //background: #000;
+  opacity: 0.3;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  position: absolute;
+  z-index: 999;
+}
 
-  .mobile .fixed-header {
-    width: 100%;
-  }
-  .sidebar-container {
-    background: transparent;
-  }
-  .card-box {
-    display: flex;
-    align-items: center;
-    color:#2b78eb;
-    .card-check {
-      font-size: 30px;
-      width: 40px;
-      line-height: 40px;
-      text-align: center;
-      border-radius: 50%;
-      border: 1px solid #2b78eb;
+.fixed-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 9;
+  width: calc(100% - #{$sideBarWidth});
+  transition: width 0.28s;
+}
 
-      margin: 0 10px;
-    }
+.hideSidebar .fixed-header {
+  width: calc(100% - 54px)
+}
+
+.mobile .fixed-header {
+  width: 100%;
+}
+
+.sidebar-container {
+  background: transparent;
+}
+
+.card-box {
+  display: flex;
+  align-items: center;
+  color: #2b78eb;
+
+  .card-check {
+    font-size: 30px;
+    width: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    border: 1px solid #2b78eb;
+
+    margin: 0 10px;
   }
+}
 </style>
