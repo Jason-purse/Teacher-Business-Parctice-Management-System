@@ -30,7 +30,7 @@ export default {
     ...mapState('user', ['userInfo']),
     routes() {
       const roles = sessionStorage.getItem('roles')
-      // const roles = [ 'teacher', 'auditor' ]
+      // const roles = ['teacher', 'auditor', 'admin']
       if (roles.length == 0) {
         this.$router.push('/nothing')
         return []
