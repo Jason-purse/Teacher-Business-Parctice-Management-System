@@ -75,9 +75,9 @@
                   </el-table-column>
                   <el-table-column label="发起时间" prop="createTimeStr" align="center"/>
                   <el-table-column label="审核人" prop="auditUserName" align="center"/>
-                  <el-table-column label="文件预览" >
+                  <el-table-column label="文件预览">
                     <template v-slot="{row}">
-                        <el-link size="small" @click="pdfPreviewAction">点击预览</el-link>
+                      <el-link size="small" @click="pdfPreviewAction(row)">点击预览</el-link>
                     </template>
                   </el-table-column>
                   <el-table-column label="审核阶段" prop="auditPhase" align="center">
@@ -274,9 +274,11 @@
         <el-button @click="auditResult.visible = false; auditResult.description = ''">关闭</el-button>
       </span>
     </el-dialog>
-    <pdf  ref="pdf"
-         :src="pdfPreview.url"
-         :page="pdfPreview.pageNum">
+    <pdf ref="pdf"
+         :page="pdfPreview.pageNum"
+         @num-pages="pdfPreview.totalPages =$event"
+         @error="() => {}"
+         :src="pdfPreview.url">
     </pdf>
   </div>
 
@@ -292,15 +294,18 @@ import attachmentApi from '@/api/attachment'
 import {getAccessToken} from '@/utils/auth'
 import auditApi from '@/api/audit'
 import {mapState} from 'vuex'
+import pdf from 'vue-pdf'
 
 export default {
   name: 'Index',
+  components: {pdf},
   data() {
     return {
 
       pdfPreview: {
         url: '',
-        pageNum: '',
+        pageNum: 1,
+        totalPages: 1,
         pageRotate: '',
       },
       rules: {
@@ -455,8 +460,8 @@ export default {
       })
     },
 
-    pdfPreviewAction({reportUrl}) {
-      this.pdfPreview.url = reportUrl;
+    pdfPreviewAction({reportUrlStr}) {
+      this.pdfPreview.url = reportUrlStr;
     },
 
     validReportFormat(file) {

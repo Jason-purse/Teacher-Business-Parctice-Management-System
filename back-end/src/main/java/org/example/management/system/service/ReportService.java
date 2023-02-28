@@ -132,7 +132,7 @@ public class ReportService {
         if(attachments.size() > 0) {
             Map<Integer, String> collect = attachments.stream().collect(Collectors.toMap(Attachment::getId, Attachment::getFileUrl));
             stream = stream.peek(ele -> {
-                String fileUrl = collect.get(ele.getId());
+                String fileUrl = collect.get(ele.getReportUrlId());
                 ele.setReportUrlStr(fileUrl);
             });
         }

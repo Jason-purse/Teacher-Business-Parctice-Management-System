@@ -41,6 +41,10 @@ module.exports = {
         target: 'http://localhost:8090',
         changeOrigin: true
       },
+      '^/attachment': {
+        target: 'http://localhost:8090',
+        changeOrigin: true
+      },
       '^/api': {
         target: 'http://localhost:8090',
         pathRewrite: {'^/api' : '/api'},

@@ -3,6 +3,7 @@ package org.example.management.system.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.UrlResource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -19,10 +20,16 @@ public class ManagementConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         try {
-            registry.addResourceHandler("/attachment")
+            registry.addResourceHandler("/attachment/**")
                     .addResourceLocations(new UrlResource(Paths.get(URI.create(properties.getFileStoreDir()).resolve("attachment")).toUri()));
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("提供了一个无效的文件存储路径,无法进行资源映射放行 !!!");
         }
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/attachment/**")
+                .allowedOrigins("*");
     }
 }

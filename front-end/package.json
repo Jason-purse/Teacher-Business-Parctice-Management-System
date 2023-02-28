@@ -23,6 +23,7 @@
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",
     "path-to-regexp": "2.4.0",
+    "pdfjs": "^2.4.7",
     "vue": "2.6.10",
     "vue-pdf": "^4.3.0",
     "vue-router": "3.0.6",
