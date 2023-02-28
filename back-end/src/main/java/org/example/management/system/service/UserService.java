@@ -41,6 +41,7 @@ import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.jianyue.lightning.boot.starter.util.OptionalFlux.of;
@@ -117,8 +118,12 @@ public class UserService implements LightningUserDetailService {
                 .findAll(new ComplexSpecification(userParam.getUsername(), userParam.getEmail(), userParam.getStartTimeAt(), userParam.getEndTimeAt()),
                         pageable);
 
+        Map<Integer, List<Dict>> roles = roleService.getUserRolesByIds(all.map(User::getId).stream().distinct().toList());
         return of(all.getContent().size() > 0 ? all.getContent() : null)
-                .map(StreamUtil.listMap(BeanUtils.transformFrom(UserVo.class)))
+                .map(StreamUtil.listMap(BeanUtils.transformTo(UserVo.class,vo -> {
+                    List<Dict> rolesdict = roles.get(vo.getId());
+                    vo.setRoles(ElvisUtil.acquireNotNullList_Empty(rolesdict));
+                })))
                 .orElse(Collections.emptyList())
                 .map(ele -> {
                     return new PageImpl<>(
@@ -158,8 +163,14 @@ public class UserService implements LightningUserDetailService {
         if(users == null) {
             users = userRepository.findAllById(userIds);
         }
+        Map<Integer,List<Dict>> rolesMap = roleService.getUserRolesByIds(userIds);
+
+
         return OptionalFlux.of(users)
-                .map(StreamUtil.listMap(BeanUtils.transformFrom(UserVo.class)))
+                .map(StreamUtil.listMap(BeanUtils.transformTo(UserVo.class,vo -> {
+                    List<Dict> roles = rolesMap.get(vo.getId());
+                    vo.setRoles(ElvisUtil.acquireNotNullList_Empty(roles));
+                })))
                 .map(values -> new PageImpl<>(values, pageable, roleRRUS.getTotalElements()))
                 .getResult();
     }
@@ -179,14 +190,7 @@ public class UserService implements LightningUserDetailService {
         UserVo userVo = BeanUtils.transformFrom(user.get(), UserVo.class);
         assert userVo != null;
         List<Dict> roles = roleService.getUserRoles(id);
-        if(roles.size() > 0) {
-            userVo.setRoles(
-                    roles.stream().map(Dict::getItemType).toList()
-            );
-        }
-        else {
-            userVo.setRoles(Collections.emptyList());
-        }
+        userVo.setRoles(ElvisUtil.acquireNotNullList_Empty(roles));
         return userVo;
     }
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.management.system.model.entity.Dict;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,7 +30,7 @@ public class UserVo {
      */
     private String avatarUrl;
 
-    private List<String> roles;
+    private List<Dict> roles;
 
 
     private String email;

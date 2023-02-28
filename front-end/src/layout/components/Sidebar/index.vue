@@ -29,20 +29,20 @@ export default {
     ]),
     ...mapState('user', ['userInfo']),
     routes() {
-      const roles = sessionStorage.getItem('roles')
+      // const roles = sessionStorage.getItem('roles')
       // const roles = ['teacher', 'auditor', 'admin']
-      if (roles.length == 0) {
-        this.$router.push('/nothing')
-        return []
-      }
-      let newRoute = this.$router.options.routes.filter(item => item.path == '/')[0].children
-      newRoute = newRoute.filter(item => {
-        return roles.some(it => {
-          return item.meta.roles.includes(it)
-        })
-      })
-      return newRoute
-      // return this.$router.options.routes
+      // if (roles.length == 0) {
+      //   this.$router.push('/nothing')
+      //   return []
+      // }
+      // let newRoute = this.$router.options.routes.filter(item => item.path == '/')[0].children
+      // newRoute = newRoute.filter(item => {
+      //   return roles.some(it => {
+      //     return item.meta.roles.includes(it)
+      //   })
+      // })
+      // return newRoute
+      return this.$router.options.routes
     },
     activeMenu() {
       const route = this.$route

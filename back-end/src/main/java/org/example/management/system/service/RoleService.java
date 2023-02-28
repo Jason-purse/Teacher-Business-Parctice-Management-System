@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -25,9 +26,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +40,7 @@ public class RoleService {
 
     private final DictService dictService;
 
+    @Transactional
     public void updateUserWithRole(UserWithRoleParam param) {
 
         // 先删后增
@@ -60,6 +63,7 @@ public class RoleService {
         rruRepository.saveAll(rrus);
     }
 
+    @Transactional
     public void updateRoleWithAuditPhase(RoleWithAuditPhaseParam param) {
         LocalDateTime now = LocalDateTime.now();
         long timeOfDay = DateTimeUtils.getTimeOfDay(now);
@@ -107,13 +111,40 @@ public class RoleService {
         List<RoleRRU> all = rruRepository.findAll(Example.of(RoleRRU.builder()
                 .userId(userId)
                 .build()));
-        if(all.size() > 0) {
+        if (all.size() > 0) {
             List<Integer> roleIds = all.stream().map(RoleRRU::getRoleId).toList();
             List<Dict> roles = dictService.getDictItemsBy(DictConstant.ROLE);
             return roles.stream().filter(ele -> roleIds.contains(ele.getId()))
                     .toList();
         }
         return Collections.emptyList();
+    }
+
+    public Map<Integer, List<Dict>> getUserRolesByIds(List<Integer> ids) {
+        List<RoleRRU> all = rruRepository.findAll(new ForUserIdsSpecification(ids));
+        if (all.size() > 0) {
+            List<Dict> roles = dictService.getDictItemsBy(DictConstant.ROLE);
+            Map<Integer, Dict> roledictMap = roles.stream().collect(Collectors.toMap(Dict::getId, Function.identity()));
+            Map<Integer, List<RoleRRU>> userWithRoleMap = all.stream().collect(Collectors.groupingBy(RoleRRU::getUserId, Collectors.toList()));
+
+            Map<Integer, List<Dict>> values = new HashMap<>();
+            for (Integer id : ids) {
+                List<RoleRRU> dicts = userWithRoleMap.get(id);
+                if (dicts != null) {
+                    dicts.forEach(ele -> {
+                        //  意味着有角色
+                        Dict role = roledictMap.get(ele.getRoleId());
+                        values.computeIfAbsent(id, (key) -> {
+                                    return new ArrayList<>();
+                                })
+                                .add(role);
+                    });
+                }
+            }
+
+            return values;
+        }
+        return Collections.emptyMap();
     }
 
     @AllArgsConstructor
@@ -127,6 +158,16 @@ public class RoleService {
             Predicate predicate = criteriaBuilder.equal(root.get(LambdaUtils.getPropertyNameForLambda(RoleRRU::getRoleId)), roleId);
             return criteriaBuilder.and(predicate,
                     root.get(LambdaUtils.getPropertyNameForLambda(RoleRRU::getUserId)).in(userIds));
+        }
+    }
+
+    @AllArgsConstructor
+    class ForUserIdsSpecification implements Specification<RoleRRU> {
+        private final List<Integer> userIds;
+
+        @Override
+        public Predicate toPredicate(Root<RoleRRU> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
+            return root.get(LambdaUtils.getPropertyNameForLambda(RoleRRU::getUserId)).in(userIds);
         }
     }
 }

@@ -84,7 +84,7 @@ export default {
     },
 
     getRoles() {
-      return getDataItemsByParentType(ItemTypes.role).then(({ result }) => {
+      return getDataItemsByParentType(ItemTypes.roles).then(({ result }) => {
         this.roles = result
       })
     },
