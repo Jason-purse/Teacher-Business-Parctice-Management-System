@@ -32,7 +32,8 @@ import static org.example.management.system.model.constant.DictConstant.*;
 
 @Service
 @RequiredArgsConstructor
-public class DictService {
+public class
+DictService {
 
     private final DictRepository dictRepository;
 

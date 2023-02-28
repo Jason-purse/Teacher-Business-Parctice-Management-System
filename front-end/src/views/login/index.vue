@@ -49,6 +49,7 @@
 
 <script>
 import user from "@/api/user"
+import { mapMutations } from 'vuex'
 export default {
   name: 'Login',
   data() {
@@ -103,6 +104,8 @@ export default {
   },
   methods: {
     ...user.methods,
+    ...mapMutations('user',['SET_USERINFO']),
+    ...user.methods,
     /**
      * 切换tab
      * @param {*} value
@@ -132,10 +135,19 @@ export default {
             const component = this.$message.success('登陆成功 !!!')
             sessionStorage.setItem('isFirst', 1)
             this.loading = false
-            setTimeout(() => {
-              this.$router.push({ path: this.redirect || '/' })
-              component.close()
-            }, 500)
+            this.getCurrentUserInfo().then(res => {
+              if (res.code === 200) {
+                this.userInfo = res.result
+                this.formInfo = { ...res.result }
+                sessionStorage.setItem('roles', res.result.roles)
+                this.SET_USERINFO({ ...res.result })
+              }
+            }).finally(() => {
+              setTimeout(() => {
+                this.$router.push({ path: this.redirect || '/' })
+                component.close()
+              }, 500)
+            })
           }).catch(() => {
             this.loading = false
           })

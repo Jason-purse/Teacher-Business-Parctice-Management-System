@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import Logo from './Logo'
 import SidebarItem from './SidebarItem'
 import variables from '@/styles/variables.scss'
@@ -28,8 +28,22 @@ export default {
     ...mapGetters([
       'sidebar'
     ]),
+    ...mapState('user', ['userInfo']),
     routes() {
-      return this.$router.options.routes
+      const roles = sessionStorage.getItem('roles')
+      // const roles = [ 'teacher', 'auditor' ]
+      if (roles.length == 0) {
+        this.$router.push('/nothing')
+        return []
+      }
+      let newRoute = this.$router.options.routes.filter(item => item.path == '/')[0].children
+      newRoute = newRoute.filter(item => {
+        return roles.some(it => {
+          return item.meta.roles.includes(it)
+        })
+      })
+      return newRoute
+      // return this.$router.options.routes
     },
     activeMenu() {
       const route = this.$route
