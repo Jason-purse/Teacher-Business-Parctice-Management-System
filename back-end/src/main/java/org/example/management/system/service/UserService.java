@@ -140,23 +140,25 @@ public class UserService implements LightningUserDetailService {
             }
             List<Integer> userIds = all.stream().map(User::getId).toList();
             Page<RoleRRU> roleRRUS = roleService.getUserIdForAuditPhase(auditPhaseId, userIds, pageable);
-            return getUserVos(pageable, roleRRUS);
+            return getUserVos(pageable, roleRRUS,all);
         } else {
             Page<RoleRRU> roleRRUS = roleService.getUserIdForAuditPhase(auditPhaseId, pageable);
             if (roleRRUS.getNumberOfElements() == 0) {
                 // 表示没有
                 return new PageImpl<>(Collections.emptyList(), pageable, roleRRUS.getTotalElements());
             } else {
-                return getUserVos(pageable, roleRRUS);
+                return getUserVos(pageable, roleRRUS,null);
             }
         }
     }
 
-    private Page<UserVo> getUserVos(Pageable pageable, Page<RoleRRU> roleRRUS) {
+    private Page<UserVo> getUserVos(Pageable pageable, Page<RoleRRU> roleRRUS,List<User> users) {
         List<RoleRRU> content = roleRRUS.getContent();
         List<Integer> userIds = content.stream().map(RoleRRU::getUserId).distinct().toList();
-        List<User> all = userRepository.findAllById(userIds);
-        return OptionalFlux.of(all)
+        if(users == null) {
+            users = userRepository.findAllById(userIds);
+        }
+        return OptionalFlux.of(users)
                 .map(StreamUtil.listMap(BeanUtils.transformFrom(UserVo.class)))
                 .map(values -> new PageImpl<>(values, pageable, roleRRUS.getTotalElements()))
                 .getResult();

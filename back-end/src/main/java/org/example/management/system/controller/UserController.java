@@ -66,7 +66,7 @@ public class UserController {
 
     /**
      * 获取所有用户数据并组装为审核 ..
-     * @return
+     * 根据审核阶段来查询那些用户可以被选择 ..
      */
     @GetMapping("list/audit")
     public Page<UserVo> getAllUserDetailsForAudit(Integer auditPhaseId,UserParam userParam,Pageable pageable) {
@@ -95,5 +95,4 @@ public class UserController {
 
         userService.updateCurrentInfo(userParam,user);
     }
-
 }
