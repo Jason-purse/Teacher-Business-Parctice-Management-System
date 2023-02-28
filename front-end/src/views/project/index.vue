@@ -103,7 +103,7 @@
                   <el-table-column label="操作" align="center">
                     <template v-slot="{row}">
                       <template v-if="!row.auditUserId">
-                        <el-button size="small" type="primary" @click="addAuditUser(row)">指派审核</el-button>
+                        <el-button v-if="roles.includes('admin')" size="small" type="primary" @click="addAuditUser(row)">指派审核</el-button>
                       </template>
                       <template v-else-if="row.failureFlag !== null && row.failureFlag">
                         <el-button size="small" type="success" @click="restoreReportAction(row)">重新申请</el-button>
@@ -336,7 +336,7 @@ export default {
   components: { pdf, VueOfficeDocx },
   data() {
     return {
-
+      roles: sessionStorage.getItem('roles'),
       pdfPreview: {
         url: '',
         pageNum: 1,

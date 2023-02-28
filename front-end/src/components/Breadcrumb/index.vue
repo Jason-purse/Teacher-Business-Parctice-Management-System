@@ -29,6 +29,7 @@ export default {
   methods: {
     getBreadcrumb() {
       const roles = sessionStorage.getItem('roles')
+      // const roles = [ 'teacher', 'auditor' ]
       if (roles.length === 0) {
         this.$router.push('/nothing')
         this.levelList = []
@@ -36,7 +37,6 @@ export default {
       }
       // only show routes with meta.title
       const matched = this.$route.matched.filter(item => item.meta && item.meta.title)
-      console.log(123)
       // const first = matched[0]
 
       // if (!this.isDashboard(first)) {
