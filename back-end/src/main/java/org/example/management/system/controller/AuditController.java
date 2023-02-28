@@ -50,6 +50,7 @@ public class AuditController {
         LightningUserContext.get()
                 .getUserPrincipal(SimpleUserPrincipal.class)
                 .ifPresent(user -> param.setAuditUserId(user.getUser().getId()));
+
         return auditService.getAllReportsForAuditByPage(param, PageUtil.getPageable(pageable));
     }
 }
