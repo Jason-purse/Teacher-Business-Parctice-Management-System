@@ -36,9 +36,9 @@ export default {
         this.$router.push('/nothing')
         return []
       }
-      let newRoute = this.$router.options.routes.filter(item => item.path == '/')[0].children
+      let newRoute = this.$router.options.routes.filter(item => item.path === '/')[0].children.filter(it => !it.meta.hidden)
       newRoute = newRoute.filter(item => {
-        return roles.some(it => {
+        return roles.filter(it => {
           return item.meta.roles.includes(it)
         })
       })
