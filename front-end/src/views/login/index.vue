@@ -143,7 +143,8 @@ export default {
               this.SET_USERINFO({ ...result })
             }).finally(() => {
               setTimeout(() => {
-                this.$router.push({ path: this.redirect || '/' })
+                // this.$router.push({ path: this.redirect || '/' })
+                this.$router.push('/')
                 component.close()
               }, 500)
             })
