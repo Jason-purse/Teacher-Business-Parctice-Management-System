@@ -96,12 +96,12 @@ export default {
     }
   },
   watch: {
-    $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect
-      },
-      immediate: true
-    }
+    // $route: {
+    //   handler: function(route) {
+    //     this.redirect = route.query && route.query.redirect
+    //   },
+    //   immediate: true
+    // }
   },
   methods: {
     ...user.methods,
@@ -138,9 +138,17 @@ export default {
             this.getCurrentUserInfo().then(({ result }) => {
               this.userInfo = result
               this.formInfo = { ...result }
-              console.log((result.roles || []).map(ele => ele.id))
+              // console.log((result.roles || []).map(ele => ele.id))
               setRoles((result.roles || []).map(ele => ele.itemType))
               this.SET_USERINFO({ ...result })
+
+              let newRoute = this.$router.options.routes.filter(item => item.path === '/')[0].children
+              newRoute = newRoute.filter(item => {
+                return result.roles.filter(it => {
+                  return item.meta.roles.includes(it)
+                })
+              })
+              this.redirect = newRoute[0].path
             }).finally(() => {
               setTimeout(() => {
                 this.$router.push({ path: this.redirect || '/' })
