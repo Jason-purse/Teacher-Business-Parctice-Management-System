@@ -60,6 +60,8 @@ public class AttendanceController {
     @GetMapping("/currentuser/info")
     public AttendanceVo currentAttendanceInfo() {
         AttendanceParam attendanceParam = new AttendanceParam();
+
+
         LightningUserContext.get()
                     .getUserPrincipal(SimpleUserPrincipal.class)
                     .ifPresent(ele -> {
