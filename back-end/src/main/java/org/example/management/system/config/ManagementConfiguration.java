@@ -18,6 +18,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.net.MalformedURLException;
@@ -49,12 +50,18 @@ public class ManagementConfiguration implements WebMvcConfigurer, ApplicationLis
                     .addResourceLocations("classpath:/admin/static/");
             registry.addResourceHandler("/*.worker.js")
                     .addResourceLocations("classpath:/admin/");
+
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("提供了一个无效的文件存储路径,无法进行资源映射放行 !!!");
         }
     }
 
 
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/")
+                .setViewName("redirect:/admin/index.html");
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

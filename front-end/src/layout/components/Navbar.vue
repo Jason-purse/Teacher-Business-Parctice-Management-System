@@ -13,7 +13,7 @@
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <el-dropdown-item>
-            <div @click="drawerVisable = !drawerVisable">个人主页</div>
+            <div @click="drawerVisable = !drawerVisable;">个人主页</div>
           </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">退出登录</span>
@@ -112,7 +112,7 @@ export default {
   },
 
   created() {
-    // this.getInfo()
+    this.getInfo()
     this.getGenderStatus()
   },
   methods: {

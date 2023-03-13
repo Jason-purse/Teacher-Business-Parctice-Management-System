@@ -1,5 +1,6 @@
 package org.example.management.system.service;
 
+import com.generatera.security.authorization.server.specification.LightningUserContext;
 import com.jianyue.lightning.boot.starter.util.BeanUtils;
 import com.jianyue.lightning.boot.starter.util.ElvisUtil;
 import com.jianyue.lightning.boot.starter.util.OptionalFlux;
@@ -9,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.management.system.model.constant.DictConstant;
 import org.example.management.system.model.entity.Dict;
 import org.example.management.system.model.entity.Project;
+import org.example.management.system.model.entity.User;
 import org.example.management.system.model.param.ProjectParam;
+import org.example.management.system.model.security.SimpleUserPrincipal;
 import org.example.management.system.repository.ProjectRepository;
 import org.example.management.system.utils.DateTimeUtils;
 import org.example.management.system.utils.EscapeUtil;
@@ -40,8 +43,10 @@ public class ProjectService {
 
     private final ReportService reportService;
 
+    private final RoleService roleService;
+
     public void createProject(ProjectParam param) {
-       Project project = BeanUtils.transformFrom(param, Project.class);
+        Project project = BeanUtils.transformFrom(param, Project.class);
         assert project != null;
         Dict item = dictService.getFirstDataItemInFlow(DictConstant.PROJECT_STATUS);
         project.setStatus(item.getId());
@@ -72,11 +77,11 @@ public class ProjectService {
     }
 
     @Transactional
-    public void deleteProjectById(Integer id,Boolean force) {
+    public void deleteProjectById(Integer id, Boolean force) {
         Optional<Project> project = projectRepository.findById(id);
         project.ifPresent(ele -> {
-            if(!force) {
-                Assert.isTrue(ele.getFinished(),"当前项目正在进行中,无法删除 !!!");
+            if (!force) {
+                Assert.isTrue(ele.getFinished(), "当前项目正在进行中,无法删除 !!!");
             }
             projectRepository.deleteById(id);
             // 删除关联的项目
@@ -86,7 +91,27 @@ public class ProjectService {
 
     public Page<Project> findProjects(ProjectParam param, Pageable pageable) {
 
+        // 当前用户是否为管理员
+        LightningUserContext.get()
+                .getUserPrincipal(SimpleUserPrincipal.class)
+                .ifPresent(ele -> {
+                    List<Dict> userRoles = roleService.getUserRoles(ele.getUser().getId());
+                    boolean status = true;
+                    for (Dict userRole : userRoles) {
+                        if (userRole.getItemType().equals(DictConstant.ROLE_ADMIN_TYPE)) {
+                            status = false;
+                            break;
+                        }
+                    }
+                    if(status) {
+                        // 设置只能查询自己
+                        param.setUserId(ele.getUser().getId());
+                    }
+
+                });
+
         return projectRepository.findAll(new ProjectComplexSpecification(
+                param.getUserId(),
                 param.getName(), param.getUsername(), param.getStartTimeAt(),
                 param.getEndTimeAt()
         ), pageable);
@@ -94,9 +119,12 @@ public class ProjectService {
 
     @AllArgsConstructor
     class ProjectComplexSpecification implements Specification<Project> {
+
+        private Integer userId;
         private String name;
 
         private String username;
+
 
         private Long startTimeAt;
 
@@ -105,22 +133,25 @@ public class ProjectService {
         @Override
         public Predicate toPredicate(@NotNull Root<Project> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
             return OptionalFlux
-                    .of(
-                            ElvisUtil.stringElvis(name, null)
-                    )
+                    .of(name)
                     .map(projectName -> criteriaBuilder.like(
                             root.get(LambdaUtils.getPropertyNameForLambda(Project::getName)),
                             EscapeUtil.escapeExprSpecialWord(projectName.trim()).concat("%"))
                     )
                     .combine(
-                            OptionalFlux.of(
-                                            ElvisUtil.stringElvis(username, null)
+                            OptionalFlux
+                                    .of(userId)
+                                    .map(id -> criteriaBuilder.equal(root.get(LambdaUtils.getPropertyNameForLambda(Project::getUserId)), id))
+                                    .orElse(OptionalFlux.of(
+                                                    ElvisUtil.stringElvis(username, null)
+                                            )
+                                            .map(userName -> criteriaBuilder
+                                                    .like(
+                                                            root.get(LambdaUtils.getPropertyNameForLambda(Project::getUsername)),
+                                                            EscapeUtil.escapeExprSpecialWord(userName.trim()).concat("%")
+                                                    ))
                                     )
-                                    .map(userName -> criteriaBuilder
-                                            .like(
-                                                    root.get(LambdaUtils.getPropertyNameForLambda(Project::getUsername)),
-                                                    EscapeUtil.escapeExprSpecialWord(userName.trim()).concat("%")
-                                            )),
+                            ,
                             criteriaBuilder::and
                     )
                     .combine(

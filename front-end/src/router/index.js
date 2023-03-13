@@ -46,7 +46,7 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    meta: { title: '教师企业实战管理', icon: 'el-icon-menu' },
+    meta: { title: '教师企业实践管理', icon: 'el-icon-menu' },
     redirect: '/project',
     children: [
       {

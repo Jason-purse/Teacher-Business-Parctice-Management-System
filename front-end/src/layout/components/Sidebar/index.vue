@@ -17,10 +17,10 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import {mapGetters, mapState} from 'vuex'
 import SidebarItem from './SidebarItem'
 import variables from '@/styles/variables.scss'
-import { getRoleInfos } from '@/utils/auth'
+import {getRoleInfos} from '@/utils/auth'
 
 export default {
   components: { SidebarItem },
@@ -37,12 +37,12 @@ export default {
         return []
       }
       let newRoute = this.$router.options.routes.filter(item => item.path === '/')[0].children.filter(it => !it.meta.hidden)
-      newRoute = newRoute.filter(item => {
+
+      return newRoute.filter(item => {
         return roles.filter(it => {
           return item.meta.roles.includes(it)
-        })
+        }).length > 0
       })
-      return newRoute
       // return this.$router.options.routes
     },
     activeMenu() {

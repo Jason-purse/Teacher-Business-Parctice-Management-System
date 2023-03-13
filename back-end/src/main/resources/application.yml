@@ -34,6 +34,7 @@ lightning:
           component:
             permission:
               url-white-list:
+                - /
                 - /admin/**
                 - /d21cf2c10c32bcc34455.worker.js
                 - /public/**
