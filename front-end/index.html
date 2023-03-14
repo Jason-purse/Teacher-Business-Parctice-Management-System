@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    html,body {
+      height: 100%;
+      width: 100%;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+    }
+    .content {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+    }
+    .top {
+      flex: 1;
+      background-color: #5daf34;
+      height: 1200px;
+    }
+    .internal-view {
+      height: 1200px;
+    }
+    .bottom {
+      height: 30px;
+      background-color: #2b2f3a;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="content">
+     <div class="top">
+       <div class="internal-view">
+
+       </div>
+     </div>
+    <div class="bottom">
+      bottom
+    </div>
+  </div>
+  <div>
+    page
+  </div>
+</div>
+</body>
+</html>

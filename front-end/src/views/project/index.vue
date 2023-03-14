@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex-container">
     <div class="search-line">
       <el-form
         ref="searchForm"
@@ -45,122 +45,126 @@
     </div>
     <el-divider class="margin-top-bottom-10" />
     <template>
-      <div class="margin-top-bottom-10 margin-left-25">
-        <el-button type="success" @click="openProjectDrawer(false)">创建项目</el-button>
-      </div>
+      <div class="content">
+        <div class="margin-top-bottom-10 margin-left-25">
+          <el-button type="success" @click="openProjectDrawer(false)">创建项目</el-button>
+        </div>
 
-      <el-table
-        ref="tableData"
-        :data="tableData"
-        row-key="id"
-        style="width: 100%"
-        class="tableData"
-        @row-click="expandRow"
-        @expand-change="loadReportsTrigger"
-      >
-        <el-table-column type="expand">
-          <template v-slot="{row}">
-            <div :style="{margin: '10px'}">
-              <div class="margin-top-bottom-10 margin-left-25">
-                <el-button type="primary" size="small" @click="openDialogCommitReport(row)">提交报告</el-button>
-              </div>
-              <el-table
-                ref="reportList"
-                :key="row.id"
-                v-loading="currentRow.loading"
-                element-loading-spinner="el-icon-loading"
-                size="small"
-                row-key="id"
-                :data="currentRow.reportList"
-              >
-                <el-table-column label="报告列表">
-                  <el-table-column label="名称" prop="reportName" align="center" />
-                  <el-table-column label="描述" prop="description" align="center" />
-                  <el-table-column label="发起人" prop="submitUserName" align="center" />
-                  <el-table-column label="报告类型" prop="reportType" align="center">
-                    <template v-slot="{row: {reportType}}">
-                      {{ mapDictItemValue('reportTypes', reportType) }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="报告格式" prop="reportFormat" align="center">
-                    <template v-slot="{row: {reportFormat}}">
-                      {{ mapDictItemValue('reportFormat', reportFormat) }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="发起时间" prop="createTimeStr" align="center" />
-                  <el-table-column label="审核人" prop="auditUserName" align="center" />
-                  <el-table-column label="文件预览">
-                    <template v-slot="{row}">
-                      <el-link size="small" @click="pdfPreviewAction(row)">点击预览</el-link>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="审核阶段" prop="auditPhase" align="center">
-                    <template v-slot="{row: {auditPhase}}">
-                      {{ mapDictItemValue('auditPhase', auditPhase) }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="审核状态" prop="status" align="center">
-                    <template v-slot="{row}">
-                      <el-link type="primary" @click="openDescriptionDialog(row)">
-                        {{ mapDictItemValue('auditStatus', row.status) }}
-                      </el-link>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="操作" align="center">
-                    <template v-slot="{row}">
-                      <template v-if="!row.auditUserId">
-                        <el-button
-                          v-if="roleInfos.includes('admin') && !row.assignFlag"
-                          size="small"
-                          type="primary"
-                          @click="addAuditUser(row)"
-                        >指派审核
-                        </el-button>
-                      </template>
-                      <template v-else-if="row.failureFlag !== null && row.failureFlag && row.submitUserId === currentUserInfo.id">
-                        <el-button size="small" type="success" @click="restoreReportAction(row)">重新申请</el-button>
-                      </template>
-                      <el-button
-                        :disabled="row.finished"
-                        size="small"
-                        type="danger"
-                        @click="deleteReportDialogHandle(row)"
-                      >删除
-                      </el-button>
-                    </template>
-                  </el-table-column>
-                </el-table-column>
-              </el-table>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column type="index" label="序号" />
-        <el-table-column label="名称" prop="name" />
-        <el-table-column label="描述" prop="description" />
-        <el-table-column label="发起人" prop="username" />
-        <el-table-column label="发起时间" prop="createTimeStr" />
-        <el-table-column label="状态" prop="status">
-          <template v-slot="{row: {status}}">
-            {{ mapDictItemValue('projectStatus', status) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center">
-          <template v-slot="props">
-            <el-button type="warning" size="small" @click="deleteDialogHandle(props)">删除</el-button>
-            <el-button type="danger" size="small" @click="forceDeleteDialogHandle(props)">强制删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div style="margin-top: 5px;text-align: right;">
-        <el-pagination
-          small
-          background
-          :current-page.sync="pager.page"
-          :page-size="pager.size"
-          layout="prev, pager, next"
-          :total="pager.total"
-          @current-change="onSubmit"
-        />
+        <div class="internal-view">
+           <el-table
+             ref="tableData"
+             :data="tableData"
+             row-key="id"
+             class="tableData"
+             style="width: 100%"
+             @row-click="expandRow"
+             @expand-change="loadReportsTrigger"
+           >
+             <el-table-column type="expand">
+               <template v-slot="{row}">
+                 <div :style="{margin: '10px'}">
+                   <div class="margin-top-bottom-10 margin-left-25">
+                     <el-button type="primary" size="small" @click="openDialogCommitReport(row)">提交报告</el-button>
+                   </div>
+                   <el-table
+                     ref="reportList"
+                     :key="row.id"
+                     v-loading="currentRow.loading"
+                     element-loading-spinner="el-icon-loading"
+                     size="small"
+                     row-key="id"
+                     :data="currentRow.reportList"
+                   >
+                     <el-table-column label="报告列表">
+                       <el-table-column label="名称" prop="reportName" align="center" />
+                       <el-table-column label="描述" prop="description" align="center" />
+                       <el-table-column label="发起人" prop="submitUserName" align="center" />
+                       <el-table-column label="报告类型" prop="reportType" align="center">
+                         <template v-slot="{row: {reportType}}">
+                           {{ mapDictItemValue('reportTypes', reportType) }}
+                         </template>
+                       </el-table-column>
+                       <el-table-column label="报告格式" prop="reportFormat" align="center">
+                         <template v-slot="{row: {reportFormat}}">
+                           {{ mapDictItemValue('reportFormat', reportFormat) }}
+                         </template>
+                       </el-table-column>
+                       <el-table-column label="发起时间" prop="createTimeStr" align="center" />
+                       <el-table-column label="审核人" prop="auditUserName" align="center" />
+                       <el-table-column label="文件预览">
+                         <template v-slot="{row}">
+                           <el-link size="small" @click="pdfPreviewAction(row)">点击预览</el-link>
+                         </template>
+                       </el-table-column>
+                       <el-table-column label="审核阶段" prop="auditPhase" align="center">
+                         <template v-slot="{row: {auditPhase}}">
+                           {{ mapDictItemValue('auditPhase', auditPhase) }}
+                         </template>
+                       </el-table-column>
+                       <el-table-column label="审核状态" prop="status" align="center">
+                         <template v-slot="{row}">
+                           <el-link type="primary" @click="openDescriptionDialog(row)">
+                             {{ mapDictItemValue('auditStatus', row.status) }}
+                           </el-link>
+                         </template>
+                       </el-table-column>
+                       <el-table-column label="操作" align="center">
+                         <template v-slot="{row}">
+                           <template v-if="!row.auditUserId">
+                             <el-button
+                               v-if="roleInfos.includes('admin') && !row.assignFlag"
+                               size="small"
+                               type="primary"
+                               @click="addAuditUser(row)"
+                             >指派审核
+                             </el-button>
+                           </template>
+                           <template v-else-if="row.failureFlag !== null && row.failureFlag && row.submitUserId === currentUserInfo.id">
+                             <el-button size="small" type="success" @click="restoreReportAction(row)">重新申请</el-button>
+                           </template>
+                           <el-button
+                             :disabled="row.finished"
+                             size="small"
+                             type="danger"
+                             @click="deleteReportDialogHandle(row)"
+                           >删除
+                           </el-button>
+                         </template>
+                       </el-table-column>
+                     </el-table-column>
+                   </el-table>
+                 </div>
+               </template>
+             </el-table-column>
+             <el-table-column type="index" label="序号" />
+             <el-table-column label="名称" prop="name" />
+             <el-table-column label="描述" prop="description" />
+             <el-table-column label="发起人" prop="username" />
+             <el-table-column label="发起时间" prop="createTimeStr" />
+             <el-table-column label="状态" prop="status">
+               <template v-slot="{row: {status}}">
+                 {{ mapDictItemValue('projectStatus', status) }}
+               </template>
+             </el-table-column>
+             <el-table-column label="操作" align="center">
+               <template v-slot="props">
+                 <el-button type="warning" size="small" @click="deleteDialogHandle(props)">删除</el-button>
+                 <el-button type="danger" size="small" @click="forceDeleteDialogHandle(props)">强制删除</el-button>
+               </template>
+             </el-table-column>
+           </el-table>
+          <div style="margin-top: 5px;text-align: right;">
+            <el-pagination
+              small
+              background
+              :current-page.sync="pager.page"
+              :page-size="pager.size"
+              layout="prev, pager, next"
+              :total="pager.total"
+              @current-change="onSubmit"
+            />
+          </div>
+        </div>
       </div>
     </template>
 
@@ -513,6 +517,28 @@ export default {
           ele.index = index
           return ele
         })
+        if(this.currentRow.row) {
+          let value = null;
+          for (let i = 0; i < result.content.length; i++) {
+            if(result.content[i].id === this.currentRow.row.id) {
+              value = result.content[i];
+              this.currentRow.row = value;
+              this.currentRow.index = i;
+              break;
+            }
+          }
+          if(value != null) {
+            this.loadReportsTrigger(this.currentRow.row,[this.currentRow.row])
+          }
+          else {
+            // 外层数据没有了,那么内层直接滞空 ..
+            this.currentRow.row = null;
+            this.currentRow.index = -1;
+            this.currentRow.reportList = []
+          }
+
+        }
+
         return result
       })
     },
@@ -638,11 +664,14 @@ export default {
     },
 
     loadReportsTrigger(row, expand) {
-      console.log(this.currentRow)
+      // (row 表示展开)
       if (expand.indexOf(row) !== -1) {
         this.currentRow.loading = false
         // 表示此元素打开
         if (this.currentRow.row && this.currentRow.row !== row) {
+
+          // 之前的bug, 拿到不同的响应式数据进行row 关闭,必然关闭失败 !!!
+          // 原因是 外层表单数据查询之后是一个新的响应式对象列表，所以 不等于之前的对象 ...
           this.$refs.tableData.toggleRowExpansion(this.currentRow.row, false)
           this.currentRow.reportList = []
           this.currentRow.row = row
@@ -663,6 +692,7 @@ export default {
           })
       } else {
         this.currentRow.loading = false
+        console.log("当前关闭的行是" + this.currentRow.row.name)
       }
     },
     deleteDialogHandle({ row: { id, name }}) {
@@ -779,6 +809,29 @@ export default {
 .tableData {
   :hover {
     cursor: pointer;
+  }
+}
+
+.flex-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  overflow-y: hidden;
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+    .internal-view {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: hidden;
+      .tableData {
+        overflow-y: auto;
+      }
+    }
   }
 }
 

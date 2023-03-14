@@ -80,17 +80,17 @@ public class AuditService {
             report.setFailureReason(auditParam.getFailureReason());
             // 改变阶段到前一个 ..
             Dict dict = dictService.getDictItemById(report.getAuditPhase());
-            if (dict.getPreviousDataTypeID() != null) {
-                // 如果为第一个,则设置为false ..
-                if(dict.getPreviousDataTypeID().equals(FIRST_ITEM_IDENTIFY)) {
-                    report.setAuditPhase(null);
-                }
-                else {
-                    Dict previousDict = dictService.getDictItemById(dict.getPreviousDataTypeID());
-                    // 设置为前一个阶段 ..
-                    report.setAuditPhase(previousDict.getId());
-                }
-            }
+//            if (dict.getPreviousDataTypeID() != null) {
+//                // 如果为第一个,则设置为false ..
+//                if(dict.getPreviousDataTypeID().equals(FIRST_ITEM_IDENTIFY)) {
+//                    report.setAuditPhase(null);
+//                }
+//                else {
+//                    Dict previousDict = dictService.getDictItemById(dict.getPreviousDataTypeID());
+//                    // 设置为前一个阶段 ..
+//                    report.setAuditPhase(previousDict.getId());
+//                }
+//            }
         } else {
             // 表示成功 !!! 进入下一个阶段
             Dict item = dictService.getDictItemById(report.getAuditPhase());

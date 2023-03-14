@@ -114,13 +114,28 @@ public class ReportService {
         BeanUtils.updateProperties(reportParam, report);
         if(reportParam.getRestore() != null && reportParam.getRestore()) {
             Dict nextDict = dictService.getDictItemById(dictService.getFirstAuditStatus().getNextDataTypeID());
-            // 直接进入下一个 ..
+            // 直接进入下一个 审核状态..
             report.setStatus(nextDict.getId());
             //report.setAuditUserId(null);
             //report.setAuditUserName(null);
             report.setFailureFlag(null);
-            Dict item = dictService.getFirstDataItemInFlow(DictConstant.AUDIT_PHASE);
-            report.setAuditPhase(item.getId());
+
+            Integer auditPhase = report.getAuditPhase();
+            Dict dict = dictService.getDictItemById(auditPhase);
+            assert dict != null;
+            // 不进入第一个阶段 ...
+//            Dict item = dictService.getFirstDataItemInFlow(DictConstant.AUDIT_PHASE);
+            // 设置为前一个阶段 ..
+            if (dict.getPreviousDataTypeID() != null) {
+                // 如果为第一个,则设置为false ..
+                if (!dict.getPreviousDataTypeID().equals(FIRST_ITEM_IDENTIFY)) {
+                    Dict previousDict = dictService.getDictItemById(dict.getPreviousDataTypeID());
+                    // 设置为前一个阶段 ..
+                    report.setAuditPhase(previousDict.getId());
+                }
+            }
+            // 否则表示第一个 ...
+            // 不需要做任何设置 ...
         }
         reportRepository.save(report);
     }
