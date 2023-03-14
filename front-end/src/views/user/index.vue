@@ -79,12 +79,12 @@
       direction="rtl"
     >
       <div class="scroll-view">
-        <el-form size="small" :model="drawerDialogData" class="search-form" style="padding: 5px">
-          <el-form-item label="用户名">
-            <el-input v-model="drawerDialogData.username" placeholder="请输入用户名" />
+        <el-form size="small" :model="drawerDialogData" :rules="rules" class="search-form" style="padding: 10px" label-width="75px" label-position="left">
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="drawerDialogData.username" placeholder="请输入用户名" clearable />
           </el-form-item>
-          <el-form-item label="昵称">
-            <el-input v-model="drawerDialogData.nickname" placeholder="请输入昵称" />
+          <el-form-item label="昵称" prop="nickname">
+            <el-input v-model="drawerDialogData.nickname" placeholder="请输入昵称" clearable />
           </el-form-item>
           <el-form-item label="个人简介">
             <el-input
@@ -95,19 +95,20 @@
               maxlength="300"
               show-word-limit
               placeholder="请输入个人简介"
+              clearable
             />
           </el-form-item>
-          <el-form-item label="email">
-            <el-input v-model="drawerDialogData.email" placeholder="请输入邮箱信息" />
+          <el-form-item label="email" prop="email">
+            <el-input v-model="drawerDialogData.email" placeholder="请输入邮箱信息" clearable />
           </el-form-item>
-          <el-form-item label="密码">
-            <el-input v-model="drawerDialogData.password" placeholder="请输入密码信息" />
+          <el-form-item label="密码" prop="password">
+            <el-input show-password type="password" v-model="drawerDialogData.password" placeholder="请输入密码信息" clearable />
           </el-form-item>
           <el-form-item label="phone">
-            <el-input v-model="drawerDialogData.phone" placeholder="请输入手机号码" />
+            <el-input v-model="drawerDialogData.phone" placeholder="请输入手机号码" clearable />
           </el-form-item>
           <el-form-item label="性别">
-            <el-select v-model="drawerDialogData.gex" placeholder="请选择性别">
+            <el-select style="width: 100%" v-model="drawerDialogData.gex" placeholder="请选择性别" clearable >
               <el-option
                 v-for="({itemType,itemValue,id}) in genderStatus"
                 :key="itemType"
@@ -119,6 +120,7 @@
           <el-form-item label="出生日期">
             <el-date-picker
               v-model="drawerDialogData.birthday"
+              style="width: 100%"
               type="date"
               placeholder="请选择出生日期"
             />
@@ -169,6 +171,14 @@ import { setRoles } from '@/utils/auth'
 export default {
   name: 'Index',
   data() {
+    const validateEmail = (rule, value, callback) => {
+      const verify = /^\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/
+      if (!verify.test(value)) {
+        callback(new Error('邮箱格式错误, 请重新输入'))
+      } else {
+        callback()
+      }
+    }
     return {
       searchForm: {
         username: '',
@@ -198,7 +208,13 @@ export default {
       },
       currentToggleRoleIds: [],
       ...backendStyle.data(),
-      ...dict.data()
+      ...dict.data(),
+      rules: {
+        username: [{ required: true, trigger: 'blur', message: '请输入用户账号' }],
+        password: [{ required: true, trigger: 'blur', message: '请输入用户密码' }],
+        nickname: [{ required: true, trigger: 'blur', message: '请输入用户昵称' }],
+        email: [{ required: true, trigger: 'blur', validator: validateEmail }],
+      }
     }
   },
 
