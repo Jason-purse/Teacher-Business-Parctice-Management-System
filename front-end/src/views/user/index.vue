@@ -4,7 +4,7 @@
     <div class="search-line">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="用户名称">
-          <el-input v-model="searchForm.username" placeholder="请输入用户名称" clearable />
+          <el-input v-model="searchForm.username" placeholder="请输入用户名称" clearable/>
         </el-form-item>
         <el-form-item label="注册时间">
           <el-date-picker
@@ -29,7 +29,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-divider class="margin-top-bottom-10" />
+    <el-divider class="margin-top-bottom-10"/>
     <template>
       <div class="margin-top-bottom-10 margin-left-25">
         <el-button type="success" @click="openDrawer(false)">创建用户</el-button>
@@ -38,22 +38,22 @@
         :data="tableData"
         style="width: 100%"
       >
-        <el-table-column label="昵称" prop="nickname" />
-        <el-table-column label="姓名" prop="username" />
+        <el-table-column label="昵称" prop="nickname"/>
+        <el-table-column label="姓名" prop="username"/>
         <el-table-column label="角色" prop="roles">
           <template v-slot="{row:{roles}}">
             {{ roles.map(ele => ele.itemValue) }}
           </template>
         </el-table-column>
-        <el-table-column label="邮箱" prop="email" />
-        <el-table-column label="电话" prop="phone" />
-        <el-table-column label="个人简介" prop="description" />
+        <el-table-column label="邮箱" prop="email"/>
+        <el-table-column label="电话" prop="phone"/>
+        <el-table-column label="个人简介" prop="description"/>
         <el-table-column label="性别">
           <template v-slot="{row: {gex}}">
             {{ mapDictItemValue('genderStatus', gex) }}
           </template>
         </el-table-column>
-        <el-table-column label="创建时间" prop="createTimeStr" />
+        <el-table-column label="创建时间" prop="createTimeStr"/>
         <el-table-column label="操作" width="250px" align="center">
           <template v-slot="props">
             <el-button type="primary" @click="assignRolesToUser(props)">分配角色</el-button>
@@ -79,12 +79,14 @@
       direction="rtl"
     >
       <div class="scroll-view">
-        <el-form size="small" :model="drawerDialogData" :rules="rules" class="search-form" style="padding: 10px" label-width="75px" label-position="left">
+        <el-form ref="formRef" size="small" :model="drawerDialogData" :rules="rules" class="search-form"
+                 style="padding: 10px" label-width="75px" label-position="left"
+        >
           <el-form-item label="用户名" prop="username">
-            <el-input v-model="drawerDialogData.username" placeholder="请输入用户名" clearable />
+            <el-input v-model="drawerDialogData.username" placeholder="请输入用户名" clearable/>
           </el-form-item>
           <el-form-item label="昵称" prop="nickname">
-            <el-input v-model="drawerDialogData.nickname" placeholder="请输入昵称" clearable />
+            <el-input v-model="drawerDialogData.nickname" placeholder="请输入昵称" clearable/>
           </el-form-item>
           <el-form-item label="个人简介">
             <el-input
@@ -99,16 +101,18 @@
             />
           </el-form-item>
           <el-form-item label="email" prop="email">
-            <el-input v-model="drawerDialogData.email" placeholder="请输入邮箱信息" clearable />
+            <el-input v-model="drawerDialogData.email" placeholder="请输入邮箱信息" clearable/>
           </el-form-item>
           <el-form-item label="密码" prop="password">
-            <el-input show-password type="password" v-model="drawerDialogData.password" placeholder="请输入密码信息" clearable />
+            <el-input v-model="drawerDialogData.password" type="password" show-password  placeholder="请输入密码信息"
+                      clearable
+            />
           </el-form-item>
-          <el-form-item label="phone">
-            <el-input v-model="drawerDialogData.phone" placeholder="请输入手机号码" clearable />
+          <el-form-item label="phone" prop="phone">
+            <el-input v-model="drawerDialogData.phone" placeholder="请输入手机号码" clearable/>
           </el-form-item>
           <el-form-item label="性别">
-            <el-select style="width: 100%" v-model="drawerDialogData.gex" placeholder="请选择性别" clearable >
+            <el-select style="width: 100%" v-model="drawerDialogData.gex" placeholder="请选择性别" clearable>
               <el-option
                 v-for="({itemType,itemValue,id}) in genderStatus"
                 :key="itemType"
@@ -151,8 +155,8 @@
         @select-all="configUserRoles"
         @select="configUserRoles"
       >
-        <el-table-column type="selection" :reserve-selection="true" />
-        <el-table-column label="角色" prop="itemValue" align="center" />
+        <el-table-column type="selection" :reserve-selection="true"/>
+        <el-table-column label="角色" prop="itemValue" align="center"/>
       </el-table>
     </el-dialog>
   </div>
@@ -175,6 +179,17 @@ export default {
       const verify = /^\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/
       if (!verify.test(value)) {
         callback(new Error('邮箱格式错误, 请重新输入'))
+      } else {
+        callback()
+      }
+    }
+    const validatePhone = (rule, value, callback) => {
+      if (value.length < 1) {
+        callback()
+      }
+      const verify = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
+      if (!verify.test(value)) {
+        callback(new Error('请输入正确手机号'))
       } else {
         callback()
       }
@@ -214,6 +229,7 @@ export default {
         password: [{ required: true, trigger: 'blur', message: '请输入用户密码' }],
         nickname: [{ required: true, trigger: 'blur', message: '请输入用户昵称' }],
         email: [{ required: true, trigger: 'blur', validator: validateEmail }],
+        phone: [{ required: false, trigger: 'blur', validator: validatePhone }]
       }
     }
   },
@@ -252,7 +268,7 @@ export default {
           if (!this.currentToggleRoleIds.includes(ele.id)) {
             this.$refs.assignedRoles.toggleRowSelection(ele)
             // 设置正确绑定
-            this.currentToggleRoleIds = [... this.currentToggleRoleIds, ele.id]
+            this.currentToggleRoleIds = [...this.currentToggleRoleIds, ele.id]
           }
         })
       })
@@ -262,22 +278,26 @@ export default {
       this.roleForm.disabled = !(selection.length > 0)
     },
     saveUser() {
-      if (!this.drawerAction) {
-        this.registerUser(this.drawerDialogData).then(() => {
-          this.$message.success('注册成功 !!!')
-          this.getDataFunc()
-        })
-      } else {
-        this.updateUser(this.drawerDialogData).then(() => {
-          this.$message.success('更新成功 !!!')
-          this.getDataFunc()
-        })
-      }
+      this.$refs.formRef.validate(valid => {
+        if (valid) {
+          if (!this.drawerAction) {
+            this.registerUser(this.drawerDialogData).then(() => {
+              this.$message.success('注册成功 !!!')
+              this.getDataFunc()
+            })
+          } else {
+            this.updateUser(this.drawerDialogData).then(() => {
+              this.$message.success('更新成功 !!!')
+              this.getDataFunc()
+            })
+          }
+        }
+      })
     },
     subUserWithRoles() {
       // 提交完毕之后,清理表单 ...
       this.updateRoleForUser({
-        ... this.roleForm.data,
+        ...this.roleForm.data,
         // 更新角色信息
         roleIds: this.roleForm.data.roles.map(ele => ele.id)
       }).then(() => {
@@ -311,7 +331,7 @@ export default {
       }
       this.drawerFlag = true
     },
-    deleteDialogHandle({ row: { id, username }}) {
+    deleteDialogHandle({ row: { id, username } }) {
       this.$confirm(`确定删除用户${username}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
