@@ -5,7 +5,9 @@
       <breadcrumb/>
     </div>
     <div class="navbar-right">
-      <div class="roles-list"><span v-for="(item) in userInfo.roles" :key="item.id">{{item.itemValue }}</span></div>
+      <template v-if="userInfo.roles">
+        <div class="roles-list"><span v-for="(item) in userInfo.roles" :key="item.id">{{item.itemValue }}</span></div>
+      </template>
       <div class="right-menu">
         <el-dropdown class="avatar-container" trigger="click">
           <div class="avatar-wrapper">
