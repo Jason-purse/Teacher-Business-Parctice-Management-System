@@ -1,27 +1,29 @@
 <template>
   <div class="navbar">
-    <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-
-    <breadcrumb class="breadcrumb-container" />
-
-    <div class="right-menu">
-      <el-dropdown class="avatar-container" trigger="click">
-        <div class="avatar-wrapper">
-          <!--          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">-->
-          <el-avatar class="sub-title" icon="el-icon-user-solid" />
-          <i class="el-icon-caret-bottom" />
-        </div>
-        <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <el-dropdown-item>
-            <div @click="drawerVisable = !drawerVisable;">个人主页</div>
-          </el-dropdown-item>
-          <el-dropdown-item divided @click.native="logout">
-            <span style="display:block;">退出登录</span>
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+    <div class="navbar-left">
+      <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
+      <breadcrumb/>
     </div>
-
+    <div class="navbar-right">
+      <div class="roles-list"><span v-for="(item) in userInfo.roles" :key="item.id">{{item.itemValue }}</span></div>
+      <div class="right-menu">
+        <el-dropdown class="avatar-container" trigger="click">
+          <div class="avatar-wrapper">
+            <!--          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">-->
+            <el-avatar class="sub-title" icon="el-icon-user-solid" />
+            <i class="el-icon-caret-bottom" />
+          </div>
+          <el-dropdown-menu slot="dropdown" class="user-dropdown">
+            <el-dropdown-item>
+              <div @click="drawerVisable = !drawerVisable;">个人主页</div>
+            </el-dropdown-item>
+            <el-dropdown-item divided @click.native="logout">
+              <span style="display:block;">退出登录</span>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </div>
+    </div>
     <el-drawer
       title="个人主页"
       :visible.sync="drawerVisable"
@@ -148,6 +150,8 @@ export default {
 
 <style lang="scss" scoped>
 .navbar {
+  display: flex;
+  justify-content: space-between;
   height: 50px;
   overflow: hidden;
   position: relative;
@@ -167,12 +171,23 @@ export default {
     }
   }
 
-  .breadcrumb-container {
-    float: left;
+  .navbar-right {
+    display: flex;
+    align-items: center;
+    .roles-list {
+      font-size: 14px;
+      color: #fff;
+      span {
+        padding:8px;
+        margin-right: 5px;
+        border-radius: 15px;
+        background: #409eff;
+      }
+    }
   }
 
   .right-menu {
-    float: right;
+    //float: right;
     height: 100%;
     line-height: 50px;
 
