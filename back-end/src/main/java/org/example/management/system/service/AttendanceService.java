@@ -1,5 +1,6 @@
 package org.example.management.system.service;
 
+import com.generatera.security.authorization.server.specification.LightningUserContext;
 import com.jianyue.lightning.boot.starter.util.BeanUtils;
 import com.jianyue.lightning.boot.starter.util.ElvisUtil;
 import com.jianyue.lightning.boot.starter.util.OptionalFlux;
@@ -7,8 +8,11 @@ import com.jianyue.lightning.boot.starter.util.StreamUtil;
 import com.jianyue.lightning.boot.starter.util.lambda.LambdaUtils;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.example.management.system.model.constant.DictConstant;
 import org.example.management.system.model.entity.Attendance;
+import org.example.management.system.model.entity.Dict;
 import org.example.management.system.model.param.AttendanceParam;
+import org.example.management.system.model.security.SimpleUserPrincipal;
 import org.example.management.system.model.vo.AttendanceVo;
 import org.example.management.system.repository.AttendanceRepository;
 import org.example.management.system.utils.DateTimeUtils;
@@ -42,6 +46,8 @@ public class AttendanceService {
 
 
     private final AttendanceRepository attendanceRepository;
+
+    private final RoleService roleService;
 
     /**
      * 获取打卡详情 !!!
@@ -93,9 +99,26 @@ public class AttendanceService {
      */
     public Page<AttendanceVo> getAttendanceInfosByPage(AttendanceParam attendanceParam, Pageable pageable) {
 
+        LightningUserContext.get().getUserPrincipal(SimpleUserPrincipal.class)
+                .ifPresent(ele -> {
+                    boolean status = false;
+                    List<Dict> userRoles = roleService.getUserRoles(ele.getUser().getId());
+                    for (Dict userRole : userRoles) {
+                        if(userRole.getItemType().equals(DictConstant.ROLE_ADMIN_TYPE)) {
+                            status = true;
+                            break;
+                        }
+                    }
+                    // 非管理员
+                    if(!status) {
+                        attendanceParam.setUserId(ele.getUser().getId());
+                    }
+                });
+
         Page<Attendance> all = attendanceRepository
                 .findAll(
                         new ComplexSpecification(
+                                attendanceParam.getUserId(),
                                 attendanceParam.getUsername(),
                                 attendanceParam.getStartTimeAt(),
                                 attendanceParam.getEndTimeAt()),
@@ -125,6 +148,8 @@ public class AttendanceService {
     @AllArgsConstructor
     class ComplexSpecification implements Specification<Attendance> {
 
+        private Integer userId;
+
         private String username;
 
         private Long startTimeAt;
@@ -135,40 +160,48 @@ public class AttendanceService {
         @Override
         public Predicate toPredicate(@NotNull Root<Attendance> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder criteriaBuilder) {
 
-            return OptionalFlux.of(ElvisUtil.stringElvis(username,null))
-                    .map(userName -> {
-                        Path<String> path = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getUsername));
-                        return criteriaBuilder.like(path, EscapeUtil.escapeExprSpecialWord(username).concat("%"));
-                    })
-                    .combine(
-                            OptionalFlux
-                                    .of(startTimeAt)
-                                    .<Predicate>map(
-                                            start -> {
-                                                Path<Long> creatAt = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getCreateAt));
-                                                return OptionalFlux
-                                                        .of(endTimeAt)
-                                                        .map(end -> criteriaBuilder.between(creatAt, start, end))
-                                                        .orElse(() -> criteriaBuilder.greaterThanOrEqualTo(creatAt, start))
-                                                        .getResult();
-                                            }
-                                    )
-                                    .orElse(
-                                            () ->
-                                                    OptionalFlux
-                                                            .of(endTimeAt)
-                                                            .map(
-                                                                    end -> {
-                                                                        Path<Long> creatAt = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getCreateAt));
-                                                                        return criteriaBuilder.lessThanOrEqualTo(creatAt, endTimeAt);
-                                                                    }
-                                                            )
-                                                            .getResult()
+            return
+                    OptionalFlux.of(userId)
+                            .map(id -> {
+                                Path<Integer> idPath = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getId));
+                                return criteriaBuilder.equal(idPath, id);
+                            })
+                            .orElseFlattenTo(() -> {
+                                return OptionalFlux.stringOrNull(username)
+                                        .map(userName -> {
+                                            Path<String> path = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getUsername));
+                                            return criteriaBuilder.like(path, EscapeUtil.escapeExprSpecialWord(username).concat("%"));
+                                        });
+                            })
+                            .combine(
+                                    OptionalFlux
+                                            .of(startTimeAt)
+                                            .<Predicate>map(
+                                                    start -> {
+                                                        Path<Long> creatAt = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getCreateAt));
+                                                        return OptionalFlux
+                                                                .of(endTimeAt)
+                                                                .map(end -> criteriaBuilder.between(creatAt, start, end))
+                                                                .orElse(() -> criteriaBuilder.greaterThanOrEqualTo(creatAt, start))
+                                                                .getResult();
+                                                    }
+                                            )
+                                            .orElse(
+                                                    () ->
+                                                            OptionalFlux
+                                                                    .of(endTimeAt)
+                                                                    .map(
+                                                                            end -> {
+                                                                                Path<Long> creatAt = root.get(LambdaUtils.getPropertyNameForLambda(Attendance::getCreateAt));
+                                                                                return criteriaBuilder.lessThanOrEqualTo(creatAt, endTimeAt);
+                                                                            }
+                                                                    )
+                                                                    .getResult()
 
 
-                                    ),
-                            criteriaBuilder::and
-                    ).getResult();
+                                            ),
+                                    criteriaBuilder::and
+                            ).getResult();
         }
     }
 

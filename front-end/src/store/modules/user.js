@@ -38,7 +38,6 @@ const mutations = {
     state.avatar = avatar
   },
   SET_USERINFO: (state, userInfo) => {
-    console.log(userInfo, 'state')
     state.userInfo = userInfo
   }
 }

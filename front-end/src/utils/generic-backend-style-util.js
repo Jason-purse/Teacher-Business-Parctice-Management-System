@@ -5,7 +5,7 @@
  * 以及表格分页处理 ...
  */
 
-const validTimeRange = function(identity, form = 'searchForm') {
+const validTimeRange = function (identity, form = 'searchForm') {
   let searchForm = this[form]
   if (typeof form === 'object') {
     searchForm = form

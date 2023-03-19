@@ -25,6 +25,10 @@ public class AttachmentVo {
 
     private Integer mediaType;
 
+    private String projectName;
+
+    private String reportName;
+
     /**
      * 报告关联数量
      */

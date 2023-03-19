@@ -84,6 +84,8 @@ public class ReportService {
         value.setCreateTimeStr(DateTimeUtils.getTimeStr(now));
         value.setUpdateAt(value.getCreateAt());
         value.setUpdateTimeStr(value.getCreateTimeStr());
+        // 设置项目名称
+        value.setProjectName(project.get().getName());
         // 设置状态
         value.setStatus(dictService.getFirstAuditStatus().getId());
         value.setFinished(false);
@@ -158,6 +160,8 @@ public class ReportService {
                     ele.setReportUrlStr(attachment.getFileUrl());
                     ele.setMediaType(attachment.getMediaType());
 
+                    // 设置文件名
+                    ele.setReportFileName(attachment.getFileName());
                     // 设置文件格式 ...
                     List<Dict> dict = dictService.getDictItemsBy(DictConstant.REPORT_FORMAT);
                     Map<String, Integer> map = dict.stream().collect(Collectors.toMap(Dict::getItemType, Dict::getId));

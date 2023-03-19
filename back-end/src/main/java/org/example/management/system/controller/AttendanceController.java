@@ -3,6 +3,7 @@ package org.example.management.system.controller;
 import com.generatera.security.authorization.server.specification.LightningUserContext;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
+import org.example.management.system.MYLightningUserPrincipal;
 import org.example.management.system.model.param.AttendanceParam;
 import org.example.management.system.model.security.SimpleUserPrincipal;
 import org.example.management.system.model.vo.AttendanceVo;

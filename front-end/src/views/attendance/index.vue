@@ -3,7 +3,7 @@
   <div>
     <div class="search-line">
       <el-form :inline="true" :model="searchForm" class="search-form" @keydown.enter.native="onSubmit">
-        <el-form-item label="用户名称">
+        <el-form-item v-if="isAdmin()" label="用户名称">
           <el-input v-model="searchForm.username" placeholder="请输入用户名称" clearable />
         </el-form-item>
         <el-form-item label="开始时间">
@@ -61,6 +61,8 @@
 import { throttle } from '@/utils/throttle'
 import backendStyle from '@/utils/generic-backend-style-util'
 import attendanceApi from '@/api/attendance'
+import userApi from '@/api/user'
+import {mapState} from "vuex";
 
 export default {
   name: 'Index',
@@ -81,6 +83,8 @@ export default {
   methods: {
     ...backendStyle.methods,
     ...attendanceApi.methods,
+    isAdmin: userApi.methods.isAdmin,
+    ...mapState('user',['userInfo']),
     deleteAttachment() {
       this.$throttle(() => {
         this.$message.warning('删除动作触发!!')

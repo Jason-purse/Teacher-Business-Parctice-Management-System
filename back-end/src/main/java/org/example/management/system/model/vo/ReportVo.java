@@ -22,6 +22,8 @@ public class ReportVo {
      */
     private String reportUrlStr;
 
+    private String reportFileName;
+
     /**
      * media type
      */

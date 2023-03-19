@@ -111,17 +111,20 @@ public class AttachmentService {
 
         Page<Attachment> all = attachmentRepository.findAll(specification, pageable);
         if (all.hasContent()) {
-            List<Integer> attachmentIds = new ArrayList<>();
+            List<Integer> attachmentIds = all.getContent().stream().map(Attachment::getId).distinct().toList();
             List<Report> reports = reportRepository.findAll(
                     new CollectionSpecification<>(LambdaUtils.getPropertyNameForLambda(Report::getReportUrlId), attachmentIds));
             Map<Integer, List<Report>> map = ElvisUtil.acquireNotNullList_Empty(reports)
                     .stream().collect(Collectors.groupingBy(Report::getReportUrlId, Collectors.toList()));
 
-            return new PageImpl<>(all.getContent().stream().peek(ele -> {
-                attachmentIds.add(ele.getId());
-            }).map(BeanUtils.transformFrom(AttachmentVo.class)).peek(ele -> {
+            return new PageImpl<>(all.getContent().stream().map(BeanUtils.transformFrom(AttachmentVo.class)).peek(ele -> {
                 List<Report> list = map.get(ele.getId());
                 ele.setReportRRCount(list != null ? list.size() : 0);
+                if(list != null && list.size() > 0) {
+                    Report report = list.get(0);
+                    ele.setReportName(report.getReportName());
+                    ele.setProjectName(report.getProjectName());
+                }
             }).toList(), all.getPageable(), all.getTotalElements());
         }
         return new PageImpl<>(Collections.emptyList(), pageable, all.getTotalElements());
