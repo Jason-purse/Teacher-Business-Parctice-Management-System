@@ -60,6 +60,7 @@ service.interceptors.response.use(
             messageDialog.close()
           }
 
+
           messageDialog = Message({
             message: res.message || 'Error',
             type: 'error',
