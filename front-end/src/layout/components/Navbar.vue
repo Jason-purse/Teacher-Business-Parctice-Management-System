@@ -2,11 +2,15 @@
   <div class="navbar">
     <div class="navbar-left">
       <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-      <breadcrumb/>
+      <breadcrumb />
     </div>
     <div class="navbar-right">
-      <template v-if="userInfo.roles">
-        <div class="roles-list"><span v-for="(item) in userInfo.roles" :key="item.id">{{item.itemValue }}</span></div>
+      <template v-if="currentUserInfo_temp.roles">
+        <div v-if="isAdmin()" class="roles-list">
+          <span>{{ currentUserInfo_temp.roles.filter(ele => ele.itemType === 'admin')[0].itemValue }}</span>
+        </div>
+        <div v-else class="roles-list"><span v-for="(item) in currentUserInfo_temp.roles" :key="item.id">{{ item.itemValue }}</span>
+        </div>
       </template>
       <div class="right-menu">
         <el-dropdown class="avatar-container" trigger="click">
@@ -38,24 +42,24 @@
         <el-button v-if="isEdit" type="warning" size="mini" @click="isEdit = false">取消</el-button>
         <el-form ref="form" :model="formInfo" label-width="50px" style="margin-top: 10px" :rules="rules">
           <el-form-item label="姓名">
-            <div>{{ userInfo.username }}</div>
+            <div>{{ currentUserInfo_temp.username }}</div>
           </el-form-item>
           <el-form-item label="昵称" prop="nickname">
-            <div v-if="!isEdit">{{ userInfo.nickname ? userInfo.nickname : '暂无' }}</div>
+            <div v-if="!isEdit">{{ currentUserInfo_temp.nickname ? currentUserInfo_temp.nickname : '暂无' }}</div>
             <el-input v-else v-model="formInfo.nickname" size="small" clearable />
           </el-form-item>
           <el-form-item label="手机" prop="phone">
-            <div v-if="!isEdit">{{ userInfo.phone ? userInfo.phone : '暂无' }}</div>
+            <div v-if="!isEdit">{{ currentUserInfo_temp.phone ? currentUserInfo_temp.phone : '暂无' }}</div>
             <el-input v-else v-model="formInfo.phone" size="small" clearable />
           </el-form-item>
           <el-form-item label="简介" prop="description">
-            <div v-if="!isEdit">{{ userInfo.description ? userInfo.description : '暂无' }}</div>
+            <div v-if="!isEdit">{{ currentUserInfo_temp.description ? currentUserInfo_temp.description : '暂无' }}</div>
             <el-input v-else v-model="formInfo.description" size="small" clearable />
           </el-form-item>
           <el-form-item label="性别" prop="gex">
             <div v-if="!isEdit">
               <template>
-                {{ userInfo.gex ? mapDictItemValue('genderStatus',userInfo.gex ): '暂无' }}
+                {{ currentUserInfo_temp.gex ? mapDictItemValue('genderStatus', currentUserInfo_temp.gex) : '暂无' }}
               </template>
             </div>
             <el-select v-else v-model="formInfo.gex" size="small" placeholder="请选择性别" clearable>
@@ -63,7 +67,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="邮箱">
-            <div>{{ userInfo.email ? userInfo.email : '暂无' }}</div>
+            <div>{{ currentUserInfo_temp.email ? currentUserInfo_temp.email : '暂无' }}</div>
           </el-form-item>
         </el-form>
       </div>
@@ -72,7 +76,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import user from '@/api/user'
@@ -97,7 +101,7 @@ export default {
     }
     return {
       drawerVisable: false,
-      userInfo: {},
+      currentUserInfo_temp: {},
       formInfo: {},
       isEdit: false,
       ...dict.data(),
@@ -122,6 +126,7 @@ export default {
   methods: {
     ...user.methods,
     ...dict.methods,
+    ...mapState('user', ['userInfo']),
     ...mapMutations('user', ['SET_USERINFO']),
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
@@ -134,7 +139,7 @@ export default {
     getInfo() {
       this.getCurrentUserInfo().then(res => {
         if (res.code === 200) {
-          this.userInfo = res.result
+          this.currentUserInfo_temp = res.result
           this.formInfo = { ...res.result }
           this.SET_USERINFO({ ...res.result })
         }
@@ -176,11 +181,13 @@ export default {
   .navbar-right {
     display: flex;
     align-items: center;
+
     .roles-list {
       font-size: 14px;
       color: #fff;
+
       span {
-        padding:8px;
+        padding: 8px;
         margin-right: 5px;
         border-radius: 15px;
         background: #409eff;

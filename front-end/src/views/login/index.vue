@@ -3,7 +3,7 @@
     <div class="login-container">
       <div class="login-pic">
         <img src="./images/bg.png">
-        <div class="title">教师企业实战管理</div>
+        <div class="title">教师企业实践管理</div>
       </div>
       <div class="login-form">
         <div class="tab-box">

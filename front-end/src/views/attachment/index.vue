@@ -4,11 +4,11 @@
     <div class="search-line">
       <el-form :inline="true" :model="searchForm" class="search-form" @keydown.enter.native="onSubmit">
         <el-form-item label="附件名称" prop="fileName">
-          <el-input v-model="searchForm.fileName" placeholder="请输入附件名称"/>
+          <el-input v-model="searchForm.fileName" placeholder="请输入附件名称" />
         </el-form-item>
         <el-form-item label="文件类型" prop="mediaType">
           <el-select v-model="searchForm.mediaType" placeholder="请选择文件类型" clearable>
-            <el-option v-for="({itemValue,id}) in mediaType" :key="id" :label="itemValue" :value="id"/>
+            <el-option v-for="({itemValue,id}) in mediaType" :key="id" :label="itemValue" :value="id" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -24,13 +24,13 @@
         class="table-content"
         row-key="id"
       >
-        <el-table-column type="selection" align="center"/>
-        <el-table-column type="index" label="序号" align="center"/>
-        <el-table-column label="名称" prop="fileName" align="center"/>
-        <el-table-column label="类型" prop="mediaType" align="center"/>
-        <el-table-column label="创建时间" prop="createTimeStr" align="center"/>
-        <el-table-column label="所属项目" prop="projectName" align="center"/>
-        <el-table-column label="所属报告" prop="reportName" align="center"/>
+        <el-table-column type="selection" align="center" />
+        <el-table-column type="index" label="序号" align="center" />
+        <el-table-column label="名称" prop="fileName" align="center" />
+        <el-table-column label="类型" prop="mediaType" align="center" />
+        <el-table-column label="创建时间" prop="createTimeStr" align="center" />
+        <el-table-column label="所属项目" prop="projectName" align="center" />
+        <el-table-column label="所属报告" prop="reportName" align="center" />
         <el-table-column label="文件类型" prop="identifier" align="center">
           <template v-slot="{row: {mediaType}}">
             {{ mapDictItemValue('mediaType', mediaType) }}
@@ -38,7 +38,12 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template v-slot="{row}">
-            <el-button :disabled="row.reportRRCount && row.reportRRCount > 0" type="danger" size="small" @click="deleteAttachmentAction(row)">
+            <el-button
+              :disabled="(row.reportRRCount || 0) > 0 || false"
+              type="danger"
+              size="small"
+              @click="deleteAttachmentAction(row)"
+            >
               删除
             </el-button>
           </template>
@@ -87,7 +92,7 @@ export default {
     ...attachment.methods,
     ...dict.methods,
     deleteAttachmentAction(row) {
-      const {id} = row
+      const { id } = row
       this.$confirm(`确定删除此附件${name}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -106,7 +111,7 @@ export default {
       })
     },
     getDataFunc() {
-      return this.getAllAttachmentByPage(this.getSearchform(), this.pager).then(({result}) => {
+      return this.getAllAttachmentByPage(this.getSearchform(), this.pager).then(({ result }) => {
         this.tableData = result.content.map((ele, index) => {
           ele.index = index
           return ele

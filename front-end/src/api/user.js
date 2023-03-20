@@ -69,7 +69,7 @@ export default {
       return request.get(apiEndpoints.getCurrentUserInfoUrl)
     },
     isAdmin() {
-      return this.userInfo().roles?.filter(ele => ele.itemType === 'admin').length > 0
+      return this.userInfo && this.userInfo().roles?.filter(ele => ele.itemType === 'admin').length > 0
     }
   }
 }

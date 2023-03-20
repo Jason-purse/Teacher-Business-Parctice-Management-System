@@ -4,7 +4,7 @@
     <div class="search-line">
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="用户名称">
-          <el-input v-model="searchForm.username" placeholder="请输入用户名称" clearable/>
+          <el-input v-model="searchForm.username" placeholder="请输入用户名称" clearable />
         </el-form-item>
         <el-form-item label="注册时间">
           <el-date-picker
@@ -29,7 +29,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <el-divider class="margin-top-bottom-10"/>
+    <el-divider class="margin-top-bottom-10" />
     <template>
       <div class="margin-top-bottom-10 margin-left-25">
         <el-button type="success" @click="openDrawer(false)">创建用户</el-button>
@@ -38,22 +38,22 @@
         :data="tableData"
         style="width: 100%"
       >
-        <el-table-column label="昵称" prop="nickname"/>
-        <el-table-column label="姓名" prop="username"/>
+        <el-table-column label="昵称" prop="nickname" />
+        <el-table-column label="姓名" prop="username" />
         <el-table-column label="角色" prop="roles">
           <template v-slot="{row:{roles}}">
             {{ roles.map(ele => ele.itemValue) }}
           </template>
         </el-table-column>
-        <el-table-column label="邮箱" prop="email"/>
-        <el-table-column label="电话" prop="phone"/>
-        <el-table-column label="个人简介" prop="description"/>
+        <el-table-column label="邮箱" prop="email" />
+        <el-table-column label="电话" prop="phone" />
+        <el-table-column label="个人简介" prop="description" />
         <el-table-column label="性别">
           <template v-slot="{row: {gex}}">
             {{ mapDictItemValue('genderStatus', gex) }}
           </template>
         </el-table-column>
-        <el-table-column label="创建时间" prop="createTimeStr"/>
+        <el-table-column label="创建时间" prop="createTimeStr" />
         <el-table-column label="操作" width="250px" align="center">
           <template v-slot="props">
             <el-button type="primary" @click="assignRolesToUser(props)">分配角色</el-button>
@@ -79,14 +79,21 @@
       direction="rtl"
     >
       <div class="scroll-view">
-        <el-form ref="formRef" size="small" :model="drawerDialogData" :rules="rules" class="search-form"
-                 style="padding: 10px" label-width="75px" label-position="left"
+        <el-form
+          ref="formRef"
+          size="small"
+          :model="drawerDialogData"
+          :rules="rules"
+          class="search-form"
+          style="padding: 10px"
+          label-width="75px"
+          label-position="left"
         >
           <el-form-item label="用户名" prop="username">
-            <el-input v-model="drawerDialogData.username" placeholder="请输入用户名" clearable/>
+            <el-input v-model="drawerDialogData.username" placeholder="请输入用户名" clearable />
           </el-form-item>
           <el-form-item label="昵称" prop="nickname">
-            <el-input v-model="drawerDialogData.nickname" placeholder="请输入昵称" clearable/>
+            <el-input v-model="drawerDialogData.nickname" placeholder="请输入昵称" clearable />
           </el-form-item>
           <el-form-item label="个人简介">
             <el-input
@@ -101,18 +108,22 @@
             />
           </el-form-item>
           <el-form-item label="email" prop="email">
-            <el-input v-model="drawerDialogData.email" placeholder="请输入邮箱信息" clearable/>
+            <el-input v-model="drawerDialogData.email" placeholder="请输入邮箱信息" clearable />
           </el-form-item>
           <el-form-item label="密码" prop="password">
-            <el-input v-model="drawerDialogData.password" type="password" show-password  placeholder="请输入密码信息"
-                      clearable
+            <el-input
+              v-model="drawerDialogData.password"
+              type="password"
+              show-password
+              placeholder="请输入密码信息"
+              clearable
             />
           </el-form-item>
           <el-form-item label="phone" prop="phone">
-            <el-input v-model="drawerDialogData.phone" placeholder="请输入手机号码" clearable/>
+            <el-input v-model="drawerDialogData.phone" placeholder="请输入手机号码" clearable />
           </el-form-item>
           <el-form-item label="性别">
-            <el-select style="width: 100%" v-model="drawerDialogData.gex" placeholder="请选择性别" clearable>
+            <el-select v-model="drawerDialogData.gex" style="width: 100%" placeholder="请选择性别" clearable>
               <el-option
                 v-for="({itemType,itemValue,id}) in genderStatus"
                 :key="itemType"
@@ -155,8 +166,8 @@
         @select-all="configUserRoles"
         @select="configUserRoles"
       >
-        <el-table-column type="selection" :reserve-selection="true"/>
-        <el-table-column label="角色" prop="itemValue" align="center"/>
+        <el-table-column type="selection" :reserve-selection="true" />
+        <el-table-column label="角色" prop="itemValue" align="center" />
       </el-table>
     </el-dialog>
   </div>
@@ -331,7 +342,7 @@ export default {
       }
       this.drawerFlag = true
     },
-    deleteDialogHandle({ row: { id, username } }) {
+    deleteDialogHandle({ row: { id, username }}) {
       this.$confirm(`确定删除用户${username}?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
